@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".NavbarActivity">
+
+    <com.google.android.flexbox.FlexboxLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <com.google.android.flexbox.FlexboxLayout
+            android:id="@+id/toDown"
+            app:layout_flexGrow="1"
+            app:flexDirection="column"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+            <com.google.android.flexbox.FlexboxLayout
+                app:justifyContent="center"
+                app:alignItems="center"
+                android:layout_width="match_parent"
+                android:layout_height="28dp">
+                <ImageView
+                    android:id="@+id/downImg"
+                    android:layout_marginTop="6dp"
+                    android:src="@drawable/down"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp" />
+            </com.google.android.flexbox.FlexboxLayout>
+            <com.google.android.flexbox.FlexboxLayout
+                app:justifyContent="center"
+                app:alignItems="center"
+                android:layout_width="match_parent"
+                android:layout_height="22dp">
+                <TextView
+                    android:id="@+id/downText"
+                    android:text="下载"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </com.google.android.flexbox.FlexboxLayout>
+        </com.google.android.flexbox.FlexboxLayout>
+        <com.google.android.flexbox.FlexboxLayout
+            android:id="@+id/toPack"
+            app:layout_flexGrow="1"
+            app:flexDirection="column"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+            <com.google.android.flexbox.FlexboxLayout
+                app:justifyContent="center"
+                app:alignItems="center"
+                android:layout_width="match_parent"
+                android:layout_height="28dp">
+                <ImageView
+                    android:id="@+id/packImg"
+                    android:layout_marginTop="6dp"
+                    android:src="@drawable/dabao"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp" />
+            </com.google.android.flexbox.FlexboxLayout>
+            <com.google.android.flexbox.FlexboxLayout
+                app:justifyContent="center"
+                app:alignItems="center"
+                android:layout_width="match_parent"
+                android:layout_height="22dp">
+                <TextView
+                    android:id="@+id/filepack"
+                    android:text="打包"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </com.google.android.flexbox.FlexboxLayout>
+        </com.google.android.flexbox.FlexboxLayout>
+        <com.google.android.flexbox.FlexboxLayout
+            android:id="@+id/upload"
+            app:layout_flexGrow="1"
+            app:flexDirection="column"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+            <com.google.android.flexbox.FlexboxLayout
+                app:justifyContent="center"
+                app:alignItems="center"
+                android:layout_width="match_parent"
+                android:layout_height="28dp">
+                <ImageView
+                    android:id="@+id/uploadimg"
+                    android:layout_marginTop="6dp"
+                    android:src="@drawable/ic_fileupload_upload"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp" />
+            </com.google.android.flexbox.FlexboxLayout>
+            <com.google.android.flexbox.FlexboxLayout
+                app:justifyContent="center"
+                app:alignItems="center"
+                android:layout_width="match_parent"
+                android:layout_height="22dp">
+                <TextView
+                    android:id="@+id/uploadtext"
+                    android:text="上传"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </com.google.android.flexbox.FlexboxLayout>
+        </com.google.android.flexbox.FlexboxLayout>
+        <com.google.android.flexbox.FlexboxLayout
+            android:id="@+id/toSystem"
+            app:layout_flexGrow="1"
+            app:flexDirection="column"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+            <com.google.android.flexbox.FlexboxLayout
+                app:justifyContent="center"
+                app:alignItems="center"
+                android:layout_width="match_parent"
+                android:layout_height="28dp">
+                <ImageView
+                    android:id="@+id/systemImg"
+                    android:layout_marginTop="6dp"
+                    android:src="@drawable/persion"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp" />
+            </com.google.android.flexbox.FlexboxLayout>
+            <com.google.android.flexbox.FlexboxLayout
+                app:justifyContent="center"
+                app:alignItems="center"
+                android:layout_width="match_parent"
+                android:layout_height="22dp">
+                <TextView
+                    android:id="@+id/systemText"
+                    android:text="设置"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </com.google.android.flexbox.FlexboxLayout>
+        </com.google.android.flexbox.FlexboxLayout>
+    </com.google.android.flexbox.FlexboxLayout>
+
+</android.support.constraint.ConstraintLayout>

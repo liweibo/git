@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".SystemActivity">
+
+    <com.google.android.flexbox.FlexboxLayout
+        app:flexDirection="column"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:divider="@drawable/title"
+            android:showDividers="end"
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:layout_height="50dp">
+            <com.google.android.flexbox.FlexboxLayout
+                android:layout_width="match_parent"
+                android:layout_height="49dp">
+                <com.google.android.flexbox.FlexboxLayout
+                    app:layout_flexGrow="1"
+                    app:justifyContent="center"
+                    app:alignItems="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent">
+                    <TextView
+                        android:textSize="16dp"
+                        android:text="系统设置"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </com.google.android.flexbox.FlexboxLayout>
+            </com.google.android.flexbox.FlexboxLayout>
+        </LinearLayout>
+
+        <com.google.android.flexbox.FlexboxLayout
+            android:layout_margin="30dp"
+            app:alignItems="center"
+            app:flexDirection="column"
+            app:layout_flexGrow="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:divider="@drawable/title"
+                android:showDividers="end"
+                android:layout_width="match_parent"
+                android:orientation="vertical"
+                android:layout_height="50dp">
+                <com.google.android.flexbox.FlexboxLayout
+                    app:alignItems="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="49dp">
+                    <TextView
+                        app:layout_flexGrow="1"
+                        android:text="WIFI下自动上传文件"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                    <ImageView
+                        android:src="@drawable/kaiqi"
+                        android:layout_width="46dp"
+                        android:layout_height="wrap_content" />
+                </com.google.android.flexbox.FlexboxLayout>
+            </LinearLayout>
+            <LinearLayout
+                android:divider="@drawable/title"
+                android:showDividers="end"
+                android:layout_width="match_parent"
+                android:orientation="vertical"
+                android:layout_height="50dp">
+                <com.google.android.flexbox.FlexboxLayout
+                    app:alignItems="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="49dp">
+                    <TextView
+                        app:layout_flexGrow="1"
+                        android:text="4G下继续上传文件"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                    <ImageView
+                        android:src="@drawable/kaiqi"
+                        android:layout_width="46dp"
+                        android:layout_height="wrap_content" />
+                </com.google.android.flexbox.FlexboxLayout>
+            </LinearLayout>
+            <LinearLayout
+                android:divider="@drawable/title"
+                android:showDividers="end"
+                android:layout_width="match_parent"
+                android:orientation="vertical"
+                android:layout_height="50dp">
+                <com.google.android.flexbox.FlexboxLayout
+                    app:alignItems="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="49dp">
+                    <TextView
+                        app:layout_flexGrow="1"
+                        android:text="下载文件本地目录查看"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                    <ImageView
+                        android:layout_marginRight="10dp"
+                        android:src="@drawable/expandablelistview_indicator_up"
+                        android:layout_width="12dp"
+                        android:layout_height="wrap_content" />
+                </com.google.android.flexbox.FlexboxLayout>
+            </LinearLayout>
+            <LinearLayout
+                android:divider="@drawable/title"
+                android:showDividers="end"
+                android:layout_width="match_parent"
+                android:orientation="vertical"
+                android:layout_height="50dp">
+                <com.google.android.flexbox.FlexboxLayout
+                    app:alignItems="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="49dp">
+                    <TextView
+                        app:layout_flexGrow="1"
+                        android:text="车辆设备信息设置"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                    <ImageView
+                        android:layout_marginRight="10dp"
+                        android:src="@drawable/expandablelistview_indicator_up"
+                        android:layout_width="12dp"
+                        android:layout_height="wrap_content" />
+                </com.google.android.flexbox.FlexboxLayout>
+            </LinearLayout>
+            <LinearLayout
+                android:divider="@drawable/title"
+                android:showDividers="end"
+                android:layout_width="match_parent"
+                android:orientation="vertical"
+                android:layout_height="50dp">
+                <com.google.android.flexbox.FlexboxLayout
+                    app:alignItems="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="49dp">
+                    <TextView
+                        app:layout_flexGrow="1"
+                        android:text="已下载文件删除设置"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                    <Spinner
+                        android:background="@drawable/slider"
+                        app:layout_flexGrow="1"
+                        android:entries="@array/delteoptions"
+                        android:layout_marginLeft="10dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp">
+
+                    </Spinner>
+                </com.google.android.flexbox.FlexboxLayout>
+            </LinearLayout>
+        </com.google.android.flexbox.FlexboxLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:showDividers="beginning"
+            android:divider="@drawable/title"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            tools:ignore="MissingConstraints">
+            <include layout="@layout/navbar" android:id="@+id/systembar"></include>
+        </LinearLayout>
+    </com.google.android.flexbox.FlexboxLayout>
+
+</android.support.constraint.ConstraintLayout>

@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".HomeActivity">
+
+    <com.google.android.flexbox.FlexboxLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:flexDirection="column">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:divider="@drawable/title"
+            android:orientation="vertical"
+            android:showDividers="end">
+
+            <com.google.android.flexbox.FlexboxLayout
+                android:layout_width="match_parent"
+                android:layout_height="49dp">
+
+                <ImageView
+                    android:id="@+id/homeback"
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:layout_marginLeft="10dp"
+                    android:src="@drawable/ico_brawser_backwards_d" />
+
+                <com.google.android.flexbox.FlexboxLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    app:alignItems="center"
+                    app:justifyContent="center"
+                    app:layout_flexGrow="1">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="信息配置"
+                        android:textSize="16dp" />
+                </com.google.android.flexbox.FlexboxLayout>
+
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginRight="6dp"
+                    android:src="@drawable/ic_view_girdview" />
+            </com.google.android.flexbox.FlexboxLayout>
+        </LinearLayout>
+
+        <com.google.android.flexbox.FlexboxLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="50dp"
+            android:paddingTop="20dp"
+            android:paddingRight="50dp"
+            android:paddingBottom="20dp"
+            app:alignItems="center"
+            app:flexDirection="column"
+            app:layout_flexGrow="1">
+
+            <com.google.android.flexbox.FlexboxLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:alignItems="center">
+
+                <TextView
+                    android:layout_width="95dp"
+                    android:layout_height="wrap_content"
+                    android:text="车型"
+                    android:textSize="16dp" />
+
+                <cn.lognteng.editspinner.lteditspinner.LTEditSpinner
+                    android:id="@+id/edit_spinnerCheXing"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp">
+
+                </cn.lognteng.editspinner.lteditspinner.LTEditSpinner>
+            </com.google.android.flexbox.FlexboxLayout>
+
+            <com.google.android.flexbox.FlexboxLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                app:alignItems="center">
+
+                <TextView
+                    android:layout_width="95dp"
+                    android:layout_height="wrap_content"
+                    android:textSize="16dp" />
+
+                <cn.lognteng.editspinner.lteditspinner.LTEditSpinner
+                    android:id="@+id/edit_spinnerjuTiCheXing"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp">
+
+                </cn.lognteng.editspinner.lteditspinner.LTEditSpinner>
+            </com.google.android.flexbox.FlexboxLayout>
+
+            <com.google.android.flexbox.FlexboxLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                app:alignItems="center">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <TextView
+                        android:layout_width="95dp"
+                        android:layout_height="wrap_content"
+                        android:singleLine="true"
+                        android:text="车号"
+                        android:textSize="16dp" />
+
+                    <scut.carson_ho.diy_view.SuperEditText
+                        android:id="@+id/editext_chehao"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:textSize="12dp"
+                        app:cursor="@drawable/cursortest"
+                        app:delete_height="80"
+                        app:delete_width="80"
+                        app:delete_x="0"
+                        app:delete_y="0"
+                        app:ic_delete="@drawable/delete"
+                        app:ic_left_click="@drawable/ic_left_click"
+                        app:ic_left_unclick="@drawable/ic_left_unclick"
+                        app:left_height="0"
+                        app:left_width="0"
+                        app:left_x="0"
+                        app:left_y="0"
+
+
+                        app:lineColor_click="@color/colorfocus"
+                        app:lineColor_unclick="@color/colorDeafult"
+                        app:linePosition="1"
+
+                        />
+
+                    <ImageButton
+                        android:id="@+id/imagebtnCamera"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginRight="10dp"
+                        android:background="@drawable/camera" />
+
+                    <ImageButton
+                        android:id="@+id/imagebtnVoice"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginLeft="10dp"
+                        android:background="@drawable/voice"
+
+                        />
+                </LinearLayout>
+
+            </com.google.android.flexbox.FlexboxLayout>
+
+            <com.google.android.flexbox.FlexboxLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                app:alignItems="center">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                <TextView
+                    android:layout_width="95dp"
+                    android:layout_height="wrap_content"
+                    android:text="配属用户"
+                    android:textSize="16dp" />
+
+
+
+                <scut.carson_ho.diy_view.SuperEditText
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:textSize="12dp"
+                    app:cursor="@drawable/cursortest"
+
+                    app:delete_height="80"
+                    app:delete_width="80"
+                    app:delete_x="0"
+                    app:delete_y="0"
+                    app:ic_delete="@drawable/delete"
+                    app:ic_left_click="@drawable/ic_left_click"
+
+                    app:ic_left_unclick="@drawable/ic_left_unclick"
+                    app:left_height="0"
+                    app:left_width="0"
+                    app:left_x="0"
+                    app:left_y="0"
+
+
+                    app:lineColor_click="@color/colorfocus"
+                    app:lineColor_unclick="@color/colorDeafult"
+                    app:linePosition="1"
+
+                    />
+
+
+                <ImageButton
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginRight="10dp"
+                    android:background="@color/transparent" />
+
+                <ImageButton
+                    android:id="@+id/voicePeiShu"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginLeft="10dp"
+                    android:background="@drawable/voice" />
+                </LinearLayout>
+            </com.google.android.flexbox.FlexboxLayout>
+
+            <com.google.android.flexbox.FlexboxLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                app:alignItems="center">
+
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:text="车厢号"
+                    android:textSize="16dp" />
+
+                <cn.lognteng.editspinner.lteditspinner.LTEditSpinner
+                    android:id="@+id/edit_spinnerCheXingCheHao"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"></cn.lognteng.editspinner.lteditspinner.LTEditSpinner>
+            </com.google.android.flexbox.FlexboxLayout>
+
+            <com.google.android.flexbox.FlexboxLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:visibility="gone"
+                app:alignItems="center">
+
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:text="CMD"
+                    android:textSize="16dp" />
+
+                <cn.lognteng.editspinner.lteditspinner.LTEditSpinner
+                    android:id="@+id/edit_spinnerCheXingCheHaoCMD"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"></cn.lognteng.editspinner.lteditspinner.LTEditSpinner>
+            </com.google.android.flexbox.FlexboxLayout>
+
+            <com.google.android.flexbox.FlexboxLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                app:alignItems="center">
+
+                <TextView
+                    android:layout_width="95dp"
+                    android:layout_height="wrap_content"
+                    android:text="设备"
+                    android:textSize="16dp" />
+
+                <cn.lognteng.editspinner.lteditspinner.LTEditSpinner
+                    android:id="@+id/edit_spinnerCheXingCheHaoSheBei"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"></cn.lognteng.editspinner.lteditspinner.LTEditSpinner>
+            </com.google.android.flexbox.FlexboxLayout>
+
+            <TextView
+                android:id="@+id/testtext"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="" />
+
+            <Button
+                android:id="@+id/vercode"
+                android:layout_width="match_parent"
+                android:layout_height="38dp"
+                android:layout_marginTop="40dp"
+                android:background="@drawable/btn"
+                android:text="确定"
+                android:textColor="#fff"
+                android:textSize="16dp" />
+
+        </com.google.android.flexbox.FlexboxLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:divider="@drawable/title"
+            android:orientation="vertical"
+            android:showDividers="beginning"
+            tools:ignore="MissingConstraints">
+
+            <include
+                android:id="@+id/systembar"
+                layout="@layout/navbar"></include>
+        </LinearLayout>
+
+
+    </com.google.android.flexbox.FlexboxLayout>
+
+
+</android.support.constraint.ConstraintLayout>

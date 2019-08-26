@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    >
+    <solid android:color="#0098fd"/> 按钮的背景颜色此时为透明
+    <!--<stroke android:width="3dp"-->
+        <!--android:color="@color/colorPrimary"/>  按钮边框的宽度和颜色-->
+    <corners android:radius="5dp"/>  圆角的弧度
+</shape>

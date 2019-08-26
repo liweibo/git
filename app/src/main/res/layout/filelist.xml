@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <com.google.android.flexbox.FlexboxLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <com.google.android.flexbox.FlexboxLayout
+            app:flexDirection="column"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <LinearLayout
+                android:divider="@drawable/title"
+                android:showDividers="end"
+                android:layout_width="match_parent"
+                android:orientation="vertical"
+                android:layout_height="50dp">
+                <com.google.android.flexbox.FlexboxLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="49dp">
+                    <ImageView
+                        android:id="@+id/homeback"
+                        android:layout_marginLeft="10dp"
+                        android:src="@drawable/ico_brawser_backwards_d"
+                        android:layout_width="26dp"
+                        android:layout_height="26dp" />
+                    <com.google.android.flexbox.FlexboxLayout
+                        app:layout_flexGrow="1"
+                        app:justifyContent="center"
+                        app:alignItems="center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent">
+                        <TextView
+                            android:textSize="16dp"
+                            android:text="文件列表"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </com.google.android.flexbox.FlexboxLayout>
+                    <ImageView
+                        android:layout_marginRight="6dp"
+                        android:src="@drawable/ic_view_girdview"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp" />
+                </com.google.android.flexbox.FlexboxLayout>
+            </LinearLayout>
+            <com.google.android.flexbox.FlexboxLayout
+                app:flexDirection="column"
+                app:layout_flexGrow="1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.google.android.flexbox.FlexboxLayout
+                    app:alignItems="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        app:layout_flexGrow="1"
+                        android:padding="10dp"
+                        android:text="选择下载的文件："
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                    <TextView
+                        android:text="筛选"
+                        android:layout_marginRight="10dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </com.google.android.flexbox.FlexboxLayout>
+                <com.google.android.flexbox.FlexboxLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <com.google.android.flexbox.FlexboxLayout
+                        app:layout_flexGrow="1"
+                        app:justifyContent="center"
+                        app:alignItems="center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+                        <RadioGroup
+                            android:orientation="horizontal"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+                            <RadioButton
+                                android:checked="true"
+                                android:text="全选"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content" />
+                            <RadioButton
+                                android:checked="false"
+                                android:layout_marginLeft="40dp"
+                                android:text="全不选"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content" />
+                        </RadioGroup>
+                    </com.google.android.flexbox.FlexboxLayout>
+                </com.google.android.flexbox.FlexboxLayout>
+                <com.google.android.flexbox.FlexboxLayout
+                    app:layout_flexGrow="1"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp">
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/listView"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                    </android.support.v7.widget.RecyclerView>
+                </com.google.android.flexbox.FlexboxLayout>
+
+
+                <!--<LinearLayout-->
+                    <!--android:layout_marginTop="10dp"-->
+                    <!--android:layout_marginLeft="10dp"-->
+                    <!--android:layout_marginRight="10dp"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content">-->
+                    <!--<com.google.android.flexbox.FlexboxLayout-->
+                        <!--android:background="@drawable/border"-->
+                        <!--app:alignItems="center"-->
+                        <!--android:layout_width="match_parent"-->
+                        <!--android:layout_height="40dp">-->
+                        <!--<CheckBox-->
+                            <!--android:layout_width="wrap_content"-->
+                            <!--android:layout_height="wrap_content" />-->
+                        <!--<ImageView-->
+                            <!--android:layout_marginLeft="10dp"-->
+                            <!--android:src="@drawable/wenjianjia"-->
+                            <!--android:layout_width="24dp"-->
+                            <!--android:layout_height="24dp" />-->
+                        <!--<TextView-->
+                            <!--app:layout_flexGrow="1"-->
+                            <!--android:text="图片文件"-->
+                            <!--android:layout_marginLeft="15dp"-->
+                            <!--android:layout_width="wrap_content"-->
+                            <!--android:layout_height="wrap_content" />-->
+                        <!--<TextView-->
+                            <!--android:layout_marginRight="10dp"-->
+                            <!--android:text="2019-07-29 10:00:00"-->
+                            <!--android:layout_width="wrap_content"-->
+                            <!--android:layout_height="wrap_content" />-->
+                    <!--</com.google.android.flexbox.FlexboxLayout>-->
+                <!--</LinearLayout>-->
+                <!--<LinearLayout-->
+                    <!--android:layout_marginTop="0dp"-->
+                    <!--android:layout_marginLeft="10dp"-->
+                    <!--android:layout_marginRight="10dp"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content">-->
+                    <!--<com.google.android.flexbox.FlexboxLayout-->
+                        <!--android:background="@drawable/border"-->
+                        <!--app:alignItems="center"-->
+                        <!--android:layout_width="match_parent"-->
+                        <!--android:layout_height="40dp">-->
+                        <!--<CheckBox-->
+                            <!--android:layout_width="wrap_content"-->
+                            <!--android:layout_height="wrap_content" />-->
+                        <!--<ImageView-->
+                            <!--android:layout_marginLeft="10dp"-->
+                            <!--android:src="@drawable/wenjianjia"-->
+                            <!--android:layout_width="24dp"-->
+                            <!--android:layout_height="24dp" />-->
+                        <!--<TextView-->
+                            <!--app:layout_flexGrow="1"-->
+                            <!--android:text="图片文件"-->
+                            <!--android:layout_marginLeft="15dp"-->
+                            <!--android:layout_width="wrap_content"-->
+                            <!--android:layout_height="wrap_content" />-->
+                        <!--<TextView-->
+                            <!--android:layout_marginRight="10dp"-->
+                            <!--android:text="2019-07-29 10:00:00"-->
+                            <!--android:layout_width="wrap_content"-->
+                            <!--android:layout_height="wrap_content" />-->
+                    <!--</com.google.android.flexbox.FlexboxLayout>-->
+                <!--</LinearLayout>-->
+                <!--<LinearLayout-->
+                    <!--android:layout_marginTop="0dp"-->
+                    <!--android:layout_marginLeft="10dp"-->
+                    <!--android:layout_marginRight="10dp"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content">-->
+                    <!--<com.google.android.flexbox.FlexboxLayout-->
+                        <!--android:background="@drawable/border"-->
+                        <!--app:alignItems="center"-->
+                        <!--android:layout_width="match_parent"-->
+                        <!--android:layout_height="40dp">-->
+                        <!--<CheckBox-->
+                            <!--android:layout_width="wrap_content"-->
+                            <!--android:layout_height="wrap_content" />-->
+                        <!--<ImageView-->
+                            <!--android:layout_marginLeft="10dp"-->
+                            <!--android:src="@drawable/wenjian"-->
+                            <!--android:layout_width="24dp"-->
+                            <!--android:layout_height="24dp" />-->
+                        <!--<TextView-->
+                            <!--app:layout_flexGrow="1"-->
+                            <!--android:text="这是一张图片"-->
+                            <!--android:layout_marginLeft="15dp"-->
+                            <!--android:layout_width="wrap_content"-->
+                            <!--android:layout_height="wrap_content" />-->
+                        <!--<TextView-->
+                            <!--android:layout_marginRight="10dp"-->
+                            <!--android:text="2019-07-29 10:00:00"-->
+                            <!--android:layout_width="wrap_content"-->
+                            <!--android:layout_height="wrap_content" />-->
+                    <!--</com.google.android.flexbox.FlexboxLayout>-->
+                <!--</LinearLayout>-->
+                <!--<LinearLayout-->
+                    <!--android:layout_marginTop="0dp"-->
+                    <!--android:layout_marginLeft="10dp"-->
+                    <!--android:layout_marginRight="10dp"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content">-->
+                    <!--<com.google.android.flexbox.FlexboxLayout-->
+                        <!--android:background="@drawable/border"-->
+                        <!--app:alignItems="center"-->
+                        <!--android:layout_width="match_parent"-->
+                        <!--android:layout_height="40dp">-->
+                        <!--<CheckBox-->
+                            <!--android:layout_width="wrap_content"-->
+                            <!--android:layout_height="wrap_content" />-->
+                        <!--<ImageView-->
+                            <!--android:layout_marginLeft="10dp"-->
+                            <!--android:src="@drawable/wenjian"-->
+                            <!--android:layout_width="24dp"-->
+                            <!--android:layout_height="24dp" />-->
+                        <!--<TextView-->
+                            <!--app:layout_flexGrow="1"-->
+                            <!--android:text="这是一张图片2"-->
+                            <!--android:layout_marginLeft="15dp"-->
+                            <!--android:layout_width="wrap_content"-->
+                            <!--android:layout_height="wrap_content" />-->
+                        <!--<TextView-->
+                            <!--android:layout_marginRight="10dp"-->
+                            <!--android:text="2019-07-29 10:00:00"-->
+                            <!--android:layout_width="wrap_content"-->
+                            <!--android:layout_height="wrap_content" />-->
+                    <!--</com.google.android.flexbox.FlexboxLayout>-->
+                <!--</LinearLayout>-->
+
+                <Button
+                    android:id="@+id/vercode"
+                    android:text="确定"
+                    android:textColor="#fff"
+                    android:layout_marginTop="40dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="38dp"
+                    android:textSize="16dp"
+                    android:background="@drawable/btn"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginLeft="10dp"
+                    />
+
+                <TextView
+                    android:id="@+id/files"
+                    android:text="文件列表"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+            </com.google.android.flexbox.FlexboxLayout>
+
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:showDividers="beginning"
+                android:divider="@drawable/title"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                tools:ignore="MissingConstraints">
+                <include layout="@layout/navbar" android:id="@+id/systembar"></include>
+            </LinearLayout>
+
+        </com.google.android.flexbox.FlexboxLayout>
+    </com.google.android.flexbox.FlexboxLayout>
+
+
+
+
+
+</android.support.constraint.ConstraintLayout>

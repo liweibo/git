@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.google.android.flexbox.FlexboxLayout
+        app:flexDirection="column"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:divider="@drawable/title"
+            android:showDividers="end"
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:layout_height="50dp">
+            <com.google.android.flexbox.FlexboxLayout
+                android:layout_width="match_parent"
+                android:layout_height="49dp">
+                <ImageView
+                    android:id="@+id/homeback"
+                    android:layout_marginLeft="10dp"
+                    android:src="@drawable/ico_brawser_backwards_d"
+                    android:layout_width="26dp"
+                    android:layout_height="26dp" />
+                <com.google.android.flexbox.FlexboxLayout
+                    app:layout_flexGrow="1"
+                    app:justifyContent="center"
+                    app:alignItems="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent">
+                    <TextView
+                        android:textSize="16dp"
+                        android:text="网络连接"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </com.google.android.flexbox.FlexboxLayout>
+                <ImageView
+                    android:layout_marginRight="6dp"
+                    android:src="@drawable/ic_view_girdview"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp" />
+            </com.google.android.flexbox.FlexboxLayout>
+        </LinearLayout>
+
+        <com.google.android.flexbox.FlexboxLayout
+            android:padding="15dp"
+            app:alignItems="center"
+            android:layout_width="match_parent"
+            android:layout_height="49dp">
+            <TextView
+                app:layout_flexGrow="1"
+                android:text="WIFI开关"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <ImageView
+                android:src="@drawable/kaiqi"
+                android:layout_width="46dp"
+                android:layout_height="wrap_content" />
+        </com.google.android.flexbox.FlexboxLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/wifiarrays"
+            app:layout_flexGrow="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        </android.support.v7.widget.RecyclerView>
+
+    </com.google.android.flexbox.FlexboxLayout>
+
+</android.support.constraint.ConstraintLayout>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="trains">
+        <item >机车</item>
+        <item >动车</item>
+        <item >城轨</item>
+    </string-array>
+    <string-array name="tnumbers">
+        <item >HXD1EC</item>
+        <item >HXB1EC</item>
+        <item >HXD2EC</item>
+    </string-array>
+    <string-array name="delteoptions">
+        <item >上传完删除</item>
+        <item >保留一天删除</item>
+        <item >保留两天删除</item>
+        <item >保留三天删除</item>
+        <item >保留一周删除</item>
+    </string-array>
+</resources>
