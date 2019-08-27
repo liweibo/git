@@ -35,7 +35,7 @@ public class AuthActivity extends AppCompatActivity {
         findViewById(R.id.bt_go).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ARouter.getInstance().build("/app/home").navigation();
+                ARouter.getInstance().build("/app/wifi").navigation();
             }
         });
 
