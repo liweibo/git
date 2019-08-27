@@ -82,6 +82,10 @@ import java.util.List;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
+import cn.lognteng.editspinner.lteditspinner.DataCMD;
+import cn.lognteng.editspinner.lteditspinner.DataJuTiCheHao;
+import cn.lognteng.editspinner.lteditspinner.DataJuTiChexing;
+import cn.lognteng.editspinner.lteditspinner.DataShebei;
 import cn.lognteng.editspinner.lteditspinner.DataTest;
 import cn.lognteng.editspinner.lteditspinner.LTEditSpinner;
 import me.leefeng.promptlibrary.PromptDialog;
@@ -93,8 +97,14 @@ import okhttp3.Response;
 
 @Route(path = "/app/home")
 public class HomeActivity extends AppCompatActivity {
-    private String[] data = {"ERM", "TCU", "Ora1nge", "Watermelon",
-            "Pear", "Grape", "Pineapple", "Strawberry", "Cherry", "Mango"};
+    private String[] dataCheXing = {"机车", "动车", "城轨"};
+    private String[] datajutiCheXing = {"HXD1C", "HXD1"};
+    private String[] dataCheHao = {"1024", "A", "B", "C",
+            "!234"};
+    private String[] dataCMD = {"新车加装CMD", "新车未加装CMD", "老车加装CMD", "老车未加装CMD",
+    };
+    private String[] dataShebei = {"ERM", "TCU", "WTD", "BCG1",
+            "BCG2", "EDRM"};
     private WifiManager wifiManager;
     private int mProgress = 0;
     private RingProgressBar roundProgressBar;
@@ -356,14 +366,81 @@ public class HomeActivity extends AppCompatActivity {
 
     private void init() {
         List<DataTest> list = new ArrayList<DataTest>();
-        for (int i = 0; i < data.length; i++) {
-            list.add(new DataTest(i, data[i]));
+        for (int i = 0; i < dataCheXing.length; i++) {
+            list.add(new DataTest(i, dataCheXing[i]));
         }
 
         LTEditSpinner<DataTest> ltEditSpinner = (LTEditSpinner) findViewById(R.id.edit_spinnerCheXing);
         ltEditSpinner.initData(list, new LTEditSpinner.OnESItemClickListener<DataTest>() {
             @Override
             public void onItemClick(DataTest item) {
+                Toast.makeText(HomeActivity.this, item.toString(), Toast.LENGTH_SHORT).show();
+            }
+        });
+        init2();
+        init3();
+        init4();
+        init5();
+    }
+
+    private void init2() {
+        List<DataJuTiChexing> list2 = new ArrayList<>();
+        for (int i = 0; i < datajutiCheXing.length; i++) {
+            list2.add(new DataJuTiChexing(i, datajutiCheXing[i]));
+        }
+
+        LTEditSpinner<DataJuTiChexing> ltEditSpinner2 = (LTEditSpinner) findViewById(R.id.edit_spinnerjuTiCheXing);
+        ltEditSpinner2.initData(list2, new LTEditSpinner.OnESItemClickListener<DataJuTiChexing>() {
+            @Override
+            public void onItemClick(DataJuTiChexing item) {
+                Toast.makeText(HomeActivity.this, item.toString(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    }
+
+    private void init3() {
+        List<DataJuTiCheHao> list3 = new ArrayList<DataJuTiCheHao>();
+        for (int i = 0; i < dataCheHao.length; i++) {
+            list3.add(new DataJuTiCheHao(i, dataCheHao[i]));
+        }
+        LTEditSpinner<DataJuTiCheHao> ltEditSpinner = (LTEditSpinner) findViewById(R.id.edit_spinnerCheXingCheHao);
+        ltEditSpinner.initData(list3, new LTEditSpinner.OnESItemClickListener<DataJuTiCheHao>() {
+            @Override
+            public void onItemClick(DataJuTiCheHao item) {
+                Toast.makeText(HomeActivity.this, item.toString(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    }
+
+    private void init4() {
+        List<DataCMD> list4 = new ArrayList<DataCMD>();
+        for (int i = 0; i < dataCMD.length; i++) {
+            list4.add(new DataCMD(i, dataCMD[i]));
+        }
+
+        LTEditSpinner<DataCMD> ltEditSpinner = (LTEditSpinner) findViewById(R.id.edit_spinnerCheXingCheHaoCMD);
+        ltEditSpinner.initData(list4, new LTEditSpinner.OnESItemClickListener<DataCMD>() {
+            @Override
+            public void onItemClick(DataCMD item) {
+                Toast.makeText(HomeActivity.this, item.toString(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    }
+
+
+    private void init5() {
+        List<DataShebei> list5 = new ArrayList<DataShebei>();
+        for (int i = 0; i < dataShebei.length; i++) {
+            list5.add(new DataShebei(i, dataShebei[i]));
+        }
+
+        LTEditSpinner<DataShebei> ltEditSpinner = (LTEditSpinner) findViewById(R.id.edit_spinnerCheXingCheHaoSheBei);
+        ltEditSpinner.initData(list5, new LTEditSpinner.OnESItemClickListener<DataShebei>() {
+            @Override
+            public void onItemClick(DataShebei item) {
                 Toast.makeText(HomeActivity.this, item.toString(), Toast.LENGTH_SHORT).show();
             }
         });
@@ -891,21 +968,14 @@ public class HomeActivity extends AppCompatActivity {
          * 指定拍照存储路径
          * 7.0 及其以上使用FileProvider替换'file://'访问
          */
-        if (Build.VERSION.SDK_INT>=24){
+        if (Build.VERSION.SDK_INT >= 24) {
             //这里的BuildConfig，需要是程序包下BuildConfig。
-            intent2.putExtra(MediaStore.EXTRA_OUTPUT, FileProvider.getUriForFile(this.getApplicationContext(), BuildConfig.APPLICATION_ID+".provider",file));
+            intent2.putExtra(MediaStore.EXTRA_OUTPUT, FileProvider.getUriForFile(this.getApplicationContext(), BuildConfig.APPLICATION_ID + ".provider", file));
             intent2.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-        }else{
+        } else {
             intent2.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
         }
-
-
-
-
         startActivityForResult(intent2, 100);
-        System.out.println(
-                "拍照测试2"
-        );
     }
 
     //拿到图片的路径
@@ -1030,7 +1100,7 @@ public class HomeActivity extends AppCompatActivity {
                                             @Override
                                             public void run() {
                                                 editext_chehao.setText(finalOcrNum);
-                                                if (!haveDismiss){
+                                                if (!haveDismiss) {
                                                     promptDialog.dismiss();
                                                 }
                                             }
