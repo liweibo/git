@@ -140,8 +140,6 @@ public class WifiActivity extends AppCompatActivity {
 
         recyclerView.setAdapter(wifiAdapter);
 
-
-
         wifiAdapter.setOnItemClickListener(new WifiAdapter.OnItemClickListener() {
             @Override
             public void tClick(int i) {

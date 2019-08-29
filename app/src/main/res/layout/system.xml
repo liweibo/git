@@ -57,7 +57,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
                     <ImageView
-                        android:src="@drawable/kaiqi"
+                        android:id="@+id/networkset"
+                        android:src="@drawable/kaiqi_c"
                         android:layout_width="46dp"
                         android:layout_height="wrap_content" />
                 </com.google.android.flexbox.FlexboxLayout>
@@ -78,12 +79,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
                     <ImageView
-                        android:src="@drawable/kaiqi"
+                        android:id="@+id/wifiset"
+                        android:src="@drawable/kaiqi_c"
                         android:layout_width="46dp"
                         android:layout_height="wrap_content" />
                 </com.google.android.flexbox.FlexboxLayout>
             </LinearLayout>
             <LinearLayout
+                android:id="@+id/toFileView"
                 android:divider="@drawable/title"
                 android:showDividers="end"
                 android:layout_width="match_parent"

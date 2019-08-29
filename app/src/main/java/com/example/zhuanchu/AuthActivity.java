@@ -32,6 +32,8 @@ public class AuthActivity extends AppCompatActivity {
         ARouter.openDebug();
         ARouter.init(getApplication());
 
+        ARouter.getInstance().build("/app/system").navigation();
+
         findViewById(R.id.bt_go).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

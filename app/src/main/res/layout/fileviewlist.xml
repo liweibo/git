@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <LinearLayout
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:ignore="MissingConstraints">
+        <com.google.android.flexbox.FlexboxLayout
+            android:background="@drawable/border"
+            app:alignItems="center"
+            android:minHeight="40dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:id="@+id/fileimg"
+                android:layout_marginLeft="10dp"
+                app:layout_flexShrink="0"
+                android:src="@drawable/wenjianjia"
+                android:layout_width="24dp"
+                android:layout_height="24dp" />
+            <TextView
+                android:id="@+id/fileName"
+                app:layout_flexGrow="1"
+                android:text="图片文件"
+                android:layout_marginLeft="15dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/filetime"
+                android:layout_marginRight="10dp"
+                android:text="2019-07-29 10:00:00"
+                app:layout_flexShrink="0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </com.google.android.flexbox.FlexboxLayout>
+
+    </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>
