@@ -46,6 +46,7 @@
         <activity android:name=".AuthActivity" />
         <activity android:name=".WifiActivity" />
         <activity android:name=".AuthfailActivity"></activity>
+        <activity android:name=".FileView"></activity>
 
         <!-- FileProvider配置访问路径，适配7.0及其以上 -->
         <provider

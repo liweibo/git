@@ -1,5 +1,6 @@
 package com.example.zhuanchu;
 
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -13,6 +14,8 @@ import com.alibaba.android.arouter.launcher.ARouter;
 
 @Route( path = "/app/system")
 public class SystemActivity extends AppCompatActivity {
+
+    SharedPreferences sharedPreferences = null;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,5 +56,52 @@ public class SystemActivity extends AppCompatActivity {
         image.setImageResource(R.drawable.persion_c);
         TextView textView = findViewById(R.id.systembar).findViewById(R.id.systemText);
         textView.setTextColor( Color.parseColor("#35ae5d")  );
+
+        sharedPreferences = getSharedPreferences("data",MODE_PRIVATE);
+        final SharedPreferences.Editor editor = sharedPreferences.edit();
+
+
+
+        findViewById(R.id.networkset).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean networkstate = sharedPreferences.getBoolean("network", false);
+
+                ImageView imageView = findViewById(R.id.networkset);
+                if( networkstate ){
+                    imageView.setImageResource(R.drawable.kaiqi_c);
+                    editor.putBoolean("network", false);
+                }else{
+                    imageView.setImageResource(R.drawable.kaiqi);
+                    editor.putBoolean("network", true);
+                }
+                editor.commit();
+            }
+        });
+
+        findViewById(R.id.wifiset).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean wifistate = sharedPreferences.getBoolean("wifi", false);
+
+                ImageView imageView = findViewById(R.id.wifiset);
+                if( wifistate ){
+                    imageView.setImageResource(R.drawable.kaiqi_c);
+                    editor.putBoolean("wifi", false);
+                }else{
+                    imageView.setImageResource(R.drawable.kaiqi);
+                    editor.putBoolean("wifi", true);
+                }
+                editor.commit();
+            }
+        });
+
+        findViewById(R.id.toFileView).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ARouter.getInstance().build("/app/fileview").navigation();
+            }
+        });
+
     }
 }
