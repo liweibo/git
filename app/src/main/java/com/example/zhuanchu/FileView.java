@@ -42,55 +42,9 @@ public class FileView extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fileview);
+
         path = Environment.getExternalStorageDirectory() + "/CRRC";
         readFile( path );
-
-//        try {
-//            String path = Environment.getExternalStorageDirectory() + "/CRRC";
-//
-//            File file = new File(path);
-//
-//            File[] files = file.listFiles();
-//
-//            jsonArray = new JSONArray();
-//
-//            for (File spec : files) {
-//                JSONObject jsonObject = new JSONObject();
-//                jsonObject.put("name", spec.getName());
-//                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//                String dateTime=df.format(new Date(spec.lastModified()));
-//                jsonObject.put("time", dateTime );
-//                jsonObject.put("file", spec);
-//                jsonObject.put("check", false);
-//
-//
-//                if( spec.isDirectory() ){
-//                    jsonObject.put("style", "1");
-//                    jsonArray.put( jsonObject );
-//                }
-//                //filename += spec.getName();
-//            }
-//
-//            for (File spec : files) {
-//                JSONObject jsonObject = new JSONObject();
-//                jsonObject.put("name", spec.getName());
-//                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//                String dateTime=df.format(new Date(spec.lastModified()));
-//                jsonObject.put("time", dateTime );
-//                jsonObject.put("file", spec);
-//                jsonObject.put("check", false);
-//                if( spec.isFile() ){
-//                    jsonObject.put("style", "2");
-//                    jsonArray.put( jsonObject );
-//                }
-//                //filename += spec.getName();
-//            }
-//
-//
-//
-//        }catch (Exception e){
-//
-//        }
 
         final RecyclerView recyclerView = findViewById(R.id.listviews);
         FlexboxLayoutManager flexboxLayoutManager = new FlexboxLayoutManager(this);

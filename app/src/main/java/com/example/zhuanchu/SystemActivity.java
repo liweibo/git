@@ -61,6 +61,24 @@ public class SystemActivity extends AppCompatActivity {
         final SharedPreferences.Editor editor = sharedPreferences.edit();
 
 
+        /*
+         * 初始化wifi,4g打开按钮
+         * */
+        boolean networkinit = sharedPreferences.getBoolean("network", false);
+        boolean wifiinit = sharedPreferences.getBoolean("wifi", false);
+        ImageView networkImg = findViewById(R.id.networkset);
+        ImageView wifiImg = findViewById(R.id.wifiset);
+        if( networkinit ){
+            networkImg.setImageResource(R.drawable.kaiqi);
+        }else{
+            networkImg.setImageResource(R.drawable.kaiqi_c);
+        }
+        if( wifiinit ){
+            wifiImg.setImageResource(R.drawable.kaiqi);
+        }else{
+            wifiImg.setImageResource(R.drawable.kaiqi_c);
+        }
+
 
         findViewById(R.id.networkset).setOnClickListener(new View.OnClickListener() {
             @Override
