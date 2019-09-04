@@ -16,6 +16,7 @@
             android:orientation="vertical"
             android:layout_height="50dp">
             <com.google.android.flexbox.FlexboxLayout
+                app:alignItems="center"
                 android:layout_width="match_parent"
                 android:layout_height="49dp">
                 <ImageView
@@ -37,10 +38,14 @@
                         android:layout_height="wrap_content" />
                 </com.google.android.flexbox.FlexboxLayout>
                 <ImageView
-                    android:layout_marginRight="6dp"
-                    android:src="@drawable/ic_view_girdview"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp" />
+                    android:layout_width="40dp"
+                    android:layout_height="wrap_content" />
+                <!--<TextView-->
+                    <!--android:id="@+id/upload"-->
+                    <!--android:text="上传文件"-->
+                    <!--android:paddingRight="15dp"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content" />-->
             </com.google.android.flexbox.FlexboxLayout>
         </LinearLayout>
 
@@ -51,12 +56,8 @@
             android:layout_height="49dp">
             <TextView
                 app:layout_flexGrow="1"
-                android:text="WIFI开关"
+                android:text="选取网络"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-            <ImageView
-                android:src="@drawable/kaiqi"
-                android:layout_width="46dp"
                 android:layout_height="wrap_content" />
         </com.google.android.flexbox.FlexboxLayout>
 
@@ -66,6 +67,20 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
         </android.support.v7.widget.RecyclerView>
+
+        <Button
+            android:id="@+id/upload"
+            android:text="上传文件"
+            android:textColor="#fff"
+            android:layout_marginTop="40dp"
+            android:layout_width="match_parent"
+            android:layout_height="38dp"
+            android:textSize="16dp"
+            android:background="@drawable/btn"
+            android:layout_marginRight="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginBottom="20dp"
+            />
 
     </com.google.android.flexbox.FlexboxLayout>
 
