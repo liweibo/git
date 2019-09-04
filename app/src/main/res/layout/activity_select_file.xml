@@ -19,12 +19,14 @@
             android:orientation="vertical"
             android:showDividers="end">
 
+
             <com.google.android.flexbox.FlexboxLayout
                 android:layout_width="match_parent"
+                android:background="@color/colorfocus"
                 android:layout_height="49dp">
 
                 <ImageView
-                    android:id="@+id/homeback"
+                    android:id="@+id/homebackselect"
                     android:layout_width="26dp"
                     android:layout_height="26dp"
                     android:layout_marginLeft="10dp"
@@ -41,16 +43,31 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="文件下载"
-                        android:textSize="16dp" />
+                        android:textColor="#ffffff"
+                        android:textSize="20dp" />
                 </com.google.android.flexbox.FlexboxLayout>
 
                 <ImageView
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:layout_marginRight="6dp"
-                    android:src="@drawable/ic_view_girdview" />
+                    />
             </com.google.android.flexbox.FlexboxLayout>
+
+
         </LinearLayout>
+
+
+    <com.google.android.flexbox.FlexboxLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="20dp"
+        android:paddingTop="20dp"
+        android:paddingRight="20dp"
+        android:paddingBottom="20dp"
+        app:alignItems="center"
+        app:flexDirection="column"
+        app:layout_flexGrow="1">
 
         <LinearLayout
             android:id="@+id/lll"
@@ -138,6 +155,6 @@
                 layout="@layout/navbar"></include>
         </LinearLayout>
     </com.google.android.flexbox.FlexboxLayout>
-
+    </com.google.android.flexbox.FlexboxLayout>
 
 </android.support.constraint.ConstraintLayout>

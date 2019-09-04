@@ -8,13 +8,13 @@
     <string name="textlogin_port">Ftp端口</string>
     <string name="login_success">login success</string>
     <string name="login">登录</string>
-    <string name="Username">密码</string>
+    <string name="Username">用户名</string>
     <string name="Password">密码</string>
     <string name="forgot_your_password">忘记密码 ?</string>
     <string name="go">确定</string>
     <string name="repeat_password">Repeat Password</string>
     <string name="next">NEXT</string>
 
-    <string name="register">请重新输入授权密码，或联系售后服务中心申请获得授权密码！</string>
+    <string name="register">请输入用户名，密码，若无法登陆请联系售后服务中心！</string>
     <string name="tishi">提示</string>
 </resources>

@@ -10,7 +10,11 @@ import android.transition.Transition;
 import android.transition.TransitionInflater;
 import android.view.View;
 import android.view.ViewAnimationUtils;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.animation.AccelerateInterpolator;
+
+import com.githang.statusbar.StatusBarCompat;
 
 public class AuthfailActivity extends AppCompatActivity {
     private FloatingActionButton fab;
@@ -28,6 +32,8 @@ public class AuthfailActivity extends AppCompatActivity {
                 animateRevealClose();
             }
         });
+        StatusBarCompat.setStatusBarColor(this, getResources().getColor(R.color.gplus_color_2), true);
+
     }
 
     private void initView() {
@@ -72,7 +78,7 @@ public class AuthfailActivity extends AppCompatActivity {
 
     public void animateRevealShow() {
         Animator mAnimator = ViewAnimationUtils.createCircularReveal(cvAdd, cvAdd.getWidth()/2,0, fab.getWidth() / 2, cvAdd.getHeight());
-        mAnimator.setDuration(500);
+        mAnimator.setDuration(200);
         mAnimator.setInterpolator(new AccelerateInterpolator());
         mAnimator.addListener(new AnimatorListenerAdapter() {
             @Override
@@ -91,7 +97,7 @@ public class AuthfailActivity extends AppCompatActivity {
 
     public void animateRevealClose() {
         Animator mAnimator = ViewAnimationUtils.createCircularReveal(cvAdd,cvAdd.getWidth()/2,0, cvAdd.getHeight(), fab.getWidth() / 2);
-        mAnimator.setDuration(500);
+        mAnimator.setDuration(200);
         mAnimator.setInterpolator(new AccelerateInterpolator());
         mAnimator.addListener(new AnimatorListenerAdapter() {
             @Override

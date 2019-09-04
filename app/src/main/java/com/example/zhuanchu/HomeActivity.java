@@ -2,11 +2,9 @@ package com.example.zhuanchu;
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -27,25 +25,17 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -54,9 +44,16 @@ import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.alibaba.fastjson.JSON;
 import com.example.zhuanchu.bean.javaBean.JsonRootBean;
+import com.example.zhuanchu.bean.pojo15.JsonRootBean15;
+import com.example.zhuanchu.service.AESCpher;
 import com.example.zhuanchu.service.AuthService;
-import com.example.zhuanchu.service.WifiUtils;
+import com.example.zhuanchu.service.GetInfoForMultiList;
+import com.githang.statusbar.StatusBarCompat;
+import com.google.android.flexbox.FlexboxLayout;
+import com.scottyab.aescrypt.AESCrypt;
 
+import org.angmarch.views.NiceSpinner;
+import org.angmarch.views.OnSpinnerItemSelectedListener;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -66,28 +63,22 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.lang.reflect.Array;
 import java.net.Socket;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
-import cn.lognteng.editspinner.lteditspinner.DataCMD;
-import cn.lognteng.editspinner.lteditspinner.DataJuTiCheHao;
-import cn.lognteng.editspinner.lteditspinner.DataJuTiChexing;
-import cn.lognteng.editspinner.lteditspinner.DataShebei;
-import cn.lognteng.editspinner.lteditspinner.DataTest;
-import cn.lognteng.editspinner.lteditspinner.LTEditSpinner;
 import me.leefeng.promptlibrary.PromptDialog;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
@@ -97,14 +88,27 @@ import okhttp3.Response;
 
 @Route(path = "/app/home")
 public class HomeActivity extends AppCompatActivity {
-    private String[] dataCheXing = {"机车", "动车", "城轨"};
-    private String[] datajutiCheXing = {"HXD1C", "HXD1"};
-    private String[] dataCheHao = {"1024", "A", "B", "C",
-            "!234"};
-    private String[] dataCMD = {"新车加装CMD", "新车未加装CMD", "老车加装CMD", "老车未加装CMD",
-    };
-    private String[] dataShebei = {"ERM", "TCU", "WTD", "BCG1",
-            "BCG2", "EDRM"};
+    private List<String> dataCheXing = new ArrayList<>();
+    private List<String> datajutiCheXing = new ArrayList<>();
+    private List<String> dataCheHao = new ArrayList<>();
+    private List<String> dataCMD = new ArrayList<>();
+    private List<String> dataShebei = new ArrayList<>();
+    private List<String> dataIpPswUser = new ArrayList<>();
+
+    private String chexingValue = "";
+    private String jutiChexingValue = "";
+    private String chehaoValue = "";
+    private String peishuValue = "";
+    private String chexianghaoValue = "";
+    private String cmdValue = " ";
+    private String shebeiValue = "";
+
+    private String[] beforeStr = new String[]{"", ""};
+    private String[] beforeStr2 = new String[]{"", ""};
+    private String[] beforeStr3 = new String[]{"", ""};
+    private String[] beforeStr4 = new String[]{"", ""};
+    private String[] beforeStr5 = new String[]{"", ""};
+
     private WifiManager wifiManager;
     private int mProgress = 0;
     private RingProgressBar roundProgressBar;
@@ -117,6 +121,9 @@ public class HomeActivity extends AppCompatActivity {
     private String _pass = "12345678";
     private String cameraPath;
     private String imgFileName;
+    private Boolean rememberInfo = false;
+
+    protected Handler handler;
 
     // 输入流读取器对象
     InputStreamReader isr;
@@ -138,22 +145,110 @@ public class HomeActivity extends AppCompatActivity {
     public ImageButton imbtnOcr;
     public ImageButton imbtnVoiceCheHao;
     public ImageButton imbtnVoicePeiShu;
+
     public EditText editext_chehao;
+    public EditText editext_peishu;
+    public NiceSpinner edit_spinnerCheXing;
+    public NiceSpinner edit_spinnerjuTiCheXing;
+    public NiceSpinner edit_spinnerCheXingCheHao;
+    public NiceSpinner edit_spinnerCheXingCheHaoSheBei;
+    public NiceSpinner edit_spinnerCheXingCheHaoCMD;
+    public FlexboxLayout fl_cmd;
+
+
+    public CheckBox cb_remember;
     private static final int REQUEST_CALL_PHONE = 100;
     public String img64;
     private PromptDialog promptDialog;
     private boolean haveDismiss = false;
+    private String jsonRe = "";
+
+    List<String> chexingList = new LinkedList<>();
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home);
         imbtnOcr = (ImageButton) findViewById(R.id.imagebtnCamera);
-        imbtnVoiceCheHao = (ImageButton) findViewById(R.id.imagebtnVoice);
-        imbtnVoicePeiShu = (ImageButton) findViewById(R.id.voicePeiShu);
+
         editext_chehao = (EditText) findViewById(R.id.editext_chehao);
+        editext_peishu = (EditText) findViewById(R.id.et_peishu);
+        edit_spinnerCheXing = findViewById(R.id.edit_spinnerCheXing);
+        edit_spinnerjuTiCheXing = findViewById(R.id.edit_spinnerjuTiCheXing);
+        edit_spinnerCheXingCheHao = findViewById(R.id.edit_spinnerCheXingCheHao);
+        edit_spinnerCheXingCheHaoSheBei = findViewById(R.id.edit_spinnerCheXingCheHaoSheBei);
+        edit_spinnerCheXingCheHaoCMD = findViewById(R.id.edit_spinnerCheXingCheHaoCMD);
+
+        fl_cmd = (FlexboxLayout) findViewById(R.id.fl_cmd);
+        cb_remember = (CheckBox) findViewById(R.id.remember_info);
         promptDialog = new PromptDialog(this);
-//        promptDialog.getDefaultBuilder().touchAble(true).round(3).loadingDuration(3000);
+
+
+        SharedPreferences sharedPreferences = getSharedPreferences("myInfo",
+                Activity.MODE_PRIVATE);
+        String chexing = sharedPreferences.getString("chexing", "");
+        String jutichecing = sharedPreferences.getString("jutichecing", "");
+        String chexianghao = sharedPreferences.getString("chexianghao", "");
+        String shebei = sharedPreferences.getString("shebei", "");
+        String cmd = sharedPreferences.getString("cmd", "");
+        String chehao = sharedPreferences.getString("chehao", "");
+        String peishu = sharedPreferences.getString("peishu", "");
+        String views = sharedPreferences.getString("visible", "");
+        System.out.println("存储车型：" + chexing);
+        Boolean remember = sharedPreferences.getBoolean("remember", false);//记住信息
+
+        if (remember) {
+            cb_remember.setChecked(true);
+        } else {
+            cb_remember.setChecked(false);
+        }
+
+        if (chexing.equals("机车")) {
+            chexingList.clear();
+            chexingList.add("机车");
+//            chexingList.add("请选择");
+            chexingList.add("动车");
+            chexingList.add("城轨");
+        } else if (chexing.equals("动车")) {
+            chexingList.clear();
+            chexingList.add("动车");
+//            chexingList.add("请选择");
+            chexingList.add("机车");
+            chexingList.add("城轨");
+
+        } else if (chexing.equals("城轨")) {
+            chexingList.clear();
+            chexingList.add("城轨");
+//            chexingList.add("请选择");
+            chexingList.add("机车");
+            chexingList.add("动车");
+        } else {
+            chexingList.clear();
+            chexingList.add("请选择");
+            chexingList.add("机车");
+            chexingList.add("动车");
+            chexingList.add("城轨");
+
+        }
+
+        List<String> datasets = new ArrayList<>(chexingList);
+        edit_spinnerCheXing.attachDataSource(datasets);
+
+
+        edit_spinnerjuTiCheXing.setText(jutichecing);
+        edit_spinnerCheXingCheHao.setText(chexianghao);
+        edit_spinnerCheXingCheHaoSheBei.setText(shebei);
+
+
+        if (cmd.length() > 1 && views.equals("VISI")) {
+            fl_cmd.setVisibility(View.VISIBLE);
+        }
+        edit_spinnerCheXingCheHaoCMD.setText(cmd);
+        editext_chehao.setText(chehao);
+        editext_peishu.setText(peishu);
+
+
         imbtnOcr.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -161,74 +256,28 @@ public class HomeActivity extends AppCompatActivity {
                 inspectPermission();
             }
         });
-        imbtnVoicePeiShu.setOnClickListener(new View.OnClickListener() {
+
+        new Thread(new Runnable() {
             @Override
-            public void onClick(View view) {
+            public void run() {
+                jsonRe = getJson();
+
+
+                //该段代码用来获取下拉列表数据并将数据进行展示。
+//                List<String> jidongcheng = GetInfoForMultiList.jiDongCheng(jsonRe, JsonRootBean15.class);
+//                for (int i = 0; i < jidongcheng.size(); i++) {
+//                    dataCheXing.add(jidongcheng.get(i));
+//                }
+//                init();//下拉框
 
             }
-        });
+        }).start();
+        spinnerMethod();
 
-        init();//下拉框
-        findViewById(R.id.homeback).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ARouter.getInstance().build("/app/vercode").navigation();
-            }
-        });
 
-        findViewById(R.id.vercode).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String can[] = new String[4];
-                can[0] = _host;
-                can[1] = _port;
-                can[2] = _user;
-                can[3] = _pass;
-                LogTask task = new LogTask(HomeActivity.this);
-                task.execute(can);
-                //ARouter.getInstance().build("/app/down").navigation();
-            }
-        });
+        //跳转
+        initSwich();
 
-        /*
-         * 导航修改的内容
-         */
-        findViewById(R.id.systembar).findViewById(R.id.toSystem).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                promptDialog.showLoading("加载中...");
-                ARouter.getInstance().build("/app/system").navigation();
-                promptDialog.dismiss();
-
-            }
-        });
-
-        findViewById(R.id.systembar).findViewById(R.id.toDown).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                promptDialog.showLoading("加载中...");
-                ARouter.getInstance().build("/app/home").navigation();
-                promptDialog.dismiss();
-            }
-        });
-
-        findViewById(R.id.systembar).findViewById(R.id.upload).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                promptDialog.showLoading("加载中...");
-                ARouter.getInstance().build("/app/upload").navigation();
-                promptDialog.dismiss();
-            }
-        });
-
-        findViewById(R.id.systembar).findViewById(R.id.toPack).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                promptDialog.showLoading("加载中...");
-                ARouter.getInstance().build("/app/pack").navigation();
-                promptDialog.dismiss();
-            }
-        });
 
         ImageView image = findViewById(R.id.systembar).findViewById(R.id.downImg);
         image.setImageResource(R.drawable.down_c);
@@ -281,170 +330,597 @@ public class HomeActivity extends AppCompatActivity {
         text.setText(reulst);
 
 
+        StatusBarCompat.setStatusBarColor(this, getResources().getColor(R.color.colorfocus), true);
+    }
+
+
+    private String getJson() {
+        InputStream is = null;
+        String result = "";
+        String xkl = "";
+
+        try {
+            is = getAssets().open("tegs.txt");
+            int lenght = is.available();
+            byte[] buffer = new byte[lenght];
+            is.read(buffer);
+            result = new String(buffer, "utf8");
+            String keys = "ijijkjkjkjlkklok";
+            try {
+                xkl = AESCrypt.decrypt(keys, result);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return xkl;
+    }
+
+
+    public static void saveFile(String str, String fileName) {
+        // 创建String对象保存文件名路径
+        try {
+            // 创建指定路径的文件 fileName取名可为fileName.txt
+            File file = new File(Environment.getExternalStorageDirectory(), fileName);
+            // 如果文件不存在
+            if (file.exists()) {
+                // 创建新的空文件
+                file.delete();
+            }
+            file.createNewFile();
+            // 获取文件的输出流对象
+            FileOutputStream outStream = new FileOutputStream(file);
+            // 获取字符串对象的byte数组并写入文件流
+            outStream.write(str.getBytes());
+            // 最后关闭文件输出流
+            outStream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+//    NiceSpinner
+
+    private void spinnerMethod() {
+        //车型Spinner
+        List<String> jutichexingList = new ArrayList<>();
+        List<String> chexianghaoList = new ArrayList<>();
+        List<String> shebeiList = new ArrayList<>();
+        List<String> cmdList = new ArrayList<>();
+//        chexingList.clear();
+//        chexingList.add("请选择");
+//        chexingList.add("机车");
+//        chexingList.add("动车");
+//        chexingList.add("城轨");
+
+        jutichexingList.add("请选择");
+
+        chexianghaoList.add("请选择");
+
+        shebeiList.add("请选择");
+
+        cmdList.add("请选择");
+
+
+//        List<String> dataset = new ArrayList<>(chexingList);
+        final List<String> datasetjutichexingList = new ArrayList<>(jutichexingList);
+        final List<String> datasetchexianghaoList = new ArrayList<>(chexianghaoList);
+        final List<String> datasetshebeiList = new ArrayList<>(shebeiList);
+        final List<String> datasetcmdList = new ArrayList<>(cmdList);
+
+//        edit_spinnerCheXing.attachDataSource(dataset);
+        edit_spinnerjuTiCheXing.attachDataSource(datasetjutichexingList);
+        edit_spinnerCheXingCheHao.attachDataSource(datasetchexianghaoList);
+        edit_spinnerCheXingCheHaoSheBei.attachDataSource(datasetshebeiList);
+        edit_spinnerCheXingCheHaoCMD.attachDataSource(datasetcmdList);
+
+        //车型列表点击时
+        edit_spinnerCheXing.setOnSpinnerItemSelectedListener(new OnSpinnerItemSelectedListener() {
+            @Override
+
+            //选中车型时
+
+            public void onItemSelected(NiceSpinner parent, View view, int position, long id) {
+                String item = (String) parent.getItemAtPosition(position);
+                cb_remember.setChecked(false);
+                //当选择车型为"请选择"时，此时下面的列表应设为请选择。
+                if (item.equals("请选择")) {
+                    //（多个）
+                    //具体车型
+                    datasetjutichexingList.clear();
+                    datasetjutichexingList.add("请选择");
+                    edit_spinnerjuTiCheXing.setText("请选择");
+                    edit_spinnerjuTiCheXing.attachDataSource(datasetjutichexingList);//刷新数据列表
+
+                    //车厢号
+                    datasetchexianghaoList.clear();
+                    datasetchexianghaoList.add("请选择");
+                    edit_spinnerCheXingCheHao.setText("请选择");
+                    edit_spinnerCheXingCheHao.attachDataSource(datasetchexianghaoList);//刷新数据列表
+
+                    //设备
+                    datasetshebeiList.clear();
+                    datasetshebeiList.add("请选择");
+                    edit_spinnerCheXingCheHaoSheBei.setText("请选择");
+                    edit_spinnerCheXingCheHaoSheBei.attachDataSource(datasetshebeiList);//刷新数据列表
+
+                    //cmd
+                    fl_cmd.setVisibility(View.GONE);
+
+                    datasetcmdList.clear();
+                    datasetcmdList.add("请选择");
+                    edit_spinnerCheXingCheHaoCMD.setText(" ");
+                    edit_spinnerCheXingCheHaoCMD.attachDataSource(datasetcmdList);//刷新数据列表
+
+                } else {
+
+                    //选中车型时，应加载具体车型的数据
+
+                    chexingValue = item;
+                    //下面两行代码清除作用
+                    datasetjutichexingList.clear();
+                    datasetjutichexingList.add("请选择");
+
+                    jutichexing();//获取数据
+                    datasetjutichexingList.addAll(datajutiCheXing);
+                    edit_spinnerjuTiCheXing.attachDataSource(datasetjutichexingList);//刷新数据列表
+
+
+                    //当重新选定动车或机车或城轨时，车厢号，设备 ，cmd ，也应为 请选择  （多个）
+
+                    //车厢号
+                    datasetchexianghaoList.clear();
+                    datasetchexianghaoList.add("请选择");
+                    edit_spinnerCheXingCheHao.setText("请选择");
+                    edit_spinnerCheXingCheHao.attachDataSource(datasetchexianghaoList);//刷新数据列表
+
+                    //设备
+                    datasetshebeiList.clear();
+                    datasetshebeiList.add("请选择");
+                    edit_spinnerCheXingCheHaoSheBei.setText("请选择");
+                    edit_spinnerCheXingCheHaoSheBei.attachDataSource(datasetshebeiList);//刷新数据列表
+
+                    //cmd
+                    fl_cmd.setVisibility(View.GONE);
+                    datasetcmdList.clear();
+                    datasetcmdList.add("请选择");
+                    edit_spinnerCheXingCheHaoCMD.setText(" ");
+                    edit_spinnerCheXingCheHaoCMD.attachDataSource(datasetcmdList);//刷新数据列表
+
+                }
+            }
+        });
+
+
+        //具体车型列表点击时
+        edit_spinnerjuTiCheXing.setOnSpinnerItemSelectedListener(new OnSpinnerItemSelectedListener() {
+            @Override
+
+            //选中具体车型时
+
+            public void onItemSelected(NiceSpinner parent, View view, int position, long id) {
+                cb_remember.setChecked(false);
+                String item = (String) parent.getItemAtPosition(position);
+                //当选择具体车型为"请选择"时，此时下面的列表应设为请选择。
+                if (item.equals("请选择")) {
+                    //车厢号  （多个）
+                    datasetchexianghaoList.clear();
+                    datasetchexianghaoList.add("请选择");
+                    edit_spinnerCheXingCheHao.setText("请选择");
+                    edit_spinnerCheXingCheHao.attachDataSource(datasetchexianghaoList);//刷新数据列表
+
+                    //设备
+                    datasetshebeiList.clear();
+                    datasetshebeiList.add("请选择");
+                    edit_spinnerCheXingCheHaoSheBei.setText("请选择");
+                    edit_spinnerCheXingCheHaoSheBei.attachDataSource(datasetshebeiList);//刷新数据列表
+
+                    //cmd
+                    fl_cmd.setVisibility(View.GONE);
+                    datasetcmdList.clear();
+                    datasetcmdList.add("请选择");
+                    edit_spinnerCheXingCheHaoCMD.setText(" ");
+                    edit_spinnerCheXingCheHaoCMD.attachDataSource(datasetcmdList);//刷新数据列表
+
+                } else {
+                    //选中具体车型时，应加载车厢号的数据
+
+                    jutiChexingValue = item;
+                    //下面两行代码清除作用
+                    datasetchexianghaoList.clear();
+                    datasetchexianghaoList.add("请选择");
+
+                    jutichexingchehao();//获取数据
+                    datasetchexianghaoList.addAll(dataCheHao);
+                    edit_spinnerCheXingCheHao.attachDataSource(datasetchexianghaoList);//刷新数据列表
+
+
+                    //设备
+                    datasetshebeiList.clear();
+                    datasetshebeiList.add("请选择");
+                    edit_spinnerCheXingCheHaoSheBei.setText("请选择");
+                    edit_spinnerCheXingCheHaoSheBei.attachDataSource(datasetshebeiList);//刷新数据列表
+
+                    //cmd
+                    fl_cmd.setVisibility(View.GONE);
+                    datasetcmdList.clear();
+                    datasetcmdList.add("请选择");
+                    edit_spinnerCheXingCheHaoCMD.setText(" ");
+                    edit_spinnerCheXingCheHaoCMD.attachDataSource(datasetcmdList);//刷新数据列表
+                }
+            }
+        });
+
+
+        //车厢号列表点击时
+        edit_spinnerCheXingCheHao.setOnSpinnerItemSelectedListener(new OnSpinnerItemSelectedListener() {
+            @Override
+
+            //选中具体车型时
+
+            public void onItemSelected(NiceSpinner parent, View view, int position, long id) {
+                cb_remember.setChecked(false);
+                String item = (String) parent.getItemAtPosition(position);
+                //当选择具体车型为"请选择"时，此时下面的列表应设为请选择。
+                if (item.equals("请选择")) {
+                    //设备  （多个）
+                    datasetshebeiList.clear();
+                    datasetshebeiList.add("请选择");
+                    edit_spinnerCheXingCheHaoSheBei.setText("请选择");
+                    edit_spinnerCheXingCheHaoSheBei.attachDataSource(datasetshebeiList);//刷新数据列表
+
+                    //cmd
+                    fl_cmd.setVisibility(View.GONE);
+                    datasetcmdList.clear();
+                    datasetcmdList.add("请选择");
+                    edit_spinnerCheXingCheHaoCMD.setText(" ");
+                    edit_spinnerCheXingCheHaoCMD.attachDataSource(datasetcmdList);//刷新数据列表
+
+                } else {
+                    //选中车厢号时，应加载对应设备的数据
+                    if (item == "NA") {
+                        chexianghaoValue = " ";
+
+                    } else {
+                        chexianghaoValue = item;
+                    }
+                    //下面两行代码清除作用
+                    datasetshebeiList.clear();
+                    datasetshebeiList.add("请选择");
+
+                    jutichexingchehaoshebei();//获取数据
+                    datasetshebeiList.addAll(dataShebei);
+                    edit_spinnerCheXingCheHaoSheBei.attachDataSource(datasetshebeiList);//刷新数据列表
+
+                    //cmd
+                    fl_cmd.setVisibility(View.GONE);
+                    datasetcmdList.clear();
+                    datasetcmdList.add("请选择");
+                    edit_spinnerCheXingCheHaoCMD.setText(" ");
+                    edit_spinnerCheXingCheHaoCMD.attachDataSource(datasetcmdList);//刷新数据列表
+                }
+            }
+        });
+
+
+        //设备列表点击时
+        edit_spinnerCheXingCheHaoSheBei.setOnSpinnerItemSelectedListener(new OnSpinnerItemSelectedListener() {
+            @Override
+
+            //选中设备时
+
+            public void onItemSelected(NiceSpinner parent, View view, int position, long id) {
+                cb_remember.setChecked(false);
+                String item = (String) parent.getItemAtPosition(position);
+
+                List<String> cmdList = GetInfoForMultiList.jiDongChengCheXingCheHaoSheBeiCMD(jsonRe, JsonRootBean15.class,
+                        chexingValue, jutiChexingValue, chexianghaoValue, item);
+                if (cmdList.size() > 0) {
+                    fl_cmd.setVisibility(View.VISIBLE);
+                    jutichexingchehaoshebeicmd(cmdList);
+
+                    //当选择 设备 为"请选择"时，此时下面的cmd列表应设为请选择。
+                    if (item.equals("请选择")) {
+                        //cmd
+                        datasetcmdList.clear();
+                        datasetcmdList.add("请选择");
+                        edit_spinnerCheXingCheHaoCMD.setText("请选择");
+                        edit_spinnerCheXingCheHaoCMD.attachDataSource(datasetcmdList);//刷新数据列表
+
+
+                    } else {
+                        //选中设备时，应加载对应cmd的数据
+                        shebeiValue = item;
+                        //下面两行代码清除作用
+                        datasetcmdList.clear();
+                        datasetcmdList.add("请选择");
+
+                        datasetcmdList.addAll(cmdList);
+                        edit_spinnerCheXingCheHaoCMD.attachDataSource(datasetcmdList);//刷新数据列表
+                    }
+
+
+                } else {
+                    fl_cmd.setVisibility(View.GONE);
+                    cmdList.clear();
+                    datasetcmdList.clear();
+                    edit_spinnerCheXingCheHaoCMD.setText(" ");
+                }
+
+
+            }
+        });
+
+
+    }
+
+
+    private void jutichexing() {
+        List<String> jutichexing = GetInfoForMultiList.jiDongChengCheXing(jsonRe, JsonRootBean15.class, chexingValue);
+
+        datajutiCheXing.clear();
+
+        for (int i = 0; i < jutichexing.size(); i++) {
+            datajutiCheXing.add(jutichexing.get(i));
+        }
+
+    }
+
+
+    private void jutichexingchehao() {
+        List<String> jutichexingchehao = GetInfoForMultiList.jiDongChengCheXingCheHao(jsonRe, JsonRootBean15.class, chexingValue, jutiChexingValue);
+
+        dataCheHao.clear();
+
+        for (int i = 0; i < jutichexingchehao.size(); i++) {
+            if (jutichexingchehao.get(i).equals(" ")) {//没有车号
+                dataCheHao.add("NA");
+                break;//遇到na，只执行一次就可
+            } else {
+                dataCheHao.add(jutichexingchehao.get(i));
+            }
+        }
+    }
+
+
+    private void jutichexingchehaoshebei() {
+        List<String> jutichexingchehaoshebei = GetInfoForMultiList.jiDongChengCheXingCheHaoSheBei(jsonRe, JsonRootBean15.class,
+                chexingValue, jutiChexingValue, chexianghaoValue);
+
+        dataShebei.clear();
+
+        for (int i = 0; i < jutichexingchehaoshebei.size(); i++) {
+            dataShebei.add(jutichexingchehaoshebei.get(i));
+        }
+
+    }
+
+
+    private void jutichexingchehaoshebeicmd(List<String> dataCMDs) {
+
+        SharedPreferences pref = HomeActivity.this.getSharedPreferences("myInfo", MODE_PRIVATE);
+        SharedPreferences.Editor editor = pref.edit();
+
+        if (dataCMDs.size() > 0) {
+            editor.putString("visible", "VISI");
+            editor.commit();
+        } else {
+            cmdValue = " ";
+            editor.putString("visible", "NOVISI");
+            editor.commit();
+        }
+
+    }
+
+
+    private void initSwich() {
+        cb_remember.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {//记住信息
+                    //先检查信息是否填写完毕完整
+                    String checing = edit_spinnerCheXing.getText().toString().trim();
+                    String jutichecing = edit_spinnerjuTiCheXing.getText().toString().trim();
+                    String chexianghao = edit_spinnerCheXingCheHao.getText().toString().trim();
+                    String shebei = edit_spinnerCheXingCheHaoSheBei.getText().toString().trim();
+                    String cmd = edit_spinnerCheXingCheHaoCMD.getText().toString();
+                    String chehao = editext_chehao.getText().toString().trim();
+                    String peishu = editext_peishu.getText().toString().trim();
+                    //记住信息后，退出，再次点击取消记住，再点击记住信息，
+
+
+//                    cmd分两种情况 没有cmd选项时，就不要加入判空，有cmd选项，参与判空。
+
+                    if (cmd.length() > 0 && fl_cmd.getVisibility() == View.VISIBLE) {
+                        System.out.println("进来1");
+                        if (checing.length() != 0
+                                && jutichecing.length() != 0
+                                && chexianghao.length() != 0
+                                && shebei.length() != 0
+                                && cmd.length() != 0
+                                && chehao.length() != 0
+                                && peishu.length() != 0) {
+
+                            SharedPreferences pref = HomeActivity.this.getSharedPreferences("myInfo", MODE_PRIVATE);
+                            SharedPreferences.Editor editor = pref.edit();
+                            editor.putString("chexing", checing);
+                            editor.putString("jutichecing", jutichecing);
+                            editor.putString("chexianghao", chexianghao);
+                            editor.putString("shebei", shebei);
+                            editor.putString("cmd", cmd);
+                            editor.putString("chehao", chehao);
+                            editor.putString("peishu", peishu);
+                            editor.putBoolean("remember", true);//是否记住信息标志
+                            editor.commit();
+                        } else//信息填写不完整 则弹出提示框
+                        {
+                            new android.app.AlertDialog.Builder(HomeActivity.this)
+                                    .setTitle("信息填写不完整")
+                                    .setMessage("请继续填写信息")
+                                    .setPositiveButton("确定", null)
+                                    .show();
+                            cb_remember.setChecked(false);
+                        }
+                    } else {
+                        System.out.println("进来2");
+                        if (checing.length() != 0
+                                && jutichecing.length() != 0
+                                && chexianghao.length() != 0
+                                && shebei.length() != 0
+                                && chehao.length() != 0
+                                && peishu.length() != 0) {
+
+                            SharedPreferences pref = HomeActivity.this.getSharedPreferences("myInfo", MODE_PRIVATE);
+                            SharedPreferences.Editor editor = pref.edit();
+                            editor.putString("chexing", checing);
+                            editor.putString("jutichecing", jutichecing);
+                            editor.putString("chexianghao", chexianghao);
+                            editor.putString("shebei", shebei);
+                            editor.putString("cmd", " ");
+                            editor.putString("chehao", chehao);
+                            editor.putString("peishu", peishu);
+                            editor.putBoolean("remember", true);//是否记住信息标志
+                            editor.commit();
+                        } else//信息填写不完整 则弹出提示框
+                        {
+                            new android.app.AlertDialog.Builder(HomeActivity.this)
+                                    .setTitle("信息填写不完整")
+                                    .setMessage("请继续填写信息")
+                                    .setPositiveButton("确定", null)
+                                    .show();
+                            cb_remember.setChecked(false);
+                        }
+                    }
+
+                    System.out.println("保存的信息：" + checing + "，" + chexianghao + "，" + shebei + "，" + cmd + "，"
+                            + chehao + "，" + peishu);
+                } else {
+                    SharedPreferences pref = HomeActivity.this.getSharedPreferences("myInfo", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = pref.edit();
+                    editor.putBoolean("remember", false);//是否记住信息标志
+
+                    editor.putString("chexing", "");
+                    editor.putString("jutichecing", "");
+                    editor.putString("chexianghao", "");
+                    editor.putString("shebei", "");
+                    editor.putString("cmd", "");
+                    editor.putString("chehao", "");
+                    editor.putString("peishu", "");
+                    editor.commit();
+
+//                    edit_spinnerjuTiCheXing.getLtes_editText().setText("");
+//                    edit_spinnerCheXing.getLtes_editText().setText("");
+//                    edit_spinnerCheXingCheHao.getLtes_editText().setText("");
+//                    edit_spinnerCheXingCheHaoSheBei.getLtes_editText().setText("");
+//                    edit_spinnerCheXingCheHaoCMD.getLtes_editText().setText("");
+                }
+            }
+        });
+
+
+        findViewById(R.id.homeback).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                ARouter.getInstance().build("/app/auth").navigation();
+                startActivity(new Intent(HomeActivity.this, AuthActivity.class));
+            }
+        });
+
+
+        //点击确定时，获取...
+        findViewById(R.id.vercodehome).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                //从json数据中获取用户名 密码 ip
+                if (edit_spinnerCheXingCheHaoCMD.getText().toString().length() > 0 && fl_cmd.getVisibility() == View.VISIBLE) {
+                    cmdValue = edit_spinnerCheXingCheHaoCMD.getText().toString();
+                } else {
+                    cmdValue = " ";
+                }
+
+
+                //分两种情况  1。记住信息 情况下：chexingValue这些值是没有的，需要重新赋值（赋记住的值）  2。现场勾选的信息，然后点击确定按钮
+                //为了兼顾两种情况，则把chexingValue等的值全部重新赋值，
+                chexingValue = edit_spinnerCheXing.getText().toString();
+                jutiChexingValue = edit_spinnerjuTiCheXing.getText().toString();
+
+                //车厢号要考虑NA情况
+                if (edit_spinnerCheXingCheHao.getText().toString().equals("NA")) {
+                    chexianghaoValue = " ";
+                } else {
+                    chexianghaoValue = edit_spinnerCheXingCheHao.getText().toString();
+
+                }
+                shebeiValue = edit_spinnerCheXingCheHaoSheBei.getText().toString();
+
+                List<String> jutichexingchehaoshebeicmdpswIp = GetInfoForMultiList.jiDongChengCheXingCheHaoSheBeiCMDipUserPsw(jsonRe, JsonRootBean15.class,
+                        chexingValue, jutiChexingValue, chexianghaoValue, shebeiValue, cmdValue);
+                System.out.println("值：" + chexianghaoValue);
+                dataIpPswUser.clear();
+                dataIpPswUser.addAll(jutichexingchehaoshebeicmdpswIp);
+
+                new android.app.AlertDialog.Builder(HomeActivity.this)
+                        .setTitle("ip,user,psw")
+                        .setMessage(dataIpPswUser.toString())
+                        .setPositiveButton("确定", null)
+                        .show();
+
+
+                String can[] = new String[4];
+                can[0] = _host;
+                can[1] = _port;
+                can[2] = _user;
+                can[3] = _pass;
+                LogTask task = new LogTask(HomeActivity.this);
+                task.execute(can);
+                //ARouter.getInstance().build("/app/down").navigation();
+            }
+        });
+
         /*
-         * 点击wifi事件
-         * */
-
-//        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//            private WifiConfiguration conf = new WifiConfiguration();
-//
-//            @Override
-//            public void onItemSelected(AdapterView<?> parent, View view, final int position, long id) {
-//                System.out.println( dataAdapter.getItem( position ) );
-//                if( position > 0 ){
-//                    final EditText editText = new EditText(HomeActivity.this);
-//                    editText.setHint("请输入wifi密码");
-//                    AlertDialog.Builder dialog = new AlertDialog.Builder( HomeActivity.this );
-//                    dialog.setView(editText);
-//                    dialog.setTitle( dataAdapter.getItem( position ) );
-//
-//                    String wifiName = null;
-//                    wifiName = dataAdapter.getItem( position );
-//
-//                    String enc = null;
-//
-//                    try {
-//                        enc = jsonArray.getJSONObject(position).getString("capabilities");
-//                    } catch (JSONException e) {
-//                        e.printStackTrace();
-//                    }
-//
-//
-//                    final String finalWifiName = wifiName;
-//                    final String finalEnc = enc;
-//                    dialog.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-//                        @Override
-//                        public void onClick(DialogInterface dialog, int which) {
-//
-//                            // 1、注意热点和密码均包含引号，此处需要需要转义引号
-//                            String ssid = finalWifiName;
-//                            String psd = editText.getText().toString();
-//
-//                            System.out.println( finalEnc );
-//
-//                            int type = 1;
-//                            if( finalEnc.indexOf( "WEP" ) >= 0 ){
-//                                type = 2;
-//                            }
-//                            if( finalEnc.indexOf( "WPA" ) >= 0 ){
-//                                type = 3;
-//                            }
-//
-//                            System.out.println( ssid + "--------" );
-//                            System.out.println( psd + "--------" );
-//                            System.out.println( type + "--------" );
-//
-//                            WifiConfiguration wifiConfiguration = createWifiInfo(ssid, psd, type);
-//
-//                            int networkId = wifiManager.addNetwork(wifiConfiguration);
-//                            boolean enable = wifiManager.enableNetwork( networkId, true );
-//
-//                            System.out.println( networkId + "--------" );
-//
-//                            System.out.println( enable + "--------" );
-//
-//                            if( enable ){
-//                                Toast.makeText(getApplicationContext(), "连接"+ ssid +"成功", Toast.LENGTH_LONG).show();
-//                            }else{
-//                                Toast.makeText(getApplicationContext(), "连接"+ ssid +"失败", Toast.LENGTH_LONG).show();
-//                            }
-//
-//                        }
-//                    });
-//                    dialog.setNegativeButton("取消", null);
-//                    dialog.show();
-//                }
-//            }
-//
-//            @Override
-//            public void onNothingSelected(AdapterView<?> parent) {
-//
-//            }
-//        });
-
-    }
-
-    private void init() {
-        List<DataTest> list = new ArrayList<DataTest>();
-        for (int i = 0; i < dataCheXing.length; i++) {
-            list.add(new DataTest(i, dataCheXing[i]));
-        }
-
-        LTEditSpinner<DataTest> ltEditSpinner = (LTEditSpinner) findViewById(R.id.edit_spinnerCheXing);
-        ltEditSpinner.initData(list, new LTEditSpinner.OnESItemClickListener<DataTest>() {
+         * 导航修改的内容
+         */
+        findViewById(R.id.systembar).findViewById(R.id.toSystem).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onItemClick(DataTest item) {
-                Toast.makeText(HomeActivity.this, item.toString(), Toast.LENGTH_SHORT).show();
-            }
-        });
-        init2();
-        init3();
-        init4();
-        init5();
-    }
+            public void onClick(View v) {
+                promptDialog.showLoading("加载中...");
+                ARouter.getInstance().build("/app/system").navigation();
+                promptDialog.dismiss();
 
-    private void init2() {
-        List<DataJuTiChexing> list2 = new ArrayList<>();
-        for (int i = 0; i < datajutiCheXing.length; i++) {
-            list2.add(new DataJuTiChexing(i, datajutiCheXing[i]));
-        }
-
-        LTEditSpinner<DataJuTiChexing> ltEditSpinner2 = (LTEditSpinner) findViewById(R.id.edit_spinnerjuTiCheXing);
-        ltEditSpinner2.initData(list2, new LTEditSpinner.OnESItemClickListener<DataJuTiChexing>() {
-            @Override
-            public void onItemClick(DataJuTiChexing item) {
-                Toast.makeText(HomeActivity.this, item.toString(), Toast.LENGTH_SHORT).show();
             }
         });
 
-    }
-
-    private void init3() {
-        List<DataJuTiCheHao> list3 = new ArrayList<DataJuTiCheHao>();
-        for (int i = 0; i < dataCheHao.length; i++) {
-            list3.add(new DataJuTiCheHao(i, dataCheHao[i]));
-        }
-        LTEditSpinner<DataJuTiCheHao> ltEditSpinner = (LTEditSpinner) findViewById(R.id.edit_spinnerCheXingCheHao);
-        ltEditSpinner.initData(list3, new LTEditSpinner.OnESItemClickListener<DataJuTiCheHao>() {
+        findViewById(R.id.systembar).findViewById(R.id.toDown).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onItemClick(DataJuTiCheHao item) {
-                Toast.makeText(HomeActivity.this, item.toString(), Toast.LENGTH_SHORT).show();
+            public void onClick(View v) {
+                promptDialog.showLoading("加载中...");
+                ARouter.getInstance().build("/app/home").navigation();
+                promptDialog.dismiss();
             }
         });
 
-    }
-
-    private void init4() {
-        List<DataCMD> list4 = new ArrayList<DataCMD>();
-        for (int i = 0; i < dataCMD.length; i++) {
-            list4.add(new DataCMD(i, dataCMD[i]));
-        }
-
-        LTEditSpinner<DataCMD> ltEditSpinner = (LTEditSpinner) findViewById(R.id.edit_spinnerCheXingCheHaoCMD);
-        ltEditSpinner.initData(list4, new LTEditSpinner.OnESItemClickListener<DataCMD>() {
+        findViewById(R.id.systembar).findViewById(R.id.upload).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onItemClick(DataCMD item) {
-                Toast.makeText(HomeActivity.this, item.toString(), Toast.LENGTH_SHORT).show();
+            public void onClick(View v) {
+                promptDialog.showLoading("加载中...");
+                ARouter.getInstance().build("/app/upload").navigation();
+                promptDialog.dismiss();
             }
         });
 
-    }
-
-
-    private void init5() {
-        List<DataShebei> list5 = new ArrayList<DataShebei>();
-        for (int i = 0; i < dataShebei.length; i++) {
-            list5.add(new DataShebei(i, dataShebei[i]));
-        }
-
-        LTEditSpinner<DataShebei> ltEditSpinner = (LTEditSpinner) findViewById(R.id.edit_spinnerCheXingCheHaoSheBei);
-        ltEditSpinner.initData(list5, new LTEditSpinner.OnESItemClickListener<DataShebei>() {
+        findViewById(R.id.systembar).findViewById(R.id.toPack).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onItemClick(DataShebei item) {
-                Toast.makeText(HomeActivity.this, item.toString(), Toast.LENGTH_SHORT).show();
+            public void onClick(View v) {
+                promptDialog.showLoading("加载中...");
+                ARouter.getInstance().build("/app/pack").navigation();
+                promptDialog.dismiss();
             }
         });
-
     }
 
     public WifiConfiguration createWifiInfo(String SSID, String Password, int Type) {
@@ -561,7 +1037,7 @@ public class HomeActivity extends AppCompatActivity {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 toPic();
             } else {
-                Toast.makeText(this, "权限拒绝", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(this, "权限拒绝", Toast.LENGTH_SHORT).show();
             }
             return;
         }
@@ -588,11 +1064,11 @@ public class HomeActivity extends AppCompatActivity {
 
         protected void onPostExecute(Boolean flag) {
             if (flag) {
-                Toast tot = Toast.makeText(
-                        mContext,
-                        "登录成功",
-                        Toast.LENGTH_LONG);
-                tot.show();
+//                Toast tot = Toast.makeText(
+//                        mContext,
+//                        "登录成功",
+//                        Toast.LENGTH_LONG);
+//                tot.show();
                 Intent intent = new Intent(HomeActivity.this, selectFileActivity.class);
                 //准备进入选择界面并且准备好参数
                 intent.putExtra("host", _host);
@@ -601,11 +1077,11 @@ public class HomeActivity extends AppCompatActivity {
                 intent.putExtra("port", Integer.parseInt(_port));
                 startActivity(intent);
             } else {
-                new android.app.AlertDialog.Builder(mContext)
-                        .setTitle("无法连接")
-                        .setMessage("请检查是否连接无线工装WIFI以及信息填写是否无误！")
-                        .setPositiveButton("确定", null)
-                        .show();
+//                new android.app.AlertDialog.Builder(mContext)
+//                        .setTitle("无法连接")
+//                        .setMessage("请检查是否连接无线工装WIFI以及信息填写是否无误！")
+//                        .setPositiveButton("确定", null)
+//                        .show();
 
             }
         }

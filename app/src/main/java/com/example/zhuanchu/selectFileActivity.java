@@ -27,9 +27,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.android.arouter.launcher.ARouter;
-import com.cunoraz.gifview.library.GifView;
 import com.example.zhuanchu.adapter.MyAdapter;
 import com.example.zhuanchu.service.FtpUtils;
+import com.githang.statusbar.StatusBarCompat;
 
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
@@ -120,10 +120,10 @@ public class selectFileActivity extends AppCompatActivity implements OnClickList
 
         setClick();
 
-        findViewById(R.id.homeback).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.homebackselect).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ARouter.getInstance().build("/app/home").navigation();
+                startActivity(new Intent(selectFileActivity.this, HomeActivity.class));
             }
         });
 
@@ -135,8 +135,8 @@ public class selectFileActivity extends AppCompatActivity implements OnClickList
             public void onClick(View v) {
 
                 promptDialog.showLoading("加载中...");
-
-                ARouter.getInstance().build("/app/system").navigation();
+                startActivity(new Intent(selectFileActivity.this, SystemActivity.class));
+//                ARouter.getInstance().build("/app/system").navigation();
                 promptDialog.dismiss();
             }
         });
@@ -146,7 +146,8 @@ public class selectFileActivity extends AppCompatActivity implements OnClickList
             public void onClick(View v) {
 
                 promptDialog.showLoading("加载中...");
-                ARouter.getInstance().build("/app/home").navigation();
+                startActivity(new Intent(selectFileActivity.this, HomeActivity.class));
+//                ARouter.getInstance().build("/app/home").navigation();
                 promptDialog.dismiss();
             }
         });
@@ -156,7 +157,10 @@ public class selectFileActivity extends AppCompatActivity implements OnClickList
             public void onClick(View v) {
 
                 promptDialog.showLoading("加载中...");
-                ARouter.getInstance().build("/app/upload").navigation();
+
+                startActivity(new Intent(selectFileActivity.this, UploadActivity.class));
+
+//                ARouter.getInstance().build("/app/upload").navigation();
                 promptDialog.dismiss();
             }
         });
@@ -166,7 +170,9 @@ public class selectFileActivity extends AppCompatActivity implements OnClickList
             public void onClick(View v) {
 
                 promptDialog.showLoading("加载中...");
-                ARouter.getInstance().build("/app/pack").navigation();
+                startActivity(new Intent(selectFileActivity.this, PackActivity.class));
+
+//                ARouter.getInstance().build("/app/pack").navigation();
                 promptDialog.dismiss();
             }
         });
@@ -175,6 +181,7 @@ public class selectFileActivity extends AppCompatActivity implements OnClickList
         image.setImageResource(R.drawable.down_c);
         TextView textView = findViewById(R.id.systembar).findViewById(R.id.downText);
         textView.setTextColor(Color.parseColor("#35ae5d"));
+        StatusBarCompat.setStatusBarColor(this, getResources().getColor(R.color.colorfocus), true);
 
 
     }

@@ -14,13 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.cunoraz.gifview.library.GifView
-            android:id="@+id/gif11"
-            android:layout_width="180dp"
-            android:layout_height="100dp"
-            android:layout_gravity="center"
-            android_custom:gif="@mipmap/gif_load"
-            tools:ignore="MissingConstraints" />
+
 
     </com.google.android.flexbox.FlexboxLayout>
 

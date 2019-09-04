@@ -1,5 +1,6 @@
 package com.example.zhuanchu;
 
+import android.annotation.SuppressLint;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,51 +12,77 @@ import android.transition.Explode;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
-import com.alibaba.android.arouter.facade.annotation.Route;
-import com.alibaba.android.arouter.launcher.ARouter;
+import com.githang.statusbar.StatusBarCompat;
 
-@Route(path = "/app/auth")
+import me.leefeng.promptlibrary.PromptDialog;
+
+
 public class AuthActivity extends AppCompatActivity {
-    private TextView tv_forget;
+
+    private EditText etUsername;
+    private EditText etPassword;
+    private Button btGo;
     private FloatingActionButton fab;
+    private PromptDialog promptDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_auth);
-        //initView();
-        //setListener();
-        tv_forget = findViewById(R.id.tv_forget);
+        initView();
+        setListener();
+        promptDialog = new PromptDialog(this);
+
+        StatusBarCompat.setStatusBarColor(this, getResources().getColor(R.color.gplus_color_2), true);
+
+    }
+
+    private void initView() {
+        etUsername = findViewById(R.id.et_username);
+        etPassword = findViewById(R.id.et_password);
+        btGo = findViewById(R.id.bt_go);
         fab = findViewById(R.id.fab);
-        ARouter.openDebug();
-        ARouter.init(getApplication());
+    }
 
-        findViewById(R.id.bt_go).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ARouter.getInstance().build("/app/wifi").navigation();
-            }
-        });
-
-        tv_forget.setOnClickListener(new View.OnClickListener() {
+    private void setListener() {
+        btGo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getWindow().setExitTransition(null);
-                getWindow().setEnterTransition(null);
-                ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(AuthActivity.this, fab, fab.getTransitionName());
-                startActivity(new Intent(AuthActivity.this, AuthfailActivity.class), options.toBundle());
+                promptDialog.showLoading("加载中...");
+                Intent i2 = new Intent(AuthActivity.this, HomeActivity.class);
+                startActivity(i2);
+                promptDialog.dismiss();
+
             }
         });
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 getWindow().setExitTransition(null);
                 getWindow().setEnterTransition(null);
                 ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(AuthActivity.this, fab, fab.getTransitionName());
                 startActivity(new Intent(AuthActivity.this, AuthfailActivity.class), options.toBundle());
+
+//                startActivity(new Intent(AuthActivity.this, AuthfailActivity.class));
             }
         });
     }
+
+    @SuppressLint("RestrictedApi")
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        fab.setVisibility(View.GONE);
+    }
+
+    @SuppressLint("RestrictedApi")
+    @Override
+    protected void onResume() {
+        super.onResume();
+        fab.setVisibility(View.VISIBLE);
+    }
 }
+
+

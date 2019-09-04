@@ -3,17 +3,25 @@
   <component name="GradleSettings">
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
-        <compositeConfiguration>
-          <compositeBuild compositeDefinitionSource="SCRIPT" />
-        </compositeConfiguration>
         <option name="distributionType" value="DEFAULT_WRAPPED" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/app1" />
+            <option value="$PROJECT_DIR$/appYUYIN" />
+            <option value="$PROJECT_DIR$/core" />
+            <option value="$PROJECT_DIR$/coreYUYIN" />
+            <option value="$PROJECT_DIR$/corebd" />
+            <option value="$PROJECT_DIR$/diy_view" />
             <option value="$PROJECT_DIR$/lib" />
             <option value="$PROJECT_DIR$/lteditspinner" />
+            <option value="$PROJECT_DIR$/mylibraryApp" />
+            <option value="$PROJECT_DIR$/uiasr" />
+            <option value="$PROJECT_DIR$/uiasrYUYIN" />
+            <option value="$PROJECT_DIR$/uidialog" />
+            <option value="$PROJECT_DIR$/uidialogYUYIN" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />
