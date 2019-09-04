@@ -1,8 +1,12 @@
 package com.example.zhuanchu;
 
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -19,6 +23,7 @@ import com.google.android.flexbox.FlexboxLayoutManager;
 import com.example.zhuanchu.service.CompressOperate_zip4j;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -30,6 +35,8 @@ import java.util.TimerTask;
 public class PackActivity extends AppCompatActivity {
 
     private JSONArray jsonArray = null;
+    private ProgressDialog pdialog;
+    Context context;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -85,14 +92,14 @@ public class PackActivity extends AppCompatActivity {
                 }
 
                 try {
-                    String path = Environment.getExternalStorageDirectory() + "/CRRC";
+                    final String path = Environment.getExternalStorageDirectory() + "/CRRC";
                     File file = new File(path);
 
                     if (!file.exists()) {
                         file.mkdir();
                     }
 
-                    String path2 = Environment.getExternalStorageDirectory() + "/CRRC/UPLOAD";
+                    final String path2 = Environment.getExternalStorageDirectory() + "/CRRC/UPLOAD";
 
                     file = new File( path2 );
                     if (!file.exists()) {
@@ -110,11 +117,38 @@ public class PackActivity extends AppCompatActivity {
                     java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("yyyyMMddHH:mm:ss");
                     String packtime = dateFormat.format(new Date());
 
-                    String packname = choose.getString("name") + "_" + packtime + "_" + "A" + "_重庆机务段.zip";
+                    final String packname = choose.getString("name") + "_" + packtime + "_" + "A" + "_重庆机务段.zip";
 
-                    CompressOperate_zip4j.compressZip4j(path + "/DOWNLOAD/" + choose.getString("name"), path2 + "/" + packname, "123456" );
+                    pdialog = new ProgressDialog( PackActivity.this );
+                    pdialog.setTitle("任务正在执行中");
+                    pdialog.setMessage("正在下载中，敬请等待...");
+                    pdialog.setCancelable(false);
+                    pdialog.setMax(100);
+                    pdialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                    pdialog.setIndeterminate(false);
+                    pdialog.setProgress(0);
+                    pdialog.show();
 
-                    Toast.makeText(getApplicationContext(), "打包成功", Toast.LENGTH_LONG).show();
+                    Toast toast = new Toast( PackActivity.this );
+
+                    final JSONObject finalChoose = choose;
+                    Thread thread = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                CompressOperate_zip4j.compressZip4j(path + "/DOWNLOAD/" + finalChoose.getString("name"), path2 + "/" + packname, "123456", pdialog, PackActivity.this );
+                                //pdialog.dismiss();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                            //Toast.makeText(getApplicationContext(), "打包成功", Toast.LENGTH_LONG).show();
+                        }
+                    });
+                    thread.start();
+
+
+
 
 //                    final AlertDialog.Builder dialog = new AlertDialog.Builder( PackActivity.this );
 //                    dialog.setMessage("打包成功");

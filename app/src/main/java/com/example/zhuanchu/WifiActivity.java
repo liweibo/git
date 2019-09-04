@@ -90,6 +90,13 @@ public class WifiActivity extends AppCompatActivity {
 //        ARouter.openDebug();
 //        ARouter.init(getApplication());
 
+        findViewById(R.id.upload).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ARouter.getInstance().build("/app/upload").navigation();
+            }
+        });
+
         wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         wifiManager.setWifiEnabled(true);
 

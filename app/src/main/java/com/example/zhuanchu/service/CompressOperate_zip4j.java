@@ -2,12 +2,24 @@ package com.example.zhuanchu.service;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.ZipParameters;
+import net.lingala.zip4j.progress.ProgressMonitor;
 import net.lingala.zip4j.util.Zip4jConstants;
 
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
+import android.widget.Toast;
+
+import com.example.zhuanchu.PackActivity;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 public class CompressOperate_zip4j {
@@ -16,6 +28,7 @@ public class CompressOperate_zip4j {
     private static int result = 0; //状态返回值
 
     private static final String TAG = "CompressOperate_zip4j";
+    static Handler handler;
 
     /**
      *  zip4j压缩
@@ -24,42 +37,107 @@ public class CompressOperate_zip4j {
      * @param password  密码
      * @return 状态返回值
      */
-    public static int compressZip4j(String filePath, String zipFilePath, String password) {
+    public static int compressZip4j(String filePath, String zipFilePath, String password, final ProgressDialog pdialog, final Context context) {
         File sourceFile = new File(filePath);
         File zipFile_ = new File(zipFilePath);
+//        try {
+//
+//        } catch (ZipException e) {
+//            Log.e(TAG, "compressZip4j: 异常：" + e);
+//            result = -1;
+//            return result;
+//        }
+
         try {
             zipFile = new ZipFile(zipFile_);
-            zipFile.setFileNameCharset("GBK"); //设置编码格式（支持中文）
-
-            zipParameters = new ZipParameters();
-            zipParameters.setCompressionMethod(Zip4jConstants.COMP_DEFLATE); //压缩方式
-            zipParameters.setCompressionLevel(Zip4jConstants.DEFLATE_LEVEL_NORMAL); // 压缩级别
-            if (password != null && password != "") {   //是否要加密(加密会影响压缩速度)
-                zipParameters.setEncryptFiles(true);
-                zipParameters.setEncryptionMethod(Zip4jConstants.ENC_METHOD_STANDARD); // 加密方式
-                zipParameters.setPassword(password.toCharArray());
-            }
-
-            if (zipFile_.isDirectory()) {
-                String sourceFileName = checkString(sourceFile.getName()); //文件校验
-                zipFilePath = zipFilePath + "/" + sourceFileName + ".zip";
-                Log.i(TAG, "保存压缩文件的路径(zipFilePath)：" + zipFilePath);
-                compressZip4j(filePath,zipFilePath,password);
-            }
-            if (sourceFile.isDirectory()) {
-                //  File[] files = sourceFile.listFiles();
-                //  ArrayList<File> arrayList = new ArrayList<File>();
-                //  Collections.addAll(arrayList, files);
-                zipFile.addFolder(sourceFile, zipParameters);
-            } else {
-                zipFile.addFile(sourceFile, zipParameters);
-            }
-            Log.i(TAG, "compressZip4j: 压缩成功");
         } catch (ZipException e) {
-            Log.e(TAG, "compressZip4j: 异常：" + e);
-            result = -1;
-            return result;
+            e.printStackTrace();
         }
+        try {
+            zipFile.setFileNameCharset("GBK"); //设置编码格式（支持中文）
+        } catch (ZipException e) {
+            e.printStackTrace();
+        }
+
+        zipParameters = new ZipParameters();
+        zipParameters.setCompressionMethod(Zip4jConstants.COMP_DEFLATE); //压缩方式
+        zipParameters.setCompressionLevel(Zip4jConstants.DEFLATE_LEVEL_NORMAL); // 压缩级别
+        if (password != null && password != "") {   //是否要加密(加密会影响压缩速度)
+            zipParameters.setEncryptFiles(true);
+            zipParameters.setEncryptionMethod(Zip4jConstants.ENC_METHOD_STANDARD); // 加密方式
+            zipParameters.setPassword(password.toCharArray());
+        }
+
+        final ProgressMonitor progressMonitor = zipFile.getProgressMonitor();
+
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            public void run() {
+
+                //System.out.println( progressMonitor.getPercentDone() );
+            }
+        }, 10, 500);// 设定指定的时间time,此处为2000毫秒
+
+
+
+//            if (zipFile_.isDirectory()) {
+//                String sourceFileName = checkString(sourceFile.getName()); //文件校验
+//                zipFilePath = zipFilePath + "/" + sourceFileName + ".zip";
+//                Log.i(TAG, "保存压缩文件的路径(zipFilePath)：" + zipFilePath);
+//                compressZip4j(filePath,zipFilePath,password);
+//            }
+        if (sourceFile.isDirectory()) {
+            //  File[] files = sourceFile.listFiles();
+            //  ArrayList<File> arrayList = new ArrayList<File>();
+            //  Collections.addAll(arrayList, files);
+            zipFile.setRunInThread(true);
+            try {
+                zipFile.addFolder(sourceFile, zipParameters);
+            } catch (ZipException e) {
+                e.printStackTrace();
+            }
+        } else {
+            zipFile.setRunInThread(true);
+            try {
+                zipFile.addFile(sourceFile, zipParameters);
+            } catch (ZipException e) {
+                e.printStackTrace();
+            }
+        }
+
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                boolean qidong = true;
+                while (qidong){
+
+                    System.out.println("Percentage done: " + progressMonitor.getPercentDone());
+                    System.out.println("Current file: " + progressMonitor.getFileName());
+                    pdialog.setProgress(progressMonitor.getPercentDone());
+                    if( ( progressMonitor.getPercentDone() >= 99 && progressMonitor.getFileName() != null ) || progressMonitor.getFileName() == null ){
+                        qidong = false;
+                        pdialog.dismiss();
+                        Looper.prepare();
+                        Toast.makeText(context.getApplicationContext(), "打包成功", Toast.LENGTH_LONG).show();
+                        Looper.loop();
+                    }
+                    Log.i(TAG, "compressZip4j: 压缩成功");
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+
+        thread.start();
+
+        //pdialog.dismiss();
+
+
+
+
         return result;
     }
 
