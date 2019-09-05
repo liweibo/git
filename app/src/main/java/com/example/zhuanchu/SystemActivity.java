@@ -15,7 +15,7 @@ import com.alibaba.android.arouter.launcher.ARouter;
 @Route( path = "/app/system")
 public class SystemActivity extends AppCompatActivity {
 
-    SharedPreferences sharedPreferences = null;
+    SharedPreferences sharedPreferencesSet = null;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,15 +57,15 @@ public class SystemActivity extends AppCompatActivity {
         TextView textView = findViewById(R.id.systembar).findViewById(R.id.systemText);
         textView.setTextColor( Color.parseColor("#35ae5d")  );
 
-        sharedPreferences = getSharedPreferences("data",MODE_PRIVATE);
-        final SharedPreferences.Editor editor = sharedPreferences.edit();
+        sharedPreferencesSet = getSharedPreferences("data",MODE_PRIVATE);
+        final SharedPreferences.Editor editor = sharedPreferencesSet.edit();
 
 
         /*
          * 初始化wifi,4g打开按钮
          * */
-        boolean networkinit = sharedPreferences.getBoolean("network", false);
-        boolean wifiinit = sharedPreferences.getBoolean("wifi", false);
+        boolean networkinit = sharedPreferencesSet.getBoolean("network", false);
+        boolean wifiinit = sharedPreferencesSet.getBoolean("wifi", false);
         ImageView networkImg = findViewById(R.id.networkset);
         ImageView wifiImg = findViewById(R.id.wifiset);
         if( networkinit ){
@@ -83,7 +83,7 @@ public class SystemActivity extends AppCompatActivity {
         findViewById(R.id.networkset).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                boolean networkstate = sharedPreferences.getBoolean("network", false);
+                boolean networkstate = sharedPreferencesSet.getBoolean("network", false);
 
                 ImageView imageView = findViewById(R.id.networkset);
                 if( networkstate ){
@@ -100,7 +100,7 @@ public class SystemActivity extends AppCompatActivity {
         findViewById(R.id.wifiset).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                boolean wifistate = sharedPreferences.getBoolean("wifi", false);
+                boolean wifistate = sharedPreferencesSet.getBoolean("wifi", false);
 
                 ImageView imageView = findViewById(R.id.wifiset);
                 if( wifistate ){

@@ -2,7 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.zhuanchu">
-
     <!-- 下面是使用wifi訪问网络所需的权限 -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -16,7 +15,6 @@
         android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"
         tools:ignore="ProtectedPermissions" />
 
-    <!-- 在SDCard中创建与删除文件权限 -->
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -25,6 +23,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".HorizontalNtbActivity"></activity>
         <activity
             android:name=".SplashActivity"
             android:theme="@style/BaseAppTheme.Trans">
@@ -34,7 +33,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".HomeActivity" />
+        <activity android:name=".HomeActivity"
+            android:windowSoftInputMode="adjustPan"
+            />
         <activity android:name=".SystemActivity" />
         <activity android:name=".NavbarActivity" />
         <activity android:name=".FilelistActivity" />
@@ -45,10 +46,8 @@
         <activity android:name=".MainActivity" />
         <activity android:name=".AuthActivity" />
         <activity android:name=".WifiActivity" />
-        <activity android:name=".AuthfailActivity"></activity>
-        <activity android:name=".FileView"></activity>
-
-        <!-- FileProvider配置访问路径，适配7.0及其以上 -->
+        <activity android:name=".AuthfailActivity" />
+        <activity android:name=".FileView" /> <!-- FileProvider配置访问路径，适配7.0及其以上 -->
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="${applicationId}.provider"
@@ -56,9 +55,8 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/provider_paths"/>
+                android:resource="@xml/provider_paths" />
         </provider>
     </application>
-
 
 </manifest>

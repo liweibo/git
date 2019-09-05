@@ -1,36 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android_custom="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     tools:context=".HomeActivity">
 
-    <LinearLayout
+    <com.google.android.flexbox.FlexboxLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_height="match_parent"
+        app:flexDirection="column">
 
-        <ScrollView
-            android:id="@+id/scrollView1"
+
+
+        <com.google.android.flexbox.FlexboxLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scrollbars="none">
+            android:layout_height="wrap_content"
+            android:paddingLeft="50dp"
+            android:paddingTop="20dp"
+            android:paddingRight="50dp"
+            android:paddingBottom="20dp"
+            app:alignItems="center"
+            app:flexDirection="column"
+            app:layout_flexGrow="1">
 
-
-            <LinearLayout
+            <com.google.android.flexbox.FlexboxLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingLeft="50dp"
-                android:paddingTop="20dp"
-                android:paddingRight="50dp"
-                android:paddingBottom="20dp">
-
+                app:alignItems="center">
 
                 <LinearLayout
-                    android:layout_marginTop="20dp"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
@@ -42,18 +42,28 @@
                         android:textSize="16dp" />
 
                     <org.angmarch.views.NiceSpinner
-                        android:id="@+id/edit_spinnerCheXing"
+                        android:id="@+id/edit_spinnerCheXing1"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:textSize="16dp"
-                        app:arrowTint="@color/colorfocus"
-                        app:textTint="@color/colorfocus" />
+                        app:textTint="@color/colorfocus"
+
+                        app:arrowTint="@color/colorfocus" />
+
+
                 </LinearLayout>
 
-                <LinearLayout
-                    android:layout_marginTop="20dp"
 
+            </com.google.android.flexbox.FlexboxLayout>
+
+            <com.google.android.flexbox.FlexboxLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                app:alignItems="center">
+
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
@@ -65,20 +75,28 @@
                         android:textSize="16dp" />
 
                     <org.angmarch.views.NiceSpinner
-                        android:id="@+id/edit_spinnerjuTiCheXing"
+                        android:id="@+id/edit_spinnerjuTiCheXing1"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:textSize="16dp"
-                        app:arrowTint="@color/colorfocus"
-                        app:textTint="@color/colorfocus" />
+                        app:textTint="@color/colorfocus"
+
+                        app:arrowTint="@color/colorfocus" />
+
 
                 </LinearLayout>
 
 
-                <LinearLayout
-                    android:layout_marginTop="20dp"
+            </com.google.android.flexbox.FlexboxLayout>
 
+            <com.google.android.flexbox.FlexboxLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                app:alignItems="center">
+
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
@@ -90,17 +108,17 @@
                         android:textSize="16dp" />
 
                     <scut.carson_ho.diy_view.SuperEditText
-                        android:id="@+id/editext_chehao"
+                        android:id="@+id/editext_chehao1"
 
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginRight="20dp"
                         android:layout_weight="1"
                         android:textColor="@color/colorfocus"
+
                         android:textSize="16dp"
                         app:cursor="@drawable/cursortest"
-                        app:delete_height="60"
-                        app:delete_width="60"
+                        app:delete_height="80"
+                        app:delete_width="80"
                         app:delete_x="0"
                         app:delete_y="0"
                         app:ic_delete="@drawable/delete"
@@ -115,7 +133,7 @@
                         />
 
                     <ImageButton
-                        android:id="@+id/imagebtnCamera"
+                        android:id="@+id/imagebtnCamera1"
 
                         android:layout_width="20dp"
                         android:layout_height="20dp"
@@ -126,10 +144,15 @@
 
                 </LinearLayout>
 
+            </com.google.android.flexbox.FlexboxLayout>
+
+            <com.google.android.flexbox.FlexboxLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                app:alignItems="center">
 
                 <LinearLayout
-                    android:layout_marginTop="20dp"
-
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
@@ -141,16 +164,16 @@
 
 
                     <scut.carson_ho.diy_view.SuperEditText
-                        android:id="@+id/et_peishu"
+                        android:id="@+id/et_peishu1"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginRight="20dp"
                         android:layout_weight="1"
                         android:textColor="@color/colorfocus"
+
                         android:textSize="16dp"
                         app:cursor="@drawable/cursortest"
-                        app:delete_height="60"
-                        app:delete_width="60"
+                        app:delete_height="80"
+                        app:delete_width="80"
                         app:delete_x="0"
                         app:delete_y="0"
                         app:ic_delete="@drawable/delete"
@@ -176,11 +199,15 @@
 
 
                 </LinearLayout>
+            </com.google.android.flexbox.FlexboxLayout>
 
+            <com.google.android.flexbox.FlexboxLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                app:alignItems="center">
 
                 <LinearLayout
-                    android:layout_marginTop="20dp"
-
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
@@ -192,22 +219,29 @@
                         android:textSize="16dp" />
 
                     <org.angmarch.views.NiceSpinner
-                        android:id="@+id/edit_spinnerCheXingCheHao"
+                        android:id="@+id/edit_spinnerCheXingCheHao1"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:textSize="16dp"
-                        app:arrowTint="@color/colorfocus"
+                        app:textTint="@color/colorfocus"
 
-                        app:textTint="@color/colorfocus" />
+                        app:arrowTint="@color/colorfocus" />
 
 
                 </LinearLayout>
 
 
-                <LinearLayout
-                    android:layout_marginTop="20dp"
+            </com.google.android.flexbox.FlexboxLayout>
 
+
+            <com.google.android.flexbox.FlexboxLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                app:alignItems="center">
+
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
@@ -220,24 +254,32 @@
 
 
                     <org.angmarch.views.NiceSpinner
-                        android:id="@+id/edit_spinnerCheXingCheHaoSheBei"
+                        android:id="@+id/edit_spinnerCheXingCheHaoSheBei1"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:textSize="16dp"
-                        app:arrowTint="@color/colorfocus"
-                        app:textTint="@color/colorfocus" />
+                        app:textTint="@color/colorfocus"
+
+                        app:arrowTint="@color/colorfocus" />
+
 
                 </LinearLayout>
 
 
-                <LinearLayout
-                    android:layout_marginTop="20dp"
+            </com.google.android.flexbox.FlexboxLayout>
 
-                    android:id="@+id/fl_cmd"
+            <com.google.android.flexbox.FlexboxLayout
+                android:id="@+id/fl_cmd1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:visibility="gone"
+                app:alignItems="center">
+
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:visibility="gone">
+                    android:layout_height="match_parent">
 
                     <TextView
                         android:layout_width="95dp"
@@ -247,79 +289,91 @@
                         android:textSize="16dp" />
 
                     <org.angmarch.views.NiceSpinner
-                        android:id="@+id/edit_spinnerCheXingCheHaoCMD"
+                        android:id="@+id/edit_spinnerCheXingCheHaoCMD1"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:textSize="16dp"
                         app:arrowTint="@color/colorfocus"
-                        app:textTint="@color/colorfocus" />
+                        app:textTint="@color/colorfocus"
+                        />
 
 
                 </LinearLayout>
 
 
-                <TextView
-                    android:id="@+id/testtext"
+                <!--<TextView-->
+                <!--android:layout_width="100dp"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:text="CMD"-->
+                <!--android:textSize="16dp" />-->
+
+                <!--<cn.lognteng.editspinner.lteditspinner.LTEditSpinner-->
+                <!--android:id="@+id/edit_spinnerCheXingCheHaoCMD"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="40dp"></cn.lognteng.editspinner.lteditspinner.LTEditSpinner>-->
+            </com.google.android.flexbox.FlexboxLayout>
+
+            <TextView
+                android:id="@+id/testtext1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="right"
+                android:orientation="horizontal"
+
+                >
+
+                <CheckBox
+                    android:id="@+id/remember_info1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="" />
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginRight="5dp"
+                    android:buttonTint="@color/colorfocus"
+                    android:clickable="true"
+                    android:focusable="false"
+                    android:focusableInTouchMode="false"
+                    android:gravity="center_vertical" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="right"
-                    android:orientation="horizontal"
-
-                    >
-
-                    <CheckBox
-                        android:id="@+id/remember_info"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginRight="5dp"
-                        android:buttonTint="@color/colorfocus"
-                        android:clickable="true"
-                        android:focusable="false"
-                        android:focusableInTouchMode="false"
-                        android:gravity="center_vertical" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:paddingRight="5dp"
-                        android:text="记住配置信息"
-                        android:textSize="16dp" />
-                </LinearLayout>
-
-
+                    android:layout_gravity="center_vertical"
+                    android:paddingRight="5dp"
+                    android:text="记住配置信息"
+                    android:textSize="16dp" />
             </LinearLayout>
 
+            <RelativeLayout
+                android:layout_marginTop="40dp"
+                android:layout_width="wrap_content"
+                android:layout_height="38dp"
+                android:background="@drawable/btn"
 
-        </ScrollView>
-    </LinearLayout>
+                >
+                <Button
+                    android:colorControlHighlight="#ff0000"
+                    android:background="?android:attr/selectableItemBackgroundBorderless"
+                    android:id="@+id/vercodehome1"
+                    android:layout_width="match_parent"
+                    android:layout_height="38dp"
+                    android:text="确定"
+                    android:textColor="#fff"
+                    android:textSize="16dp" />
+            </RelativeLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="38dp"
-        android:layout_marginLeft="50dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginRight="50dp"
-        android:layout_marginBottom="30dp"
-        android:background="@drawable/btn"
-        android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/vercodehome"
-            android:layout_width="match_parent"
-            android:layout_height="38dp"
-            android:layout_gravity="bottom"
-            android:background="?android:attr/selectableItemBackgroundBorderless"
-            android:colorControlHighlight="#ff0000"
-            android:text="确定"
-            android:textColor="#fff"
-            android:textSize="16dp" />
-    </LinearLayout>
-</LinearLayout>
+        </com.google.android.flexbox.FlexboxLayout>
+
+
+
+
+    </com.google.android.flexbox.FlexboxLayout>
+
+
+</android.support.constraint.ConstraintLayout>

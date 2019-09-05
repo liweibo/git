@@ -1,75 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:android_custom="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".selectFileActivity">
 
-    <com.google.android.flexbox.FlexboxLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android_custom:flexDirection="column">
+        android:orientation="vertical">
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:divider="@drawable/title"
-            android:orientation="vertical"
-            android:showDividers="end">
-
-
-            <com.google.android.flexbox.FlexboxLayout
-                android:layout_width="match_parent"
-                android:background="@color/colorfocus"
-                android:layout_height="49dp">
-
-                <ImageView
-                    android:id="@+id/homebackselect"
-                    android:layout_width="26dp"
-                    android:layout_height="26dp"
-                    android:layout_marginLeft="10dp"
-                    android:src="@drawable/ico_brawser_backwards_d" />
-
-                <com.google.android.flexbox.FlexboxLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    app:alignItems="center"
-                    app:justifyContent="center"
-                    app:layout_flexGrow="1">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="文件下载"
-                        android:textColor="#ffffff"
-                        android:textSize="20dp" />
-                </com.google.android.flexbox.FlexboxLayout>
-
-                <ImageView
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_marginRight="6dp"
-                    />
-            </com.google.android.flexbox.FlexboxLayout>
-
-
-        </LinearLayout>
-
-
-    <com.google.android.flexbox.FlexboxLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="20dp"
-        android:paddingTop="20dp"
-        android:paddingRight="20dp"
-        android:paddingBottom="20dp"
-        app:alignItems="center"
-        app:flexDirection="column"
-        app:layout_flexGrow="1">
-
-        <LinearLayout
+            android:layout_marginBottom="20dp"
+            android:layout_marginTop="20dp"
             android:id="@+id/lll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -86,28 +31,35 @@
                 android:text="请选择需要下载的文件：" />
 
             <CheckBox
-                android:buttonTint="@color/colorfocus"
                 android:id="@+id/checkbox_all"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="10dp"
+                android:buttonTint="@color/colorfocus"
                 android:clickable="true"
                 android:text="全选" />
         </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginBottom="20dp"
+            android:layout_weight="1">
 
-        <ListView
-            android:id="@+id/lv"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/tv_suc"
-            app:layout_flexGrow="1" />
+            <ListView
+                android:id="@+id/lv"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tv_suc"
+                app:layout_flexGrow="1" />
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/llbtn"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:layout_below="@+id/lv"
+            android:layout_marginBottom="30dp"
             android:orientation="horizontal"
             android:paddingLeft="10dp"
             android:paddingRight="10dp">
@@ -131,30 +83,8 @@
                 android:background="@drawable/btn"
                 android:text="返回上级目录"
                 android:textColor="#fff" />
-
         </LinearLayout>
 
-        <TextView
+    </LinearLayout>
 
-            android:id="@+id/tv_suc"
-            android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:layout_below="@+id/llbtn"
-            android:text="" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:divider="@drawable/title"
-            android:orientation="vertical"
-            android:showDividers="beginning"
-            tools:ignore="MissingConstraints">
-
-            <include
-                android:id="@+id/systembar"
-                layout="@layout/navbar"></include>
-        </LinearLayout>
-    </com.google.android.flexbox.FlexboxLayout>
-    </com.google.android.flexbox.FlexboxLayout>
-
-</android.support.constraint.ConstraintLayout>
+</LinearLayout>

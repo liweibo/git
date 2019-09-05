@@ -18,6 +18,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <CheckBox
+                android:buttonTint="@color/colorfocus"
+                android:clickable="true"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
                 android:id="@+id/filecheck"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />

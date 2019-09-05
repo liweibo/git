@@ -31,7 +31,6 @@ import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
-@Route( path = "/app/pack")
 public class PackActivity extends AppCompatActivity {
 
     private JSONArray jsonArray = null;
@@ -43,38 +42,6 @@ public class PackActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.pack);
-
-        /*
-         * 导航修改的内容
-         */
-        findViewById(R.id.systembar).findViewById(R.id.toSystem).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ARouter.getInstance().build("/app/system").navigation();
-            }
-        });
-
-        findViewById(R.id.systembar).findViewById(R.id.toDown).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ARouter.getInstance().build("/app/home").navigation();
-            }
-        });
-
-        findViewById(R.id.systembar).findViewById(R.id.toPack).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ARouter.getInstance().build("/app/pack").navigation();
-            }
-        });
-
-        findViewById(R.id.systembar).findViewById(R.id.upload).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ARouter.getInstance().build("/app/upload").navigation();
-            }
-        });
-
         ImageView image = findViewById(R.id.systembar).findViewById(R.id.packImg);
         image.setImageResource(R.drawable.dabao_c);
         TextView textView = findViewById(R.id.systembar).findViewById(R.id.filepack);
@@ -83,14 +50,12 @@ public class PackActivity extends AppCompatActivity {
         findViewById(R.id.packbtn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 if( jsonArray == null || jsonArray.length() == 0 ){
                     AlertDialog.Builder alertDialog = new AlertDialog.Builder( PackActivity.this );
                     alertDialog.setMessage("请选择需要打包的目录");
                     alertDialog.show();
                     return;
                 }
-
                 try {
                     final String path = Environment.getExternalStorageDirectory() + "/CRRC";
                     File file = new File(path);
@@ -98,16 +63,13 @@ public class PackActivity extends AppCompatActivity {
                     if (!file.exists()) {
                         file.mkdir();
                     }
-
                     final String path2 = Environment.getExternalStorageDirectory() + "/CRRC/UPLOAD";
-
                     file = new File( path2 );
                     if (!file.exists()) {
                         file.mkdir();
                     }
 
                     JSONObject choose = null;
-
                     for(int i=0;i<jsonArray.length();i++){
                         if( jsonArray.getJSONObject(i).getBoolean("check") ){
                             choose = jsonArray.getJSONObject(i);
@@ -148,20 +110,6 @@ public class PackActivity extends AppCompatActivity {
                     thread.start();
 
 
-
-
-//                    final AlertDialog.Builder dialog = new AlertDialog.Builder( PackActivity.this );
-//                    dialog.setMessage("打包成功");
-//                    final AlertDialog success = dialog.show();
-//
-//
-//                    Timer timer = new Timer();
-//                    timer.schedule(new TimerTask() {
-//                        @Override
-//                        public void run() {
-//                            success.dismiss();
-//                        }
-//                    },1500);
 
                 }catch (Exception e){
 
@@ -207,13 +155,6 @@ public class PackActivity extends AppCompatActivity {
         } catch (Exception e) {
 
         }
-
-
-//
-//        List<String> datas = new ArrayList<>();
-//        for(int i=0;i<30;i++){
-//            datas.add("item "+i);
-//        }
 
 
         RecyclerView recyclerView = findViewById(R.id.listView);

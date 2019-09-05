@@ -10,29 +10,6 @@
         app:flexDirection="column"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <LinearLayout
-            android:divider="@drawable/title"
-            android:showDividers="end"
-            android:layout_width="match_parent"
-            android:orientation="vertical"
-            android:layout_height="50dp">
-            <com.google.android.flexbox.FlexboxLayout
-                android:layout_width="match_parent"
-                android:layout_height="49dp">
-                <com.google.android.flexbox.FlexboxLayout
-                    app:layout_flexGrow="1"
-                    app:justifyContent="center"
-                    app:alignItems="center"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent">
-                    <TextView
-                        android:textSize="16dp"
-                        android:text="系统设置"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
-                </com.google.android.flexbox.FlexboxLayout>
-            </com.google.android.flexbox.FlexboxLayout>
-        </LinearLayout>
 
         <com.google.android.flexbox.FlexboxLayout
             android:layout_margin="30dp"
@@ -136,36 +113,32 @@
                 android:layout_width="match_parent"
                 android:orientation="vertical"
                 android:layout_height="50dp">
-                <com.google.android.flexbox.FlexboxLayout
-                    app:alignItems="center"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="49dp">
                     <TextView
-                        app:layout_flexGrow="1"
                         android:text="已下载文件删除设置"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
                         android:layout_height="wrap_content" />
-                    <Spinner
-                        android:background="@drawable/slider"
-                        app:layout_flexGrow="1"
-                        android:entries="@array/delteoptions"
-                        android:layout_marginLeft="10dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="40dp">
-                    </Spinner>
-                </com.google.android.flexbox.FlexboxLayout>
+
+
+                    <org.angmarch.views.NiceSpinner
+
+                        android:id="@+id/edit_spinnerDelete"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+
+                        android:textSize="16dp"
+                        app:arrowTint="@color/colorfocus"
+                        app:textTint="@color/colorfocus" />
+
+                </LinearLayout>
             </LinearLayout>
         </com.google.android.flexbox.FlexboxLayout>
 
-        <LinearLayout
-            android:orientation="vertical"
-            android:showDividers="beginning"
-            android:divider="@drawable/title"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            tools:ignore="MissingConstraints">
-            <include layout="@layout/navbar" android:id="@+id/systembar"></include>
-        </LinearLayout>
+
 
     </com.google.android.flexbox.FlexboxLayout>
 

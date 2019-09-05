@@ -2,7 +2,9 @@ package com.example.zhuanchu;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -10,46 +12,58 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
-import android.net.wifi.ScanResult;
-import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Looper;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
+import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
+
 import android.widget.ImageView;
-import android.widget.Switch;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.alibaba.fastjson.JSON;
+import com.example.zhuanchu.adapter.UploadAdapter;
+import com.example.zhuanchu.adapter.VerticalAdapter;
 import com.example.zhuanchu.bean.javaBean.JsonRootBean;
 import com.example.zhuanchu.bean.pojo15.JsonRootBean15;
-import com.example.zhuanchu.service.AESCpher;
 import com.example.zhuanchu.service.AuthService;
+import com.example.zhuanchu.service.CompressOperate_zip4j;
+import com.example.zhuanchu.service.ExMultipartBody;
 import com.example.zhuanchu.service.GetInfoForMultiList;
+import com.example.zhuanchu.service.UploadProgressListener;
 import com.githang.statusbar.StatusBarCompat;
 import com.google.android.flexbox.FlexboxLayout;
+import com.google.android.flexbox.FlexboxLayoutManager;
 import com.scottyab.aescrypt.AESCrypt;
 
 import org.angmarch.views.NiceSpinner;
@@ -64,7 +78,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -72,46 +85,38 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
+import devlight.io.library.ntb.NavigationTabBar;
 import me.leefeng.promptlibrary.PromptDialog;
+import okhttp3.Call;
 import okhttp3.FormBody;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-@Route(path = "/app/home")
 public class HomeActivity extends AppCompatActivity {
-    private List<String> dataCheXing = new ArrayList<>();
     private List<String> datajutiCheXing = new ArrayList<>();
     private List<String> dataCheHao = new ArrayList<>();
-    private List<String> dataCMD = new ArrayList<>();
     private List<String> dataShebei = new ArrayList<>();
     private List<String> dataIpPswUser = new ArrayList<>();
 
     private String chexingValue = "";
     private String jutiChexingValue = "";
-    private String chehaoValue = "";
-    private String peishuValue = "";
     private String chexianghaoValue = "";
     private String cmdValue = " ";
     private String shebeiValue = "";
 
-    private String[] beforeStr = new String[]{"", ""};
-    private String[] beforeStr2 = new String[]{"", ""};
-    private String[] beforeStr3 = new String[]{"", ""};
-    private String[] beforeStr4 = new String[]{"", ""};
-    private String[] beforeStr5 = new String[]{"", ""};
 
     private WifiManager wifiManager;
-    private int mProgress = 0;
-    private RingProgressBar roundProgressBar;
     private Socket socket;
     OutputStream outputStream;
     InputStream is;
@@ -121,30 +126,22 @@ public class HomeActivity extends AppCompatActivity {
     private String _pass = "12345678";
     private String cameraPath;
     private String imgFileName;
-    private Boolean rememberInfo = false;
 
-    protected Handler handler;
 
     // 输入流读取器对象
     InputStreamReader isr;
     BufferedReader br;
-    private Handler mMainHandler;
 
     // 接收服务器发送过来的消息
-    String response;
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static String[] PERMISSIONS_STORAGE = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
-    private Button login;
-    private Button cancel;
-    public Switch switch1;
     public static EditText host, port, name, pass;
     public static boolean haveCheck = true;
     public ImageButton imbtnOcr;
-    public ImageButton imbtnVoiceCheHao;
-    public ImageButton imbtnVoicePeiShu;
+
 
     public EditText editext_chehao;
     public EditText editext_peishu;
@@ -153,7 +150,7 @@ public class HomeActivity extends AppCompatActivity {
     public NiceSpinner edit_spinnerCheXingCheHao;
     public NiceSpinner edit_spinnerCheXingCheHaoSheBei;
     public NiceSpinner edit_spinnerCheXingCheHaoCMD;
-    public FlexboxLayout fl_cmd;
+    public LinearLayout fl_cmd;
 
 
     public CheckBox cb_remember;
@@ -165,23 +162,210 @@ public class HomeActivity extends AppCompatActivity {
 
     List<String> chexingList = new LinkedList<>();
 
+    JSONArray jsonArray = null;
+
+
+    Context context;
+    private JSONArray jsonArrayup = null;
+    private String url = "http://39.108.162.8:8089/chengdu/uploadmore";
+    SharedPreferences sharedPreferencesUp = null;
+    private ProgressDialog pdialogUp;
+
+    SharedPreferences sharedPreferencesSet = null;
+    ActionBar actionBar = null;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.home);
-        imbtnOcr = (ImageButton) findViewById(R.id.imagebtnCamera);
+        setContentView(R.layout.homeoncreate);
 
-        editext_chehao = (EditText) findViewById(R.id.editext_chehao);
-        editext_peishu = (EditText) findViewById(R.id.et_peishu);
-        edit_spinnerCheXing = findViewById(R.id.edit_spinnerCheXing);
-        edit_spinnerjuTiCheXing = findViewById(R.id.edit_spinnerjuTiCheXing);
-        edit_spinnerCheXingCheHao = findViewById(R.id.edit_spinnerCheXingCheHao);
-        edit_spinnerCheXingCheHaoSheBei = findViewById(R.id.edit_spinnerCheXingCheHaoSheBei);
-        edit_spinnerCheXingCheHaoCMD = findViewById(R.id.edit_spinnerCheXingCheHaoCMD);
+        SharedPreferences sharedPreferences = getSharedPreferences("tab",
+                Activity.MODE_PRIVATE);
+        int tabnum = sharedPreferences.getInt("tabnum", 0);
 
-        fl_cmd = (FlexboxLayout) findViewById(R.id.fl_cmd);
-        cb_remember = (CheckBox) findViewById(R.id.remember_info);
+
+        actionBar = this.getSupportActionBar();
+        if (tabnum == 3) {
+            actionBar.setTitle("系统设置");
+        } else if (tabnum == 2) {
+            actionBar.setTitle("文件上传");
+
+        } else if (tabnum == 1) {
+            actionBar.setTitle("文件打包");
+
+        } else if (tabnum == 0) {
+            actionBar.setTitle("信息配置");
+
+        } else {
+            actionBar.setTitle("信息配置");
+        }
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        StatusBarCompat.setStatusBarColor(this, getResources().getColor(R.color.colorfocus), true);
+
+        initUI();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            SharedPreferences pref = HomeActivity.this.getSharedPreferences("tab", MODE_PRIVATE);
+            SharedPreferences.Editor editor = pref.edit();
+            editor.putInt("tabnum", 0);
+            editor.commit();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void initUI() {
+        final ViewPager viewPager = (ViewPager) findViewById(R.id.vp_horizontal_ntbhome);
+        viewPager.setAdapter(new PagerAdapter() {
+            @Override
+            public int getCount() {
+                return 4;
+            }
+
+            @Override
+            public boolean isViewFromObject(final View view, final Object object) {
+                return view.equals(object);
+            }
+
+            @Override
+            public void destroyItem(final View container, final int position, final Object object) {
+                ((ViewPager) container).removeView((View) object);
+            }
+
+            @Override
+            public Object instantiateItem(final ViewGroup container, final int position) {
+                View view = null;
+                if (position == 0) {
+                    view = LayoutInflater.from(
+                            getBaseContext()).inflate(R.layout.home, null, false);
+                    initdownload(view);
+                } else if (position == 1) {
+                    view = LayoutInflater.from(
+                            getBaseContext()).inflate(R.layout.pack, null, false);
+                    initPack(view);
+                } else if (position == 2) {
+                    view = LayoutInflater.from(
+                            getBaseContext()).inflate(R.layout.upload, null, false);
+                    initUpload(view);
+                } else if (position == 3) {
+                    view = LayoutInflater.from(
+                            getBaseContext()).inflate(R.layout.system, null, false);
+                    initSet(view);
+                }
+
+
+                container.addView(view);
+                return view;
+            }
+        });
+
+
+        final String[] colors = getResources().getStringArray(R.array.default_preview);
+
+        final NavigationTabBar navigationTabBar = (NavigationTabBar) findViewById(R.id.ntb_horizontalhome);
+        final ArrayList<NavigationTabBar.Model> models = new ArrayList<>();
+        models.add(
+                new NavigationTabBar.Model.Builder(
+                        getResources().getDrawable(R.drawable.down),
+                        Color.parseColor(colors[0]))
+                        .title("下载")
+                        .build()
+        );
+        models.add(
+                new NavigationTabBar.Model.Builder(
+                        getResources().getDrawable(R.drawable.dabao),
+                        Color.parseColor(colors[1]))
+                        .title("打包")
+                        .build()
+        );
+        models.add(
+                new NavigationTabBar.Model.Builder(
+                        getResources().getDrawable(R.drawable.uploadf),
+                        Color.parseColor(colors[2]))
+                        .title("上传").badgeTitle("9")
+                        .build()
+        );
+        models.add(
+                new NavigationTabBar.Model.Builder(
+                        getResources().getDrawable(R.drawable.sets),
+                        Color.parseColor(colors[3]))
+                        .title("设置").badgeTitle("9")
+                        .build()
+        );
+        SharedPreferences sharedPreferences = getSharedPreferences("tab",
+                Activity.MODE_PRIVATE);
+        int tabnum = sharedPreferences.getInt("tabnum", 0);
+
+        navigationTabBar.setModels(models);
+        navigationTabBar.setViewPager(viewPager, tabnum);
+        navigationTabBar.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(final int position, final float positionOffset, final int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(final int position) {
+                navigationTabBar.getModels().get(position).hideBadge();
+                if (position == 3) {
+                    actionBar.setTitle("系统设置");
+                } else if (position == 2) {
+                    actionBar.setTitle("文件上传");
+
+                } else if (position == 1) {
+                    actionBar.setTitle("文件打包");
+
+                } else if (position == 0) {
+                    actionBar.setTitle("信息配置");
+
+                } else {
+                    actionBar.setTitle("信息配置");
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(final int state) {
+
+            }
+        });
+
+        navigationTabBar.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                for (int i = 0; i < navigationTabBar.getModels().size(); i++) {
+                    final NavigationTabBar.Model model = navigationTabBar.getModels().get(i);
+                    navigationTabBar.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            model.showBadge();
+                        }
+                    }, i * 100);
+                }
+            }
+        }, 500);
+    }
+
+
+    //以下4点，根据position的值，选择对应的一个即可，即在instantiateItem中被调用
+
+    //1  init下载首页的UI组件，以及逻辑代码，也就是homeactivity页面的内容
+    public void initdownload(View view) {
+        imbtnOcr = (ImageButton) view.findViewById(R.id.imagebtnCamera);
+
+        editext_chehao = (EditText) view.findViewById(R.id.editext_chehao);
+        editext_peishu = (EditText) view.findViewById(R.id.et_peishu);
+        edit_spinnerCheXing = view.findViewById(R.id.edit_spinnerCheXing);
+        edit_spinnerjuTiCheXing = view.findViewById(R.id.edit_spinnerjuTiCheXing);
+        edit_spinnerCheXingCheHao = view.findViewById(R.id.edit_spinnerCheXingCheHao);
+        edit_spinnerCheXingCheHaoSheBei = view.findViewById(R.id.edit_spinnerCheXingCheHaoSheBei);
+        edit_spinnerCheXingCheHaoCMD = view.findViewById(R.id.edit_spinnerCheXingCheHaoCMD);
+
+        fl_cmd = (LinearLayout) view.findViewById(R.id.fl_cmd);
+        cb_remember = (CheckBox) view.findViewById(R.id.remember_info);
         promptDialog = new PromptDialog(this);
 
 
@@ -207,7 +391,6 @@ public class HomeActivity extends AppCompatActivity {
         if (chexing.equals("机车")) {
             chexingList.clear();
             chexingList.add("机车");
-//            chexingList.add("请选择");
             chexingList.add("动车");
             chexingList.add("城轨");
         } else if (chexing.equals("动车")) {
@@ -220,7 +403,6 @@ public class HomeActivity extends AppCompatActivity {
         } else if (chexing.equals("城轨")) {
             chexingList.clear();
             chexingList.add("城轨");
-//            chexingList.add("请选择");
             chexingList.add("机车");
             chexingList.add("动车");
         } else {
@@ -261,78 +443,443 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void run() {
                 jsonRe = getJson();
-
-
-                //该段代码用来获取下拉列表数据并将数据进行展示。
-//                List<String> jidongcheng = GetInfoForMultiList.jiDongCheng(jsonRe, JsonRootBean15.class);
-//                for (int i = 0; i < jidongcheng.size(); i++) {
-//                    dataCheXing.add(jidongcheng.get(i));
-//                }
-//                init();//下拉框
-
             }
         }).start();
         spinnerMethod();
 
 
         //跳转
-        initSwich();
+        initSwich(view);
+    }
 
 
-        ImageView image = findViewById(R.id.systembar).findViewById(R.id.downImg);
-        image.setImageResource(R.drawable.down_c);
-        TextView textView = findViewById(R.id.systembar).findViewById(R.id.downText);
-        textView.setTextColor(Color.parseColor("#35ae5d"));
+    //2  init打包首页的UI组件，以及逻辑代码，...
+    public void initPack(View view) {
 
+        final ProgressDialog pdialog = new ProgressDialog(HomeActivity.this);
 
-        wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        wifiManager.setWifiEnabled(true);
+        Context context;
 
-        wifiManager.startScan();
+        view.findViewById(R.id.packbtn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
-        List<ScanResult> scanResults = wifiManager.getScanResults();
-        String reulst = "";
-
-//        Spinner spinner = findViewById(R.id.wifilist);
-
-        final JSONArray jsonArray = new JSONArray();
-
-        final ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item);
-        JSONObject jobject = new JSONObject();
-        try {
-            jobject.put("ssid", "请选择设备");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        jsonArray.put(jobject);
-        dataAdapter.add("请选择设备");
-
-        if (scanResults != null && scanResults.size() > 0) {
-            for (int i = 0; i < scanResults.size(); i++) {
-                ScanResult scanResult = scanResults.get(i);
-                if (!scanResult.SSID.isEmpty()) {
-                    JSONObject jsonObject = new JSONObject();
-                    try {
-                        jsonObject.put("ssid", scanResult.SSID);
-                        jsonObject.put("capabilities", scanResult.capabilities);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    dataAdapter.add(scanResult.SSID);
-                    jsonArray.put(jsonObject);
+                if (jsonArray == null || jsonArray.length() == 0) {
+                    AlertDialog.Builder alertDialog = new AlertDialog.Builder(HomeActivity.this);
+                    alertDialog.setMessage("请选择需要打包的目录");
+                    alertDialog.show();
+                    return;
                 }
+                try {
+                    final String path = Environment.getExternalStorageDirectory() + "/CRRC";
+                    File file = new File(path);
+
+                    if (!file.exists()) {
+                        file.mkdir();
+                    }
+                    final String path2 = Environment.getExternalStorageDirectory() + "/CRRC/UPLOAD";
+                    file = new File(path2);
+                    if (!file.exists()) {
+                        file.mkdir();
+                    }
+
+                    JSONObject choose = null;
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        if (jsonArray.getJSONObject(i).getBoolean("check")) {
+                            choose = jsonArray.getJSONObject(i);
+                        }
+                    }
+
+                    java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("yyyyMMddHH:mm:ss");
+                    String packtime = dateFormat.format(new Date());
+
+                    final String packname = choose.getString("name") + "_" + packtime + "_" + "A" + "_重庆机务段.zip";
+
+                    pdialog.setTitle("文件正在压缩打包");
+                    pdialog.setMessage("敬请等待...");
+                    pdialog.setProgressDrawable(getResources().getDrawable(R.drawable.myprogressbarstyle));
+                    pdialog.setCancelable(false);
+                    pdialog.setMax(100);
+                    pdialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+
+                    pdialog.setIndeterminate(false);
+                    pdialog.setProgress(0);
+                    pdialog.show();
+
+//                    Toast toast = new Toast(PackActivity.this);
+
+                    final JSONObject finalChoose = choose;
+                    Thread thread = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                CompressOperate_zip4j.compressZip4j(path + "/DOWNLOAD/" + finalChoose.getString("name"), path2 + "/" + packname, "123456", pdialog, HomeActivity.this);
+                                //pdialog.dismiss();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                            //Toast.makeText(getApplicationContext(), "打包成功", Toast.LENGTH_LONG).show();
+                        }
+                    });
+                    thread.start();
+
+
+                } catch (Exception e) {
+
+                }
+
+                //打包成ZIP
+
+            }
+        });
+
+        try {
+            String path = Environment.getExternalStorageDirectory() + "/CRRC";
+            File file = new File(path);
+
+            if (!file.exists()) {
+                file.mkdir();
+            }
+
+            path = Environment.getExternalStorageDirectory() + "/CRRC/DOWNLOAD";
+
+            file = new File(path);
+            if (!file.exists()) {
+                file.mkdir();
+            }
+
+            String filename = "";
+            jsonArray = new JSONArray();
+
+            File[] files = file.listFiles();
+            for (File spec : files) {
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("name", spec.getName());
+                java.text.SimpleDateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                String dateTime = df.format(new Date(spec.lastModified()));
+                jsonObject.put("time", dateTime);
+                jsonArray.put(jsonObject);
+                //filename += spec.getName();
+            }
+
+            TextView textView1 = view.findViewById(R.id.files);
+            textView1.setText(jsonArray.getJSONObject(0).getString("name"));
+        } catch (Exception e) {
+
+        }
+
+
+        RecyclerView recyclerView = view.findViewById(R.id.listView);
+        FlexboxLayoutManager flexboxLayoutManager = new FlexboxLayoutManager(this);
+        recyclerView.setLayoutManager(flexboxLayoutManager);
+
+        recyclerView.setAdapter(new VerticalAdapter(this, jsonArray));
+
+    }
+
+
+    //3   init上传首页的UI组件，以及逻辑代码，...
+    public void initUpload(View view) {
+        try {
+            String path = Environment.getExternalStorageDirectory() + "/CRRC";
+            File file = new File(path);
+
+            if (!file.exists()) {
+                file.mkdir();
+            }
+
+            path = Environment.getExternalStorageDirectory() + "/CRRC/UPLOAD";
+
+            file = new File(path);
+            if (!file.exists()) {
+                file.mkdir();
+            }
+
+            String filename = "";
+            jsonArrayup = new JSONArray();
+
+            File[] files = file.listFiles();
+            for (File spec : files) {
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("name", spec.getName());
+                java.text.SimpleDateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                String dateTime = df.format(new Date(spec.lastModified()));
+                jsonObject.put("time", dateTime);
+                jsonObject.put("file", spec);
+                jsonObject.put("check", false);
+                jsonArrayup.put(jsonObject);
+                //filename += spec.getName();
+            }
+
+            TextView textView1 = view.findViewById(R.id.files);
+            textView1.setText(jsonArrayup.getJSONObject(0).getString("name"));
+        } catch (Exception e) {
+
+        }
+
+
+        RecyclerView recyclerView = view.findViewById(R.id.listUpload);
+        FlexboxLayoutManager flexboxLayoutManager = new FlexboxLayoutManager(this);
+        recyclerView.setLayoutManager(flexboxLayoutManager);
+
+        recyclerView.setAdapter(new UploadAdapter(this, jsonArrayup));
+
+
+        view.findViewById(R.id.uploadbtn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                /*
+                 * 判断是否有网络
+                 * */
+                boolean network = isNetworkAvailable(HomeActivity.this);
+                if (!network) {
+
+                    Toast.makeText(HomeActivity.this, "没有检测到网络", Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                boolean mobile = isMobile(HomeActivity.this);
+                sharedPreferencesUp = getSharedPreferences("data", MODE_PRIVATE);
+
+                boolean networkinit = sharedPreferencesUp.getBoolean("network", false);
+
+                System.out.println(networkinit);
+
+                if (mobile && !networkinit) {
+                    android.app.AlertDialog.Builder dialog = new android.app.AlertDialog.Builder(HomeActivity.this);
+                    dialog.setTitle("网络检测");
+                    TextView textView1 = new TextView(HomeActivity.this);
+                    textView1.setText("当前为4G网络，要继续上传吗?");
+                    dialog.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            uploadFile(HomeActivity.this);
+                        }
+                    });
+                    dialog.setNegativeButton("取消", null);
+                    dialog.show();
+                    return;
+                }
+
+                uploadFile(HomeActivity.this);
+
+            }
+        });
+    }
+
+    //4   init设置首页的UI组件，以及逻辑代码，...
+    public void initSet(final View view) {
+
+
+        sharedPreferencesSet = getSharedPreferences("data", MODE_PRIVATE);
+        final SharedPreferences.Editor editor = sharedPreferencesSet.edit();
+
+        /*
+         * 初始化wifi,4g打开按钮
+         * */
+        boolean networkinit = sharedPreferencesSet.getBoolean("network", false);
+        boolean wifiinit = sharedPreferencesSet.getBoolean("wifi", false);
+        ImageView networkImg = view.findViewById(R.id.networkset);
+        ImageView wifiImg = view.findViewById(R.id.wifiset);
+        if (networkinit) {
+            networkImg.setImageResource(R.drawable.kaiqi);
+        } else {
+            networkImg.setImageResource(R.drawable.kaiqi_c);
+        }
+        if (wifiinit) {
+            wifiImg.setImageResource(R.drawable.kaiqi);
+        } else {
+            wifiImg.setImageResource(R.drawable.kaiqi_c);
+        }
+
+
+        view.findViewById(R.id.networkset).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean networkstate = sharedPreferencesSet.getBoolean("network", false);
+
+                ImageView imageView = view.findViewById(R.id.networkset);
+                if (networkstate) {
+                    imageView.setImageResource(R.drawable.kaiqi_c);
+                    editor.putBoolean("network", false);
+                } else {
+                    imageView.setImageResource(R.drawable.kaiqi);
+                    editor.putBoolean("network", true);
+                }
+                editor.commit();
+            }
+        });
+
+        view.findViewById(R.id.wifiset).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean wifistate = sharedPreferencesSet.getBoolean("wifi", false);
+
+                ImageView imageView = view.findViewById(R.id.wifiset);
+                if (wifistate) {
+                    imageView.setImageResource(R.drawable.kaiqi_c);
+                    editor.putBoolean("wifi", false);
+                } else {
+                    imageView.setImageResource(R.drawable.kaiqi);
+                    editor.putBoolean("wifi", true);
+                }
+                editor.commit();
+            }
+        });
+
+        view.findViewById(R.id.toFileView).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(HomeActivity.this, FileView.class));
+            }
+        });
+        NiceSpinner ns = (NiceSpinner)view.findViewById(R.id.edit_spinnerDelete);
+        List<String> ncdataList = new ArrayList<>();
+        ncdataList.add("请选择");
+        ncdataList.add("上传完删除");
+        ncdataList.add("保留一天删除");
+        ncdataList.add("保留两天删除");
+        ncdataList.add("保留三天删除");
+        ncdataList.add("保留一周删除");
+
+        List<String> ncdata = new ArrayList<>(ncdataList);
+        ns.attachDataSource(ncdata);
+    }
+
+    public void uploadFile(Context context) {
+
+        pdialogUp = new ProgressDialog(context);
+        pdialogUp.setTitle("文件正在上传");
+        pdialogUp.setMessage("敬请等待...");
+        pdialogUp.setProgressDrawable(getResources().getDrawable(R.drawable.myprogressbarstyle));
+        pdialogUp.setCancelable(false);
+        pdialogUp.setMax(100);
+        pdialogUp.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        pdialogUp.setIndeterminate(false);
+        pdialogUp.setProgress(0);
+        pdialogUp.show();
+
+        MultipartBody.Builder requestBodyBuilder = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM);
+        MediaType MutilPart_Form_Data = MediaType.parse("application/x-www-form-urlencoded;charset=utf-8");
+
+
+        for (int i = 0; i < jsonArrayup.length(); i++) {
+            try {
+                System.out.println(jsonArrayup.getJSONObject(i).getString("name"));
+                System.out.println(jsonArrayup.getJSONObject(i).getString("check"));
+                System.out.println(jsonArrayup.getJSONObject(i).getString("file"));
+                if (jsonArrayup.getJSONObject(i).getBoolean("check")) {
+                    File fileOne = new File(jsonArrayup.getJSONObject(i).getString("file")); //生成文件
+                    requestBodyBuilder.addFormDataPart("file", jsonArrayup.getJSONObject(i).getString("file"), RequestBody.create(MutilPart_Form_Data, fileOne));
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
         }
 
-//        spinner.setAdapter( dataAdapter );
+        //接口测试
+        requestBodyBuilder.addFormDataPart("type", "aa");
+        requestBodyBuilder.addFormDataPart("ab", "ab");
+        requestBodyBuilder.addFormDataPart("tip", "tip");
+        requestBodyBuilder.addFormDataPart("number", "number");
+        requestBodyBuilder.addFormDataPart("time", "time");
 
-        TextView text = findViewById(R.id.testtext);
-        text.setText(reulst);
+        ExMultipartBody exMultipartBody = new ExMultipartBody(requestBodyBuilder.build(), new UploadProgressListener() {
+            @Override
+            public void onProgress(long total, long current) {
+                System.out.println(current + "----" + total);
+                pdialogUp.setProgress((int) Math.ceil(current * 100 / total));
+                if (current == total) {
+                    pdialogUp.dismiss();
+                }
+            }
+        });
 
 
-        StatusBarCompat.setStatusBarColor(this, getResources().getColor(R.color.colorfocus), true);
+        RequestBody requestBody = requestBodyBuilder.build();
+
+        System.out.println(8888);
+        //String url = "https://www.baidu.com";
+        OkHttpClient okHttpClient = new OkHttpClient();
+//        okHttpClient.newBuilder().connectTimeout(60 * 1000, TimeUnit.MILLISECONDS)
+//                .readTimeout(5 * 60 * 1000, TimeUnit.MILLISECONDS)
+//                .writeTimeout(5 * 60 * 1000, TimeUnit.MILLISECONDS);
+
+        System.out.println(url);
+
+        Request request = new Request.Builder()
+                .url(url)
+                .post(exMultipartBody)
+                .build();
+        final Call call = okHttpClient.newCall(request);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Response response = call.execute();
+                    Looper.prepare();
+                    Toast.makeText(getApplicationContext(), "上传文件成功", Toast.LENGTH_LONG).show();
+                    Looper.loop();
+                } catch (IOException e) {
+                    Looper.prepare();
+                    Toast.makeText(getApplicationContext(), "上传文件失败", Toast.LENGTH_LONG).show();
+                    Looper.loop();
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
+    /**
+     * 检查是否有网络
+     */
+    public static boolean isNetworkAvailable(Context context) {
+
+        NetworkInfo info = getNetworkInfo(context);
+        return info != null && info.isAvailable();
+    }
+
+
+    /**
+     * 检查是否是WIFI
+     */
+    public static boolean isWifi(Context context) {
+
+        NetworkInfo info = getNetworkInfo(context);
+        if (info != null) {
+            if (info.getType() == ConnectivityManager.TYPE_WIFI) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    /**
+     * 检查是否是移动网络
+     */
+    public static boolean isMobile(Context context) {
+
+        NetworkInfo info = getNetworkInfo(context);
+        if (info != null) {
+            if (info.getType() == ConnectivityManager.TYPE_MOBILE) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    private static NetworkInfo getNetworkInfo(Context context) {
+
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(
+                Context.CONNECTIVITY_SERVICE);
+        return cm.getActiveNetworkInfo();
+    }
 
     private String getJson() {
         InputStream is = null;
@@ -717,7 +1264,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
 
-    private void initSwich() {
+    private void initSwich(View view) {
         cb_remember.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -822,17 +1369,8 @@ public class HomeActivity extends AppCompatActivity {
         });
 
 
-        findViewById(R.id.homeback).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//                ARouter.getInstance().build("/app/auth").navigation();
-                startActivity(new Intent(HomeActivity.this, AuthActivity.class));
-            }
-        });
-
-
         //点击确定时，获取...
-        findViewById(R.id.vercodehome).setOnClickListener(new View.OnClickListener() {
+        view.findViewById(R.id.vercodehome).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -882,136 +1420,9 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
 
-        /*
-         * 导航修改的内容
-         */
-        findViewById(R.id.systembar).findViewById(R.id.toSystem).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                promptDialog.showLoading("加载中...");
-                ARouter.getInstance().build("/app/system").navigation();
-                promptDialog.dismiss();
 
-            }
-        });
-
-        findViewById(R.id.systembar).findViewById(R.id.toDown).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                promptDialog.showLoading("加载中...");
-                ARouter.getInstance().build("/app/home").navigation();
-                promptDialog.dismiss();
-            }
-        });
-
-        findViewById(R.id.systembar).findViewById(R.id.upload).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                promptDialog.showLoading("加载中...");
-                ARouter.getInstance().build("/app/upload").navigation();
-                promptDialog.dismiss();
-            }
-        });
-
-        findViewById(R.id.systembar).findViewById(R.id.toPack).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                promptDialog.showLoading("加载中...");
-                ARouter.getInstance().build("/app/pack").navigation();
-                promptDialog.dismiss();
-            }
-        });
     }
 
-    public WifiConfiguration createWifiInfo(String SSID, String Password, int Type) {
-        WifiConfiguration configuration = new WifiConfiguration();
-        configuration.allowedAuthAlgorithms.clear();
-        configuration.allowedGroupCiphers.clear();
-        configuration.allowedKeyManagement.clear();
-        configuration.allowedPairwiseCiphers.clear();
-        configuration.allowedProtocols.clear();
-        configuration.SSID = "\"" + SSID + "\"";
-
-        WifiConfiguration tempConfig = this.isExsits(SSID);
-        if (tempConfig != null) {
-            wifiManager.removeNetwork(tempConfig.networkId);
-        }
-
-        switch (Type) {
-            case 1://不加密
-                configuration.wepKeys[0] = "";
-                configuration.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
-                configuration.wepTxKeyIndex = 0;
-                configuration.priority = 20000;
-                break;
-            case 2://wep加密
-                configuration.hiddenSSID = true;
-                configuration.wepKeys[0] = "\"" + Password + "\"";
-                configuration.allowedAuthAlgorithms.set(WifiConfiguration.AuthAlgorithm.SHARED);
-                configuration.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
-                configuration.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
-                configuration.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP40);
-                configuration.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP104);
-                configuration.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
-
-                break;
-            case 3: //wpa加密
-
-                configuration.preSharedKey = "\"" + Password + "\"";
-                configuration.hiddenSSID = true;
-                configuration.allowedAuthAlgorithms.set(WifiConfiguration.AuthAlgorithm.OPEN);
-                configuration.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
-                configuration.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
-                configuration.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
-                configuration.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.CCMP);
-                configuration.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.TKIP);
-                configuration.status = WifiConfiguration.Status.ENABLED;
-                break;
-        }
-        return configuration;
-    }
-
-    private WifiConfiguration isExsits(String SSID) {
-        if (wifiManager != null) {
-            List<WifiConfiguration> existingConfigs = wifiManager
-                    .getConfiguredNetworks();
-            for (WifiConfiguration existingConfig : existingConfigs) {
-                if (existingConfig.SSID.equals("\"" + SSID + "\"")) {
-                    return existingConfig;
-                }
-            }
-        }
-        return null;
-    }
-
-    public List<ScanResult> getWifiList() {
-        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
-        List<ScanResult> scanWifiList = wifiManager.getScanResults();
-        List<ScanResult> wifiList = new ArrayList<>();
-        if (scanWifiList != null && scanWifiList.size() > 0) {
-            HashMap<String, Integer> signalStrength = new HashMap<String, Integer>();
-            for (int i = 0; i < scanWifiList.size(); i++) {
-                ScanResult scanResult = scanWifiList.get(i);
-                //Log.e(ConstantUtils.TAG, "搜索的wifi-ssid:" + scanResult.SSID);
-                System.out.println(scanResult.SSID);
-                if (!scanResult.SSID.isEmpty()) {
-                    String key = scanResult.SSID + " " + scanResult.capabilities;
-                    if (!signalStrength.containsKey(key)) {
-                        signalStrength.put(key, i);
-                        wifiList.add(scanResult);
-                    }
-                }
-            }
-            TextView textView = findViewById(R.id.testtext);
-            textView.setText(scanWifiList.size() + "88888");
-        } else {
-            TextView textView = findViewById(R.id.testtext);
-            textView.setText("没有搜索到wifi");
-            //Log.e(ConstantUtils.TAG, "没有搜索到wifi");
-            System.out.println("没有搜索到wifi");
-        }
-        return wifiList;
-    }
 
     private void registerPermission() {
         //动态获取定位权限
@@ -1021,7 +1432,6 @@ public class HomeActivity extends AppCompatActivity {
                     100);
 
         } else {
-            getWifiList();
         }
     }
 
@@ -1030,7 +1440,6 @@ public class HomeActivity extends AppCompatActivity {
                                            @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == 100) {
-            getWifiList();
         }
 
         if (requestCode == REQUEST_CALL_PHONE) {
@@ -1077,11 +1486,11 @@ public class HomeActivity extends AppCompatActivity {
                 intent.putExtra("port", Integer.parseInt(_port));
                 startActivity(intent);
             } else {
-//                new android.app.AlertDialog.Builder(mContext)
-//                        .setTitle("无法连接")
-//                        .setMessage("请检查是否连接无线工装WIFI以及信息填写是否无误！")
-//                        .setPositiveButton("确定", null)
-//                        .show();
+                new android.app.AlertDialog.Builder(mContext)
+                        .setTitle("无法连接")
+                        .setMessage("请检查是否连接无线工装WIFI以及信息填写是否无误！")
+                        .setPositiveButton("确定", null)
+                        .show();
 
             }
         }
@@ -1718,35 +2127,14 @@ public class HomeActivity extends AppCompatActivity {
         return bitmap;
     }
 
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
-//    public com.google.android.gms.appindexing.Action getIndexApiAction() {
-//        com.google.android.gms.appindexing.Thing object = new com.google.android.gms.appindexing.Thing.Builder()
-//                .setName("Main Page") // TODO: Define a title for the content shown.
-//                // TODO: Make sure this auto-generated URL is correct.
-//                .setUrl(Uri.parse("http://[ENTER-YOUR-URL-HERE]"))
-//                .build();
-//        return new com.google.android.gms.appindexing.Action.Builder(com.google.android.gms.appindexing.Action.TYPE_VIEW)
-//                .setObject(object)
-//                .setActionStatus(com.google.android.gms.appindexing.Action.STATUS_TYPE_COMPLETED)
-//                .build();
-//    }
     @Override
     public void onStart() {
         super.onStart();
-
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
     }
 
     @Override
     public void onStop() {
         super.onStop();
-
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
     }
 
     @Override

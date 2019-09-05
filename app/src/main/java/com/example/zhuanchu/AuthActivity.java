@@ -32,6 +32,7 @@ public class AuthActivity extends AppCompatActivity {
         setContentView(R.layout.activity_auth);
         initView();
         setListener();
+        getSupportActionBar().hide();
         promptDialog = new PromptDialog(this);
 
         StatusBarCompat.setStatusBarColor(this, getResources().getColor(R.color.gplus_color_2), true);

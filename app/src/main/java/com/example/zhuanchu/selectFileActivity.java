@@ -14,7 +14,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -39,6 +41,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.channels.SelectableChannel;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -106,8 +109,6 @@ public class selectFileActivity extends AppCompatActivity implements OnClickList
         backDir = new ArrayList<>();
 
 
-
-
         /* 实例化各个控件 */
         lv = (ListView) findViewById(R.id.lv);
 
@@ -119,71 +120,24 @@ public class selectFileActivity extends AppCompatActivity implements OnClickList
         initDate();
 
         setClick();
-
-        findViewById(R.id.homebackselect).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(selectFileActivity.this, HomeActivity.class));
-            }
-        });
-
-        /*
-         * 导航修改的内容
-         */
-        findViewById(R.id.systembar).findViewById(R.id.toSystem).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                promptDialog.showLoading("加载中...");
-                startActivity(new Intent(selectFileActivity.this, SystemActivity.class));
-//                ARouter.getInstance().build("/app/system").navigation();
-                promptDialog.dismiss();
-            }
-        });
-
-        findViewById(R.id.systembar).findViewById(R.id.toDown).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                promptDialog.showLoading("加载中...");
-                startActivity(new Intent(selectFileActivity.this, HomeActivity.class));
-//                ARouter.getInstance().build("/app/home").navigation();
-                promptDialog.dismiss();
-            }
-        });
-
-        findViewById(R.id.systembar).findViewById(R.id.upload).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                promptDialog.showLoading("加载中...");
-
-                startActivity(new Intent(selectFileActivity.this, UploadActivity.class));
-
-//                ARouter.getInstance().build("/app/upload").navigation();
-                promptDialog.dismiss();
-            }
-        });
-
-        findViewById(R.id.systembar).findViewById(R.id.toPack).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                promptDialog.showLoading("加载中...");
-                startActivity(new Intent(selectFileActivity.this, PackActivity.class));
-
-//                ARouter.getInstance().build("/app/pack").navigation();
-                promptDialog.dismiss();
-            }
-        });
-
-        ImageView image = findViewById(R.id.systembar).findViewById(R.id.downImg);
-        image.setImageResource(R.drawable.down_c);
-        TextView textView = findViewById(R.id.systembar).findViewById(R.id.downText);
-        textView.setTextColor(Color.parseColor("#35ae5d"));
+        ActionBar actionBar = this.getSupportActionBar();
+        actionBar.setTitle("文件下载");
+        actionBar.setDisplayHomeAsUpEnabled(true);
         StatusBarCompat.setStatusBarColor(this, getResources().getColor(R.color.colorfocus), true);
 
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            SharedPreferences pref = selectFileActivity.this.getSharedPreferences("tab", MODE_PRIVATE);
+            SharedPreferences.Editor editor = pref.edit();
+            editor.putInt("tabnum", 0);
+            editor.commit();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -203,9 +157,10 @@ public class selectFileActivity extends AppCompatActivity implements OnClickList
         checkbox_all.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                if (currentFiles!=null){
+
                 if (isChecked) {
                     // 遍历list的长度，将MyAdapter中的map值全部设为true
-                    System.out.println(currentFiles.size() + "ddddd");
                     for (int i = 0; i < currentFiles.size(); i++) {
                         MyAdapter.getIsSelected().put(i, true);
                         System.out.println("11111" + MyAdapter.getIsSelected().get(i));
@@ -217,6 +172,8 @@ public class selectFileActivity extends AppCompatActivity implements OnClickList
                         MyAdapter.getIsSelected().put(i, false);
                     }
                     mAdapter.notifyDataSetChanged();
+                }
+
                 }
             }
 
@@ -652,8 +609,8 @@ public class selectFileActivity extends AppCompatActivity implements OnClickList
 
         protected void onPreExecute() {
             pdialog = new ProgressDialog(mContext);
-            pdialog.setTitle("文件下载");
-            pdialog.setMessage("正在下载中，敬请等待...");
+            pdialog.setTitle("文件正在下载");
+            pdialog.setMessage("敬请等待...");
             pdialog.setProgressDrawable(getResources().getDrawable(R.drawable.myprogressbarstyle));
             pdialog.setCancelable(false);
             pdialog.setMax(100);
