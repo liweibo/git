@@ -80,8 +80,8 @@ public class SystemActivity extends AppCompatActivity {
          * */
         boolean networkinit = sharedPreferences.getBoolean("network", false);
         boolean wifiinit = sharedPreferences.getBoolean("wifi", false);
-        ImageView networkImg = findViewById(R.id.networkset);
-        ImageView wifiImg = findViewById(R.id.wifiset);
+        ImageView networkImg = findViewById(R.id.switch_button4G);
+        ImageView wifiImg = findViewById(R.id.switch_buttonWifi);
         if( networkinit ){
             networkImg.setImageResource(R.drawable.kaiqi);
         }else{
@@ -94,12 +94,12 @@ public class SystemActivity extends AppCompatActivity {
         }
 
 
-        findViewById(R.id.networkset).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.switch_button4G).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 boolean networkstate = sharedPreferences.getBoolean("network", false);
 
-                ImageView imageView = findViewById(R.id.networkset);
+                ImageView imageView = findViewById(R.id.switch_button4G);
                 if( networkstate ){
                     imageView.setImageResource(R.drawable.kaiqi_c);
                     editor.putBoolean("network", false);
@@ -111,12 +111,12 @@ public class SystemActivity extends AppCompatActivity {
             }
         });
 
-        findViewById(R.id.wifiset).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.switch_buttonWifi).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 boolean wifistate = sharedPreferences.getBoolean("wifi", false);
 
-                ImageView imageView = findViewById(R.id.wifiset);
+                ImageView imageView = findViewById(R.id.switch_buttonWifi);
                 if( wifistate ){
                     imageView.setImageResource(R.drawable.kaiqi_c);
                     editor.putBoolean("wifi", false);
