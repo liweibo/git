@@ -104,18 +104,6 @@ public class FileView extends AppCompatActivity {
                 viewAdapter.notifyDataSetChanged();
             }
         });
-
-        findViewById(R.id.back).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                promptDialog.showLoading("加载中...");
-                ARouter.getInstance().build("/app/system").navigation();
-                promptDialog.dismiss();
-
-            }
-        });
-
-
     }
 
     public void readFile(String path){
