@@ -187,6 +187,7 @@ public class HomeActivity extends AppCompatActivity {
 
     SharedPreferences sharedPreferencesSet = null;
     ActionBar actionBar = null;
+    View uploadView = null;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -271,6 +272,7 @@ public class HomeActivity extends AppCompatActivity {
                 } else if (position == 2) {
                     view = LayoutInflater.from(
                             getBaseContext()).inflate(R.layout.upload_ntb, null, false);
+                    uploadView = view;
 
                     initUpload(view);
                 } else if (position == 3) {
@@ -337,7 +339,9 @@ public class HomeActivity extends AppCompatActivity {
                     actionBar.setTitle("系统设置");
                 } else if (position == 2) {
                     actionBar.setTitle("文件上传");
-
+                    if( uploadView != null ){
+                        fragmnetWeishangchuan(uploadView);
+                    }
                 } else if (position == 1) {
                     actionBar.setTitle("文件打包");
 
@@ -595,6 +599,7 @@ public class HomeActivity extends AppCompatActivity {
                 String dateTime = df.format(new Date(spec.lastModified()));
                 jsonObject.put("time", dateTime);
                 jsonArray.put(jsonObject);
+
                 //filename += spec.getName();
             }
 
@@ -727,7 +732,7 @@ public class HomeActivity extends AppCompatActivity {
             if (!file.exists()) {
                 file.mkdir();
             }
-
+            System.out.println( 9874655 );
             path = Environment.getExternalStorageDirectory() + "/CRRC/UPLOAD";
 
             file = new File(path);

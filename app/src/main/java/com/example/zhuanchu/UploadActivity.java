@@ -110,70 +110,6 @@ public class UploadActivity extends AppCompatActivity {
         TextView textView = findViewById(R.id.systembar).findViewById(R.id.uploadtext);
         textView.setTextColor(Color.parseColor("#35ae5d"));
 
-//        findViewById(R.id.uploadbtn).setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//                if( jsonArray == null || jsonArray.length() == 0 ){
-//                    AlertDialog.Builder alertDialog = new AlertDialog.Builder( UploadActivity.this );
-//                    alertDialog.setMessage("请选择需要上传的目录");
-//                    alertDialog.show();
-//                    return;
-//                }
-//
-//                try {
-//                    String path = Environment.getExternalStorageDirectory() + "/CRRC";
-//                    File file = new File(path);
-//
-//                    if (!file.exists()) {
-//                        file.mkdir();
-//                    }
-//
-//                    String path2 = Environment.getExternalStorageDirectory() + "/CRRC/UPLOAD";
-//
-//                    file = new File( path2 );
-//                    if (!file.exists()) {
-//                        file.mkdir();
-//                    }
-//
-//                    JSONObject choose = null;
-//
-//                    for(int i=0;i<jsonArray.length();i++){
-//                        if( jsonArray.getJSONObject(i).getBoolean("check") ){
-//                            choose = jsonArray.getJSONObject(i);
-//                        }
-//                    }
-//
-//                    java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("yyyyMMddHH:mm:ss");
-//                    String packtime = dateFormat.format(new Date());
-//
-//                    String packname = choose.getString("name") + "_" + packtime + "_" + "A" + "_重庆机务段.zip";
-//
-//                    CompressOperate_zip4j.compressZip4j(path + "/DOWNLOAD/" + choose.getString("name"), path2 + "/" + packname, "123456" );
-//
-//                    final AlertDialog.Builder dialog = new AlertDialog.Builder( UploadActivity.this );
-//                    dialog.setMessage("打包成功");
-//                    final AlertDialog success = dialog.show();
-//
-//
-//                    Timer timer = new Timer();
-//                    timer.schedule(new TimerTask() {
-//                        @Override
-//                        public void run() {
-//                            success.dismiss();
-//                        }
-//                    },1500);
-//
-//                }catch (Exception e){
-//
-//                }
-//
-//                //打包成ZIP
-//
-//            }
-//        });
-
-        //JSONArray jsonArray = null;
         try {
             String path = Environment.getExternalStorageDirectory() + "/CRRC";
             File file = new File(path);
@@ -192,6 +128,8 @@ public class UploadActivity extends AppCompatActivity {
             String filename = "";
             jsonArray = new JSONArray();
 
+            System.out.println( 987 );
+
             File[] files = file.listFiles();
             for (File spec : files) {
                 JSONObject jsonObject = new JSONObject();
@@ -208,15 +146,8 @@ public class UploadActivity extends AppCompatActivity {
             TextView textView1 = findViewById(R.id.files);
             textView1.setText( jsonArray.getJSONObject(0).getString("name") );
         } catch (Exception e) {
-
+            System.out.println( 987665412 );
         }
-
-
-//
-//        List<String> datas = new ArrayList<>();
-//        for(int i=0;i<30;i++){
-//            datas.add("item "+i);
-//        }
 
 
         RecyclerView recyclerView = findViewById(R.id.listUpload);
