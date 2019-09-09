@@ -461,6 +461,19 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
 
+        editext_chehao.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                cb_remember.setChecked(false);
+            }
+        });
+        editext_peishu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                cb_remember.setChecked(false);
+            }
+        });
+
         new Thread(new Runnable() {
             @Override
             public void run() {
