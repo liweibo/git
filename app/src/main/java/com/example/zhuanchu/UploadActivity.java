@@ -40,6 +40,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
+import me.leefeng.promptlibrary.PromptDialog;
 import okhttp3.Call;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -52,15 +53,18 @@ import okhttp3.Response;
 public class UploadActivity extends AppCompatActivity {
 
     Context context;
-    private JSONArray jsonArrayup = null;
+    private JSONArray jsonArray = null;
     private String url = "http://39.108.162.8:8089/chengdu/uploadmore";
-    SharedPreferences sharedPreferencesUp = null;
-    private ProgressDialog pdialogUp;
+    SharedPreferences sharedPreferences = null;
+    private ProgressDialog pdialog;
+    private PromptDialog promptDialog;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.upload);
+
+        promptDialog = new PromptDialog(this);
 
         /*
          * 导航修改的内容
@@ -68,28 +72,36 @@ public class UploadActivity extends AppCompatActivity {
         findViewById(R.id.systembar).findViewById(R.id.toSystem).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                promptDialog.showLoading("加载中...");
                 ARouter.getInstance().build("/app/system").navigation();
+                promptDialog.dismiss();
             }
         });
 
         findViewById(R.id.systembar).findViewById(R.id.toDown).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                promptDialog.showLoading("加载中...");
                 ARouter.getInstance().build("/app/home").navigation();
+                promptDialog.dismiss();
             }
         });
 
         findViewById(R.id.systembar).findViewById(R.id.toPack).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                promptDialog.showLoading("加载中...");
                 ARouter.getInstance().build("/app/pack").navigation();
+                promptDialog.dismiss();
             }
         });
 
         findViewById(R.id.systembar).findViewById(R.id.upload).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                promptDialog.showLoading("加载中...");
                 ARouter.getInstance().build("/app/upload").navigation();
+                promptDialog.dismiss();
             }
         });
 
@@ -98,6 +110,70 @@ public class UploadActivity extends AppCompatActivity {
         TextView textView = findViewById(R.id.systembar).findViewById(R.id.uploadtext);
         textView.setTextColor(Color.parseColor("#35ae5d"));
 
+//        findViewById(R.id.uploadbtn).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//                if( jsonArray == null || jsonArray.length() == 0 ){
+//                    AlertDialog.Builder alertDialog = new AlertDialog.Builder( UploadActivity.this );
+//                    alertDialog.setMessage("请选择需要上传的目录");
+//                    alertDialog.show();
+//                    return;
+//                }
+//
+//                try {
+//                    String path = Environment.getExternalStorageDirectory() + "/CRRC";
+//                    File file = new File(path);
+//
+//                    if (!file.exists()) {
+//                        file.mkdir();
+//                    }
+//
+//                    String path2 = Environment.getExternalStorageDirectory() + "/CRRC/UPLOAD";
+//
+//                    file = new File( path2 );
+//                    if (!file.exists()) {
+//                        file.mkdir();
+//                    }
+//
+//                    JSONObject choose = null;
+//
+//                    for(int i=0;i<jsonArray.length();i++){
+//                        if( jsonArray.getJSONObject(i).getBoolean("check") ){
+//                            choose = jsonArray.getJSONObject(i);
+//                        }
+//                    }
+//
+//                    java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("yyyyMMddHH:mm:ss");
+//                    String packtime = dateFormat.format(new Date());
+//
+//                    String packname = choose.getString("name") + "_" + packtime + "_" + "A" + "_重庆机务段.zip";
+//
+//                    CompressOperate_zip4j.compressZip4j(path + "/DOWNLOAD/" + choose.getString("name"), path2 + "/" + packname, "123456" );
+//
+//                    final AlertDialog.Builder dialog = new AlertDialog.Builder( UploadActivity.this );
+//                    dialog.setMessage("打包成功");
+//                    final AlertDialog success = dialog.show();
+//
+//
+//                    Timer timer = new Timer();
+//                    timer.schedule(new TimerTask() {
+//                        @Override
+//                        public void run() {
+//                            success.dismiss();
+//                        }
+//                    },1500);
+//
+//                }catch (Exception e){
+//
+//                }
+//
+//                //打包成ZIP
+//
+//            }
+//        });
+
+        //JSONArray jsonArray = null;
         try {
             String path = Environment.getExternalStorageDirectory() + "/CRRC";
             File file = new File(path);
@@ -114,7 +190,7 @@ public class UploadActivity extends AppCompatActivity {
             }
 
             String filename = "";
-            jsonArrayup = new JSONArray();
+            jsonArray = new JSONArray();
 
             File[] files = file.listFiles();
             for (File spec : files) {
@@ -125,23 +201,29 @@ public class UploadActivity extends AppCompatActivity {
                 jsonObject.put("time", dateTime );
                 jsonObject.put("file", spec);
                 jsonObject.put("check", false);
-                jsonArrayup.put( jsonObject );
+                jsonArray.put( jsonObject );
                 //filename += spec.getName();
             }
 
             TextView textView1 = findViewById(R.id.files);
-            textView1.setText( jsonArrayup.getJSONObject(0).getString("name") );
+            textView1.setText( jsonArray.getJSONObject(0).getString("name") );
         } catch (Exception e) {
 
         }
 
+
+//
+//        List<String> datas = new ArrayList<>();
+//        for(int i=0;i<30;i++){
+//            datas.add("item "+i);
+//        }
 
 
         RecyclerView recyclerView = findViewById(R.id.listUpload);
         FlexboxLayoutManager flexboxLayoutManager = new FlexboxLayoutManager(this);
         recyclerView.setLayoutManager(flexboxLayoutManager);
 
-        recyclerView.setAdapter(new UploadAdapter(this, jsonArrayup));
+        recyclerView.setAdapter(new UploadAdapter(this, jsonArray));
 
 
         findViewById(R.id.uploadbtn).setOnClickListener(new View.OnClickListener() {
@@ -153,15 +235,17 @@ public class UploadActivity extends AppCompatActivity {
                 * */
                 boolean network = isNetworkAvailable(UploadActivity.this);
                 if( !network ){
-
+//                    AlertDialog.Builder dialog = new AlertDialog.Builder(UploadActivity.this);
+//                    dialog.setTitle("网络检测");
+//                    dialog.show();
                     Toast.makeText(UploadActivity.this, "没有检测到网络", Toast.LENGTH_LONG).show();
                     return;
                 }
 
                 boolean mobile = isMobile( UploadActivity.this );
-                sharedPreferencesUp = getSharedPreferences("data",MODE_PRIVATE);
+                sharedPreferences = getSharedPreferences("data",MODE_PRIVATE);
 
-                boolean networkinit = sharedPreferencesUp.getBoolean("network", false);
+                boolean networkinit = sharedPreferences.getBoolean("network", false);
 
                 System.out.println( networkinit );
 
@@ -190,15 +274,15 @@ public class UploadActivity extends AppCompatActivity {
 
     public void uploadFile(Context context){
 
-        pdialogUp = new ProgressDialog( context );
-        pdialogUp.setTitle("任务正在执行中");
-        pdialogUp.setMessage("正在上传中，敬请等待...");
-        pdialogUp.setCancelable(false);
-        pdialogUp.setMax(100);
-        pdialogUp.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        pdialogUp.setIndeterminate(false);
-        pdialogUp.setProgress(0);
-        pdialogUp.show();
+        pdialog = new ProgressDialog( context );
+        pdialog.setTitle("任务正在执行中");
+        pdialog.setMessage("正在上传中，敬请等待...");
+        pdialog.setCancelable(false);
+        pdialog.setMax(100);
+        pdialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        pdialog.setIndeterminate(false);
+        pdialog.setProgress(0);
+        pdialog.show();
 
         MultipartBody.Builder requestBodyBuilder = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM);
@@ -206,14 +290,14 @@ public class UploadActivity extends AppCompatActivity {
 
 
 
-        for(int i=0;i<jsonArrayup.length();i++){
+        for(int i=0;i<jsonArray.length();i++){
             try {
-                System.out.println( jsonArrayup.getJSONObject(i).getString("name") );
-                System.out.println( jsonArrayup.getJSONObject(i).getString("check") );
-                System.out.println( jsonArrayup.getJSONObject(i).getString("file") );
-                if( jsonArrayup.getJSONObject(i).getBoolean("check") ){
-                    File fileOne = new File(jsonArrayup.getJSONObject(i).getString("file")); //生成文件
-                    requestBodyBuilder.addFormDataPart("file", jsonArrayup.getJSONObject(i).getString("file"), RequestBody.create(MutilPart_Form_Data, fileOne ) );
+                System.out.println( jsonArray.getJSONObject(i).getString("name") );
+                System.out.println( jsonArray.getJSONObject(i).getString("check") );
+                System.out.println( jsonArray.getJSONObject(i).getString("file") );
+                if( jsonArray.getJSONObject(i).getBoolean("check") ){
+                    File fileOne = new File(jsonArray.getJSONObject(i).getString("file")); //生成文件
+                    requestBodyBuilder.addFormDataPart("file", jsonArray.getJSONObject(i).getString("file"), RequestBody.create(MutilPart_Form_Data, fileOne ) );
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -231,9 +315,9 @@ public class UploadActivity extends AppCompatActivity {
             @Override
             public void onProgress(long total, long current) {
                 System.out.println( current + "----" + total );
-                pdialogUp.setProgress((int) Math.ceil(current*100/total));
+                pdialog.setProgress((int) Math.ceil(current*100/total));
                 if( current == total ){
-                    pdialogUp.dismiss();
+                    pdialog.dismiss();
                 }
             }
         });

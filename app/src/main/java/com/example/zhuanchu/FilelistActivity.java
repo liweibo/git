@@ -29,17 +29,26 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import me.leefeng.promptlibrary.PromptDialog;
+
 @Route( path = "/app/filelist" )
 public class FilelistActivity extends AppCompatActivity {
+
+    private PromptDialog promptDialog;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.filelist);
 
+        promptDialog = new PromptDialog(this);
+
         findViewById(R.id.homeback).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                promptDialog.showLoading("加载中...");
                 ARouter.getInstance().build("/app/home").navigation();
+                promptDialog.dismiss();
             }
         });
 
@@ -49,28 +58,36 @@ public class FilelistActivity extends AppCompatActivity {
         findViewById(R.id.systembar).findViewById(R.id.toSystem).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                promptDialog.showLoading("加载中...");
                 ARouter.getInstance().build("/app/system").navigation();
+                promptDialog.dismiss();
             }
         });
 
         findViewById(R.id.systembar).findViewById(R.id.toDown).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                promptDialog.showLoading("加载中...");
                 ARouter.getInstance().build("/app/home").navigation();
+                promptDialog.dismiss();
             }
         });
 
         findViewById(R.id.systembar).findViewById(R.id.toPack).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                promptDialog.showLoading("加载中...");
                 ARouter.getInstance().build("/app/pack").navigation();
+                promptDialog.dismiss();
             }
         });
 
         findViewById(R.id.systembar).findViewById(R.id.upload).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                promptDialog.showLoading("加载中...");
                 ARouter.getInstance().build("/app/upload").navigation();
+                promptDialog.dismiss();
             }
         });
 

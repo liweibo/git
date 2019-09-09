@@ -1,18 +1,14 @@
 package com.example.zhuanchu;
 
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -22,7 +18,6 @@ import com.alibaba.android.arouter.launcher.ARouter;
 import com.example.zhuanchu.adapter.UploadAdapter;
 import com.example.zhuanchu.adapter.ViewAdapter;
 import com.example.zhuanchu.adapter.WifiAdapter;
-import com.githang.statusbar.StatusBarCompat;
 import com.google.android.flexbox.FlexboxLayoutManager;
 
 import org.json.JSONArray;
@@ -36,22 +31,25 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
+import me.leefeng.promptlibrary.PromptDialog;
+
+@Route(path = "/app/fileview")
 public class FileView extends AppCompatActivity {
 
     private JSONArray jsonArray = new JSONArray();
     private String path = "";
     private File file = null;
+    private PromptDialog promptDialog;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fileview);
-        ActionBar actionBar = this.getSupportActionBar();
-        actionBar.setTitle("下载文件查看");
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        StatusBarCompat.setStatusBarColor(this, getResources().getColor(R.color.colorfocus), true);
+
+        promptDialog = new PromptDialog(this);
+
         path = Environment.getExternalStorageDirectory() + "/CRRC";
-        readFile(path);
+        readFile( path );
 
         final RecyclerView recyclerView = findViewById(R.id.listviews);
         FlexboxLayoutManager flexboxLayoutManager = new FlexboxLayoutManager(this);
@@ -65,18 +63,18 @@ public class FileView extends AppCompatActivity {
             @Override
             public void tClick(int i) {
 
-                for (int k = 0; k < jsonArray.length(); k++) {
+                for(int k=0;k<jsonArray.length();k++){
                     try {
-                        System.out.println(jsonArray.getJSONObject(k).getString("name"));
+                        System.out.println( jsonArray.getJSONObject(k).getString("name") );
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 }
 
                 try {
-                    if (jsonArray.getJSONObject(i).getString("type").equals("1")) {
+                    if( jsonArray.getJSONObject(i).getString("type").equals("1") ){
                         path = path + "/" + jsonArray.getJSONObject(i).getString("name");
-                        readFile(path);
+                        readFile( path );
                         //ViewAdapter viewAdapter = new ViewAdapter( FileView.this, jsonArray);
                         //recyclerView.setAdapter(viewAdapter);
                         viewAdapter.notifyDataSetChanged();
@@ -92,74 +90,62 @@ public class FileView extends AppCompatActivity {
         findViewById(R.id.prev).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                System.out.println(file.getPath());
-                System.out.println(file.getParent());
-                System.out.println(file.getPath().substring(file.getPath().lastIndexOf("/")));
+                System.out.println( file.getPath() );
+                System.out.println( file.getParent() );
+                System.out.println( file.getPath().substring(file.getPath().lastIndexOf("/")) );
 
-                if (file.getPath().substring(file.getPath().lastIndexOf("/")).equals("/CRRC")) {
+                if( file.getPath().substring(file.getPath().lastIndexOf("/")).equals("/CRRC") ){
                     return;
                 }
 
                 path = file.getParent();
 
-                readFile(file.getParent());
+                readFile( file.getParent() );
                 viewAdapter.notifyDataSetChanged();
             }
         });
 
-//        findViewById(R.id.back).setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                startActivity(new Intent(FileView.this, HomeActivity.class));
-//
-//            }
-//        });
+        findViewById(R.id.back).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                promptDialog.showLoading("加载中...");
+                ARouter.getInstance().build("/app/system").navigation();
+                promptDialog.dismiss();
 
+            }
+        });
 
 
     }
 
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            finish();
-            SharedPreferences pref = FileView.this.getSharedPreferences("tab", MODE_PRIVATE);
-            SharedPreferences.Editor editor = pref.edit();
-            editor.putInt("tabnum", 3);
-            editor.commit();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-    public void readFile(String path) {
+    public void readFile(String path){
         try {
 
             file = new File(path);
 
             File[] files = file.listFiles();
 
-            removedata(jsonArray);
+            removedata( jsonArray );
 
-            System.out.println(jsonArray.length());
+            System.out.println( jsonArray.length() );
 
 
             for (File spec : files) {
 
-                System.out.println(spec.getName());
+                System.out.println(  spec.getName() );
 
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("name", spec.getName());
                 SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                String dateTime = df.format(new Date(spec.lastModified()));
-                jsonObject.put("time", dateTime);
+                String dateTime=df.format(new Date(spec.lastModified()));
+                jsonObject.put("time", dateTime );
                 jsonObject.put("file", spec);
                 jsonObject.put("check", false);
 
 
-                if (spec.isDirectory()) {
+                if( spec.isDirectory() ){
                     jsonObject.put("type", "1");
-                    jsonArray.put(jsonObject);
+                    jsonArray.put( jsonObject );
                 }
             }
 
@@ -167,26 +153,26 @@ public class FileView extends AppCompatActivity {
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("name", spec.getName());
                 SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                String dateTime = df.format(new Date(spec.lastModified()));
-                jsonObject.put("time", dateTime);
+                String dateTime=df.format(new Date(spec.lastModified()));
+                jsonObject.put("time", dateTime );
                 jsonObject.put("file", spec);
                 jsonObject.put("check", false);
 
 
-                if (spec.isFile()) {
+                if( spec.isFile() ){
                     jsonObject.put("type", "2");
-                    jsonArray.put(jsonObject);
+                    jsonArray.put( jsonObject );
                 }
                 //filename += spec.getName();
             }
-        } catch (Exception e) {
+        }catch (Exception e){
 
         }
     }
 
-    public void removedata(JSONArray jsonArray) {
-        if (jsonArray.length() > 0) {
-            jsonArray.remove(0);
+    public void removedata(JSONArray jsonArray){
+        if( jsonArray.length() > 0 ){
+            jsonArray.remove( 0 );
             removedata(jsonArray);
         }
     }
