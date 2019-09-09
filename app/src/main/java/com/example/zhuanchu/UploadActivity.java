@@ -40,6 +40,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
+import me.leefeng.promptlibrary.PromptDialog;
 import okhttp3.Call;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -56,11 +57,14 @@ public class UploadActivity extends AppCompatActivity {
     private String url = "http://39.108.162.8:8089/chengdu/uploadmore";
     SharedPreferences sharedPreferences = null;
     private ProgressDialog pdialog;
+    private PromptDialog promptDialog;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.upload);
+
+        promptDialog = new PromptDialog(this);
 
         /*
          * 导航修改的内容
@@ -68,28 +72,36 @@ public class UploadActivity extends AppCompatActivity {
         findViewById(R.id.systembar).findViewById(R.id.toSystem).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                promptDialog.showLoading("加载中...");
                 ARouter.getInstance().build("/app/system").navigation();
+                promptDialog.dismiss();
             }
         });
 
         findViewById(R.id.systembar).findViewById(R.id.toDown).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                promptDialog.showLoading("加载中...");
                 ARouter.getInstance().build("/app/home").navigation();
+                promptDialog.dismiss();
             }
         });
 
         findViewById(R.id.systembar).findViewById(R.id.toPack).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                promptDialog.showLoading("加载中...");
                 ARouter.getInstance().build("/app/pack").navigation();
+                promptDialog.dismiss();
             }
         });
 
         findViewById(R.id.systembar).findViewById(R.id.upload).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                promptDialog.showLoading("加载中...");
                 ARouter.getInstance().build("/app/upload").navigation();
+                promptDialog.dismiss();
             }
         });
 

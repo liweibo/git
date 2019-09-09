@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
     <domain-config>
-        <domain includeSubdomains="true">www.baidu.com</domain>
+        <domain includeSubdomains="true">www.rongswift.com</domain>
         <!--<trust-anchors>-->
             <!--<certificates src="@raw/my_ca"/>-->
         <!--</trust-anchors>-->

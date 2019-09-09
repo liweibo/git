@@ -2,10 +2,14 @@ package com.example.zhuanchu;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
@@ -49,6 +53,14 @@ import java.util.List;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
+import me.leefeng.promptlibrary.PromptDialog;
+
+import static android.net.wifi.WifiManager.WIFI_STATE_DISABLED;
+import static android.net.wifi.WifiManager.WIFI_STATE_DISABLING;
+import static android.net.wifi.WifiManager.WIFI_STATE_ENABLED;
+import static android.net.wifi.WifiManager.WIFI_STATE_ENABLING;
+import static android.net.wifi.WifiManager.WIFI_STATE_UNKNOWN;
+
 @Route( path = "/app/wifi" )
 public class WifiActivity extends AppCompatActivity {
 
@@ -63,6 +75,7 @@ public class WifiActivity extends AppCompatActivity {
     private String _port = "21";
     private String _user = "CSR";
     private String _pass = "12345678";
+    private PromptDialog promptDialog;
 
     // 输入流读取器对象
     InputStreamReader isr;
@@ -81,11 +94,14 @@ public class WifiActivity extends AppCompatActivity {
     public Switch switch1;
     public static EditText host, port, name, pass;
     public static boolean haveCheck = true;
+    final WifiAdapter wifiAdapter = new WifiAdapter(this, jsonArray);
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.wifi);
+
+        promptDialog = new PromptDialog(this);
 
 //        ARouter.openDebug();
 //        ARouter.init(getApplication());
@@ -93,7 +109,9 @@ public class WifiActivity extends AppCompatActivity {
         findViewById(R.id.upload).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                promptDialog.showLoading("加载中...");
                 ARouter.getInstance().build("/app/upload").navigation();
+                promptDialog.dismiss();
             }
         });
 
@@ -102,38 +120,46 @@ public class WifiActivity extends AppCompatActivity {
 
         wifiManager.startScan();
 
-        List<ScanResult> scanResults = wifiManager.getScanResults();
-        String reulst = "";
+        Intent intent = new Intent(this, WifiActivity.class);
 
-        if ( scanResults != null && scanResults.size() >0 ) {
-            for(int i = 0;i<scanResults.size();i++){
-                ScanResult scanResult = scanResults.get(i);
-                if( !scanResult.SSID.isEmpty() && scanResult.SSID.indexOf("SHG") >= 0 ){
-                    JSONObject jsonObject = new JSONObject();
-                    try {
-                        jsonObject.put("ssid", scanResult.SSID);
-                        jsonObject.put("capabilities", scanResult.capabilities);
-                        jsonObject.put("check", false);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    jsonArray.put( jsonObject );
-                }
-            }
-        }
+        //onReceive(WifiActivity.this, intent );
+
+        registerBroadcast();
 
 
-        for (int i = 0;i < jsonArray.length(); i++){
-            try {
-                WifiInfo info = wifiManager.getConnectionInfo();
-                String name = info.getSSID().replace("\"", "");
-                if( jsonArray.getJSONObject(i).getString("ssid").equals(name) ){
-                    jsonArray.getJSONObject(i).put("check", true );
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
+
+//        List<ScanResult> scanResults = wifiManager.getScanResults();
+//        String reulst = "";
+//
+//        if ( scanResults != null && scanResults.size() >0 ) {
+//            for(int i = 0;i<scanResults.size();i++){
+//                ScanResult scanResult = scanResults.get(i);
+//                if( !scanResult.SSID.isEmpty() && scanResult.SSID.indexOf("SHG") >= 0 ){
+//                    JSONObject jsonObject = new JSONObject();
+//                    try {
+//                        jsonObject.put("ssid", scanResult.SSID);
+//                        jsonObject.put("capabilities", scanResult.capabilities);
+//                        jsonObject.put("check", false);
+//                    } catch (JSONException e) {
+//                        e.printStackTrace();
+//                    }
+//                    jsonArray.put( jsonObject );
+//                }
+//            }
+//        }
+//
+//
+//        for (int i = 0;i < jsonArray.length(); i++){
+//            try {
+//                WifiInfo info = wifiManager.getConnectionInfo();
+//                String name = info.getSSID().replace("\"", "");
+//                if( jsonArray.getJSONObject(i).getString("ssid").equals(name) ){
+//                    jsonArray.getJSONObject(i).put("check", true );
+//                }
+//            } catch (JSONException e) {
+//                e.printStackTrace();
+//            }
+//        }
 
         //System.out.println( info.getSSID() );
 
@@ -142,7 +168,7 @@ public class WifiActivity extends AppCompatActivity {
         FlexboxLayoutManager flexboxLayoutManager = new FlexboxLayoutManager(this);
         recyclerView.setLayoutManager(flexboxLayoutManager);
 
-        final WifiAdapter wifiAdapter = new WifiAdapter(this, jsonArray);
+
 
 
         recyclerView.setAdapter(wifiAdapter);
@@ -155,7 +181,9 @@ public class WifiActivity extends AppCompatActivity {
                 String name = info.getSSID().replace("\"", "");
                 try {
                     if( jsonArray.getJSONObject(i).getString("ssid").equals(name) ){
+                        promptDialog.showLoading("加载中...");
                         ARouter.getInstance().build("/app/home").navigation();
+                        promptDialog.dismiss();
                         return;
                     }
                 } catch (JSONException e) {
@@ -243,6 +271,146 @@ public class WifiActivity extends AppCompatActivity {
                 dialog.show();
             }
         });
+    }
+
+    public void removedata(JSONArray jsonArray){
+        if( jsonArray.length() > 0 ){
+            jsonArray.remove( 0 );
+            removedata(jsonArray);
+        }
+    }
+
+    public void changeWifiList(){
+        List<ScanResult> scanResults = wifiManager.getScanResults();
+        String reulst = "";
+
+        removedata( jsonArray );
+
+        if ( scanResults != null && scanResults.size() >0 ) {
+            for(int i = 0;i<scanResults.size();i++){
+                ScanResult scanResult = scanResults.get(i);
+                if( !scanResult.SSID.isEmpty() && scanResult.SSID.indexOf("SHG") >= 0 ){
+                    JSONObject jsonObject = new JSONObject();
+                    try {
+                        jsonObject.put("ssid", scanResult.SSID);
+                        jsonObject.put("capabilities", scanResult.capabilities);
+                        jsonObject.put("check", false);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    jsonArray.put( jsonObject );
+                }
+            }
+        }
+
+
+        for (int i = 0;i < jsonArray.length(); i++){
+            try {
+                WifiInfo info = wifiManager.getConnectionInfo();
+                String name = info.getSSID().replace("\"", "");
+                if( jsonArray.getJSONObject(i).getString("ssid").equals(name) ){
+                    jsonArray.getJSONObject(i).put("check", true );
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        wifiAdapter.notifyDataSetChanged();
+    }
+
+    private void registerBroadcast() {
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
+        registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent.getAction()== WifiManager.WIFI_STATE_CHANGED_ACTION) {
+                    switch (intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE, WIFI_STATE_UNKNOWN)) {
+                        case WIFI_STATE_DISABLED:{
+                            removedata( jsonArray );
+                            wifiAdapter.notifyDataSetChanged();
+                            Toast.makeText(context, "WiFi 已关闭", Toast.LENGTH_SHORT).show();
+                            break;
+                        }
+                        case WIFI_STATE_DISABLING:{
+                            //Toast.makeText(context, "WiFi 关闭中", Toast.LENGTH_SHORT).show();
+                            break;
+                        }
+                        case WIFI_STATE_ENABLED :{
+                            changeWifiList();
+                            Toast.makeText(context, "WiFi 已连接", Toast.LENGTH_SHORT).show();
+                            break;
+                        }
+                        case WIFI_STATE_ENABLING:{
+                            //Toast.makeText(context, "WiFi 连接中", Toast.LENGTH_SHORT).show();
+                            break;
+                        }
+                        case WIFI_STATE_UNKNOWN:{
+                            //Toast.makeText(context, "WiFi 未知", Toast.LENGTH_SHORT).show();
+                            break;
+                        }
+                    }
+                }
+            }
+        }, filter);
+    }
+
+    public void onReceive(Context context, Intent intent) {
+        if (WifiManager.WIFI_STATE_CHANGED_ACTION.equals(intent.getAction())) {//这个监听wifi的打开与关闭，与wifi的连接无关
+            int wifiState = intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE, 0);
+            switch (wifiState) {
+                case WIFI_STATE_DISABLED:
+                    //LogUtil.println(TAG + "onReceive ", "wifi has been closed");
+                    System.out.println( "wifi has been closed" );
+                    Toast.makeText(context, "wifi处于关闭状态", Toast.LENGTH_LONG);
+                    //WifiUtil.getInstance(context).openWifi();
+                    wifiManager.setWifiEnabled(true);
+                    break;
+                case WIFI_STATE_ENABLED:
+                    //LogUtil.println(TAG + "onReceive ", "wifi has been opened");
+                    break;
+            }
+        } else if (WifiManager.NETWORK_STATE_CHANGED_ACTION.equals(intent.getAction())) { // 这个监听wifi的连接状态
+            // 这个监听wifi的连接状态即是否连上了一个有效无线路由，当上边广播的状态是WifiManager.WIFI_STATE_DISABLING，和WIFI_STATE_DISABLED的时候，根本不会接到这个广播。
+            // 在上边广播接到广播是WifiManager.WIFI_STATE_ENABLED状态的同时也会接到这个广播，当然刚打开wifi肯定还没有连接到有效的无线
+            NetworkInfo info = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
+            if (info.getState().equals(NetworkInfo.State.DISCONNECTED)) {
+                Toast.makeText(context, "wifi失去连接", Toast.LENGTH_LONG);
+                System.out.println( "wifi has been disconnected" );
+            } else if (info.getState().equals(NetworkInfo.State.CONNECTED)) {
+                WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+                WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+                System.out.println( "wifi has been connected to" + wifiInfo.getSSID() );
+                //LogUtil.println(TAG + "onReceive ", "wifi has been connected to" + wifiInfo.getSSID());
+                Toast.makeText(context, "wifi has been connected to" + wifiInfo.getSSID(), Toast.LENGTH_LONG);
+            }
+            System.out.println( "info.getState = " + info.getState() );
+            Toast.makeText(context, "info.getState = " + info.getState(), Toast.LENGTH_LONG);
+        } else if (ConnectivityManager.CONNECTIVITY_ACTION.equals(intent.getAction())) {//这个监听网络连接的设置，包括wifi和移动数据的打开和关闭。.
+            //最好用的还是这个监听。wifi如果打开，关闭，以及连接上可用的连接都会接到监听。见log
+            // 这个广播的最大弊端是比上边两个广播的反应要慢，如果只是要监听wifi，我觉得还是用上边两个配合比较合适
+            // if (Constants.isBind) {
+            ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo networkInfo = manager.getActiveNetworkInfo();
+            if (networkInfo != null) {
+                if (networkInfo.isAvailable() && networkInfo.isConnected()) {
+                    if (networkInfo.getType() == ConnectivityManager.TYPE_ETHERNET) {
+                        System.out.println("NetworkReceiver ethernet network is connected");
+                    } else if (networkInfo.getType() == ConnectivityManager.TYPE_WIFI) {
+                        System.out.println("NetworkReceiver wifi network is connected");
+                    }
+                } else if (networkInfo.isConnectedOrConnecting()) {
+                    System.out.println("NetworkReceiver network is connecting");
+                } else {
+                    System.out.println("NetworkReceiver network is unKnow");
+                }
+            } else {
+                System.out.println("NetworkReceiver network is null");
+            }
+            // }
+
+        }
     }
 
     public WifiConfiguration createWifiInfo(String SSID, String Password, int Type) {

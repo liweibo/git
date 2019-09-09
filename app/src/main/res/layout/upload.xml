@@ -62,20 +62,27 @@
                 </android.support.v7.widget.RecyclerView>
             </com.google.android.flexbox.FlexboxLayout>
 
-            <Button
-                android:id="@+id/uploadbtn"
-                android:text="上传"
-                android:textColor="#fff"
-                android:layout_marginTop="40dp"
-                android:layout_width="match_parent"
-                android:layout_height="38dp"
-                android:textSize="16dp"
-                android:background="@drawable/btn"
+            <RelativeLayout
                 android:layout_marginRight="10dp"
                 android:layout_marginLeft="10dp"
                 android:layout_marginBottom="20dp"
-                />
+                android:layout_marginTop="40dp"
+                android:layout_width="wrap_content"
+                android:layout_height="38dp"
+                android:background="@drawable/btn"
 
+                >
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="38dp"
+                    android:textColor="#fff"
+                    android:textSize="16dp"
+                    android:id="@+id/uploadbtn"
+                    android:text="上传"
+                    android:colorControlHighlight="#ff0000"
+                    android:background="?android:attr/selectableItemBackgroundBorderless"
+                    />
+            </RelativeLayout>
         </com.google.android.flexbox.FlexboxLayout>
 
         <LinearLayout

@@ -12,14 +12,20 @@ import android.widget.TextView;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 
+import me.leefeng.promptlibrary.PromptDialog;
+
 @Route( path = "/app/system")
 public class SystemActivity extends AppCompatActivity {
 
     SharedPreferences sharedPreferences = null;
+    private PromptDialog promptDialog;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.system);
+
+        promptDialog = new PromptDialog(this);
 
         /*
          * 导航修改的内容
@@ -27,28 +33,36 @@ public class SystemActivity extends AppCompatActivity {
         findViewById(R.id.systembar).findViewById(R.id.toSystem).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                promptDialog.showLoading("加载中...");
                 ARouter.getInstance().build("/app/system").navigation();
+                promptDialog.dismiss();
             }
         });
 
         findViewById(R.id.systembar).findViewById(R.id.toDown).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                promptDialog.showLoading("加载中...");
                 ARouter.getInstance().build("/app/home").navigation();
+                promptDialog.dismiss();
             }
         });
 
         findViewById(R.id.systembar).findViewById(R.id.upload).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                promptDialog.showLoading("加载中...");
                 ARouter.getInstance().build("/app/upload").navigation();
+                promptDialog.dismiss();
             }
         });
 
         findViewById(R.id.systembar).findViewById(R.id.toPack).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                promptDialog.showLoading("加载中...");
                 ARouter.getInstance().build("/app/pack").navigation();
+                promptDialog.dismiss();
             }
         });
 

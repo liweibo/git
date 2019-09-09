@@ -31,12 +31,15 @@ import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import me.leefeng.promptlibrary.PromptDialog;
+
 @Route( path = "/app/pack")
 public class PackActivity extends AppCompatActivity {
 
     private JSONArray jsonArray = null;
     private ProgressDialog pdialog;
     Context context;
+    private PromptDialog promptDialog;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -44,34 +47,44 @@ public class PackActivity extends AppCompatActivity {
 
         setContentView(R.layout.pack);
 
+        promptDialog = new PromptDialog(this);
+
         /*
          * 导航修改的内容
          */
         findViewById(R.id.systembar).findViewById(R.id.toSystem).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                promptDialog.showLoading("加载中...");
                 ARouter.getInstance().build("/app/system").navigation();
+                promptDialog.dismiss();
             }
         });
 
         findViewById(R.id.systembar).findViewById(R.id.toDown).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                promptDialog.showLoading("加载中...");
                 ARouter.getInstance().build("/app/home").navigation();
+                promptDialog.dismiss();
             }
         });
 
         findViewById(R.id.systembar).findViewById(R.id.toPack).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                promptDialog.showLoading("加载中...");
                 ARouter.getInstance().build("/app/pack").navigation();
+                promptDialog.dismiss();
             }
         });
 
         findViewById(R.id.systembar).findViewById(R.id.upload).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                promptDialog.showLoading("加载中...");
                 ARouter.getInstance().build("/app/upload").navigation();
+                promptDialog.dismiss();
             }
         });
 

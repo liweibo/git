@@ -31,17 +31,22 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
+import me.leefeng.promptlibrary.PromptDialog;
+
 @Route(path = "/app/fileview")
 public class FileView extends AppCompatActivity {
 
     private JSONArray jsonArray = new JSONArray();
     private String path = "";
     private File file = null;
+    private PromptDialog promptDialog;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fileview);
+
+        promptDialog = new PromptDialog(this);
 
         path = Environment.getExternalStorageDirectory() + "/CRRC";
         readFile( path );
@@ -103,7 +108,10 @@ public class FileView extends AppCompatActivity {
         findViewById(R.id.back).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                promptDialog.showLoading("加载中...");
                 ARouter.getInstance().build("/app/system").navigation();
+                promptDialog.dismiss();
+
             }
         });
 
