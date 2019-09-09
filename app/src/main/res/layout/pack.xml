@@ -1,119 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".PackActivity">
-    <com.google.android.flexbox.FlexboxLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <com.google.android.flexbox.FlexboxLayout
-            app:flexDirection="column"
+    android:orientation="vertical"
+    android:paddingLeft="20dp"
+    android:paddingTop="20dp"
+    android:paddingRight="20dp"
+    android:paddingBottom="30dp">
+
+
+
+        <TextView
+            android:layout_marginLeft="10dp"
+            android:layout_marginBottom="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="请选择需打包的文件：" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/listView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-            <LinearLayout
-                android:divider="@drawable/title"
-                android:showDividers="end"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+        </android.support.v7.widget.RecyclerView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="38dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:orientation="horizontal"
+            android:background="@drawable/btn">
+
+            <Button
+                android:layout_gravity="bottom"
+                android:id="@+id/packbtn"
                 android:layout_width="match_parent"
-                android:orientation="vertical"
-                android:layout_height="50dp">
-                <com.google.android.flexbox.FlexboxLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="49dp">
-                    <ImageView
-                        android:id="@+id/homeback"
-                        android:layout_marginLeft="10dp"
-                        android:src="@drawable/ico_brawser_backwards_d"
-                        android:layout_width="26dp"
-                        android:layout_height="26dp" />
-                    <com.google.android.flexbox.FlexboxLayout
-                        app:layout_flexGrow="1"
-                        app:justifyContent="center"
-                        app:alignItems="center"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent">
-                        <TextView
-                            android:textSize="16dp"
-                            android:text="文件打包"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
-                    </com.google.android.flexbox.FlexboxLayout>
-                    <ImageView
-                        android:layout_marginRight="6dp"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp" />
-                </com.google.android.flexbox.FlexboxLayout>
-            </LinearLayout>
-            <com.google.android.flexbox.FlexboxLayout
-                app:flexDirection="column"
-                app:layout_flexGrow="1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <com.google.android.flexbox.FlexboxLayout
-                    app:alignItems="center"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <TextView
-                        app:layout_flexGrow="1"
-                        android:padding="10dp"
-                        android:text="选择打包的文件："
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
-                </com.google.android.flexbox.FlexboxLayout>
-                <com.google.android.flexbox.FlexboxLayout
-                    app:layout_flexGrow="1"
-                    android:layout_width="match_parent"
-                    android:layout_height="100dp">
-                    <android.support.v7.widget.RecyclerView
-                        android:id="@+id/listView"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
-
-                    </android.support.v7.widget.RecyclerView>
-                </com.google.android.flexbox.FlexboxLayout>
-
-                <RelativeLayout
-                    android:layout_marginRight="10dp"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginBottom="20dp"
-                    android:layout_marginTop="40dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="38dp"
-                    android:background="@drawable/btn"
-
-                    >
-                    <Button
-                        android:layout_width="match_parent"
-                        android:layout_height="38dp"
-                        android:textColor="#fff"
-                        android:textSize="16dp"
-                        android:id="@+id/packbtn"
-                        android:text="打包"
-                        android:colorControlHighlight="#ff0000"
-                        android:background="?android:attr/selectableItemBackgroundBorderless"
-                        />
-                </RelativeLayout>
-
-            </com.google.android.flexbox.FlexboxLayout>
-
-
-            <LinearLayout
-                android:orientation="vertical"
-                android:showDividers="beginning"
-                android:divider="@drawable/title"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                tools:ignore="MissingConstraints">
-                <include layout="@layout/navbar" android:id="@+id/systembar"></include>
-            </LinearLayout>
-
-        </com.google.android.flexbox.FlexboxLayout>
-    </com.google.android.flexbox.FlexboxLayout>
-
-
-
-
-
-</android.support.constraint.ConstraintLayout>
+                android:layout_height="38dp"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:colorControlHighlight="#ff0000"
+                android:text="确定"
+                android:textColor="#fff"
+                android:textSize="16dp" />
+        </LinearLayout>
+</LinearLayout>

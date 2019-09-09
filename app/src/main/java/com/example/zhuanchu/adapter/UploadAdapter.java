@@ -15,6 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.zhuanchu.FilelistActivity;
+import com.example.zhuanchu.MyApplication;
 import com.example.zhuanchu.R;
 import com.example.zhuanchu.bean.PackFile;
 import com.google.android.flexbox.FlexboxLayoutManager;
@@ -96,9 +97,9 @@ public class UploadAdapter extends RecyclerView.Adapter<UploadAdapter.VerticalVi
 
         public VerticalViewHolder(@NonNull View itemView) {
             super(itemView);
-            textView = itemView.findViewById(R.id.fileName);
-            fileTime = itemView.findViewById(R.id.filetime);
-            checkBox = itemView.findViewById(R.id.filecheck);
+            textView = itemView.findViewById(R.id.fileNameupload);
+            fileTime = itemView.findViewById(R.id.filetimeupload);
+            checkBox = itemView.findViewById(R.id.filecheckupload);
         }
     }
 

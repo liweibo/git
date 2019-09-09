@@ -1,76 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:orientation="vertical">
 
-    <com.google.android.flexbox.FlexboxLayout
-        app:flexDirection="column"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="20dp"
+        >
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/listviews"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.google.android.flexbox.FlexboxLayout
+    </android.support.v7.widget.RecyclerView>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="38dp"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="30dp"
+        android:background="@drawable/btn"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/prev"
             android:layout_width="match_parent"
-            android:layout_height="49dp">
-
-            <ImageView
-                android:id="@+id/back"
-                android:layout_width="26dp"
-                android:layout_height="26dp"
-                android:layout_marginLeft="10dp"
-                android:src="@drawable/ico_brawser_backwards_d" />
-
-            <com.google.android.flexbox.FlexboxLayout
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                app:alignItems="center"
-                app:justifyContent="center"
-                app:layout_flexGrow="1">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="本地目录查看"
-                    android:textSize="16dp" />
-            </com.google.android.flexbox.FlexboxLayout>
-
-            <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_marginRight="6dp"
-                android:src="@drawable/ic_view_girdview" />
-        </com.google.android.flexbox.FlexboxLayout>
-        <LinearLayout
-            android:background="#cccccc"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"></LinearLayout>
-
-        <com.google.android.flexbox.FlexboxLayout
-            app:alignItems="center"
-            android:layout_width="match_parent"
-            android:layout_height="50dp">
-            <TextView
-                android:id="@+id/prev"
-                android:layout_marginLeft="15dp"
-                android:text="返回上一页"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-        </com.google.android.flexbox.FlexboxLayout>
-
-        <com.google.android.flexbox.FlexboxLayout
-            app:layout_flexGrow="1"
-            android:layout_width="match_parent"
-            android:layout_height="100dp">
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/listviews"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-            </android.support.v7.widget.RecyclerView>
-        </com.google.android.flexbox.FlexboxLayout>
-
-
-
-    </com.google.android.flexbox.FlexboxLayout>
-
-</android.support.constraint.ConstraintLayout>
+            android:layout_height="38dp"
+            android:layout_gravity="bottom"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:colorControlHighlight="#ff0000"
+            android:text="返回上级文件目录"
+            android:textColor="#fff"
+            android:textSize="16dp" />
+    </LinearLayout>
+</LinearLayout>

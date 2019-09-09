@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".HomeActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <ScrollView
+            android:id="@+id/scrollView1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbars="none">
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingLeft="50dp"
+                android:paddingTop="20dp"
+                android:paddingRight="50dp"
+                android:paddingBottom="20dp">
+
+
+                <LinearLayout
+                    android:layout_marginTop="20dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <TextView
+                        android:layout_width="95dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:text="车型"
+                        android:textSize="16dp" />
+
+                    <org.angmarch.views.NiceSpinner
+                        android:id="@+id/edit_spinnerCheXing"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textSize="16dp"
+                        app:arrowTint="@color/colorfocus"
+                        app:textTint="@color/colorfocus" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_marginTop="20dp"
+
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <TextView
+                        android:layout_width="95dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:text=""
+                        android:textSize="16dp" />
+
+                    <org.angmarch.views.NiceSpinner
+                        android:id="@+id/edit_spinnerjuTiCheXing"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textSize="16dp"
+                        app:arrowTint="@color/colorfocus"
+                        app:textTint="@color/colorfocus" />
+
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:layout_marginTop="20dp"
+
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <TextView
+                        android:layout_width="119dp"
+                        android:layout_height="wrap_content"
+                        android:singleLine="true"
+                        android:text="车号"
+                        android:textSize="16dp" />
+
+                    <scut.carson_ho.diy_view.SuperEditText
+                        android:id="@+id/editext_chehao"
+
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="20dp"
+                        android:layout_weight="1"
+                        android:textColor="@color/colorfocus"
+                        android:textSize="16dp"
+                        app:cursor="@drawable/cursortest"
+                        app:delete_height="60"
+                        app:delete_width="60"
+                        app:delete_x="0"
+                        app:delete_y="0"
+                        app:ic_delete="@drawable/delete"
+                        app:ic_left_click="@drawable/ic_left_click"
+
+                        app:ic_left_unclick="@drawable/ic_left_unclick"
+                        app:left_height="0"
+                        app:left_width="0"
+                        app:left_x="0"
+                        app:left_y="0"
+
+                        />
+
+                    <ImageButton
+                        android:id="@+id/imagebtnCamera"
+
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginRight="10dp"
+                        android:background="@drawable/camera" />
+
+
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:layout_marginTop="20dp"
+
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <TextView
+                        android:layout_width="119dp"
+                        android:layout_height="wrap_content"
+                        android:text="配属用户"
+                        android:textSize="16dp" />
+
+
+                    <scut.carson_ho.diy_view.SuperEditText
+                        android:id="@+id/et_peishu"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="20dp"
+                        android:layout_weight="1"
+                        android:textColor="@color/colorfocus"
+                        android:textSize="16dp"
+                        app:cursor="@drawable/cursortest"
+                        app:delete_height="60"
+                        app:delete_width="60"
+                        app:delete_x="0"
+                        app:delete_y="0"
+                        app:ic_delete="@drawable/delete"
+                        app:ic_left_click="@drawable/ic_left_click"
+
+                        app:ic_left_unclick="@drawable/ic_left_unclick"
+                        app:left_height="0"
+                        app:left_width="0"
+                        app:left_x="0"
+                        app:left_y="0"
+
+
+                        />
+
+
+                    <ImageButton
+                        android:layout_width="20dp"
+
+                        android:layout_height="20dp"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginRight="10dp"
+                        android:background="@color/transparent" />
+
+
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:layout_marginTop="20dp"
+
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <TextView
+                        android:layout_width="95dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:text="车厢号"
+                        android:textSize="16dp" />
+
+                    <org.angmarch.views.NiceSpinner
+                        android:id="@+id/edit_spinnerCheXingCheHao"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textSize="16dp"
+                        app:arrowTint="@color/colorfocus"
+
+                        app:textTint="@color/colorfocus" />
+
+
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:layout_marginTop="20dp"
+
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <TextView
+                        android:layout_width="95dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:text="设备"
+                        android:textSize="16dp" />
+
+
+                    <org.angmarch.views.NiceSpinner
+                        android:id="@+id/edit_spinnerCheXingCheHaoSheBei"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textSize="16dp"
+                        app:arrowTint="@color/colorfocus"
+                        app:textTint="@color/colorfocus" />
+
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:layout_marginTop="20dp"
+
+                    android:id="@+id/fl_cmd"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:layout_width="95dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:text="CMD"
+                        android:textSize="16dp" />
+
+                    <org.angmarch.views.NiceSpinner
+                        android:id="@+id/edit_spinnerCheXingCheHaoCMD"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textSize="16dp"
+                        app:arrowTint="@color/colorfocus"
+                        app:textTint="@color/colorfocus" />
+
+
+                </LinearLayout>
+
+
+                <TextView
+                    android:id="@+id/testtext"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="right"
+                    android:orientation="horizontal"
+
+                    >
+
+                    <CheckBox
+                        android:id="@+id/remember_info"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginRight="5dp"
+                        android:buttonTint="@color/colorfocus"
+                        android:clickable="true"
+                        android:focusable="false"
+                        android:focusableInTouchMode="false"
+                        android:gravity="center_vertical" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:paddingRight="5dp"
+                        android:text="记住配置信息"
+                        android:textSize="16dp" />
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+
+        </ScrollView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="38dp"
+        android:layout_marginLeft="50dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginRight="50dp"
+        android:layout_marginBottom="30dp"
+        android:background="@drawable/btn"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/vercodehome"
+            android:layout_width="match_parent"
+            android:layout_height="38dp"
+            android:layout_gravity="bottom"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:colorControlHighlight="#ff0000"
+            android:text="确定"
+            android:textColor="#fff"
+            android:textSize="16dp" />
+    </LinearLayout>
+</LinearLayout>
