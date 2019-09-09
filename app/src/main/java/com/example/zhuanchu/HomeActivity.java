@@ -197,6 +197,7 @@ public class HomeActivity extends AppCompatActivity {
                 Activity.MODE_PRIVATE);
         int tabnum = sharedPreferences.getInt("tabnum", 0);
 
+        System.out.println("oncreat进来时tabnum值："+tabnum);
 
         actionBar = this.getSupportActionBar();
         if (tabnum == 3) {
@@ -215,25 +216,24 @@ public class HomeActivity extends AppCompatActivity {
         }
         actionBar.setDisplayHomeAsUpEnabled(true);
         StatusBarCompat.setStatusBarColor(this, getResources().getColor(R.color.colorfocus), true);
-
+        initUI();
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        initUI();
-
     }
 
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            finish();
             SharedPreferences pref = HomeActivity.this.getSharedPreferences("tab", MODE_PRIVATE);
             SharedPreferences.Editor editor = pref.edit();
             editor.putInt("tabnum", 0);
             editor.commit();
+            finish();
+
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -321,7 +321,7 @@ public class HomeActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences("tab",
                 Activity.MODE_PRIVATE);
         int tabnum = sharedPreferences.getInt("tabnum", 0);
-
+        System.out.println("设置的tab"+tabnum);
         navigationTabBar.setModels(models);
         navigationTabBar.setViewPager(viewPager, tabnum);
         navigationTabBar.setOnPageChangeListener(new MultiViewPager.OnPageChangeListener() {
@@ -872,33 +872,7 @@ public class HomeActivity extends AppCompatActivity {
         viewPager.setCurrentItem(1);
     }
 
-//    private class MyPagerAdapter extends FragmentPagerAdapter {
-//        public MyPagerAdapter(FragmentManager fm) {
-//            super(fm);
-//        }
-//
-//        @Override
-//        public int getCount() {
-//            return 2;
-//        }
-//
-//        @Override
-//        public CharSequence getPageTitle(int position) {
-//            System.out.println("当前fragment的TItle："+ mTitles_3[position]);
-//
-//            return mTitles_3[position];
-//
-//        }
-//
-//        @Override
-//        public Fragment getItem(int position) {
-//            System.out.println("当前fragment："+mFragments.get(position));
-//            return mFragments.get(position);
-//
-//        }
-//
-//
-//    }
+
 
     public void initWeishangchaun(View view){
         fragmnetWeishangchuan(view);
@@ -2356,6 +2330,10 @@ public class HomeActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        SharedPreferences pref = HomeActivity.this.getSharedPreferences("tab", MODE_PRIVATE);
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putInt("tabnum", 0);
+        editor.commit();
         if (promptDialog.onBackPressed())
             super.onBackPressed();
     }

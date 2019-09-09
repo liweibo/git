@@ -1,14 +1,17 @@
 package com.example.zhuanchu;
 
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -33,8 +36,9 @@ import java.util.List;
 
 import me.leefeng.promptlibrary.PromptDialog;
 
-@Route(path = "/app/fileview")
+
 public class FileView extends AppCompatActivity {
+
 
     private JSONArray jsonArray = new JSONArray();
     private String path = "";
@@ -45,7 +49,9 @@ public class FileView extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fileview);
-
+        ActionBar actionBar = this.getSupportActionBar();
+        actionBar.setTitle("已下载文件");
+        actionBar.setDisplayHomeAsUpEnabled(true);
         promptDialog = new PromptDialog(this);
 
         path = Environment.getExternalStorageDirectory() + "/CRRC";
@@ -105,17 +111,35 @@ public class FileView extends AppCompatActivity {
             }
         });
 
-        findViewById(R.id.back).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                promptDialog.showLoading("加载中...");
-                ARouter.getInstance().build("/app/system").navigation();
-                promptDialog.dismiss();
+//        findViewById(R.id.back).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                promptDialog.showLoading("加载中...");
+//                ARouter.getInstance().build("/app/system").navigation();
+//                promptDialog.dismiss();
+//
+//            }
+//        });
 
-            }
-        });
+
+    }
 
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+
+            promptDialog.showLoading("加载中...");
+            finish();
+            promptDialog.dismiss();
+
+            SharedPreferences pref = FileView.this.getSharedPreferences("tab", MODE_PRIVATE);
+            SharedPreferences.Editor editor = pref.edit();
+            editor.putInt("tabnum", 3);
+            editor.commit();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     public void readFile(String path){
@@ -177,4 +201,12 @@ public class FileView extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        SharedPreferences pref = FileView.this.getSharedPreferences("tab", MODE_PRIVATE);
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putInt("tabnum", 3);
+        editor.commit();
+        super.onBackPressed();
+    }
 }
