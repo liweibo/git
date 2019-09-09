@@ -1,50 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="match_parent">
+
     <LinearLayout
-        android:layout_marginTop="10dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:ignore="MissingConstraints">
-        <com.google.android.flexbox.FlexboxLayout
-            android:background="@drawable/border"
-            android:minHeight="40dp"
-            app:alignItems="center"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="5dp">
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="55dp"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/fileimgupload"
+                android:layout_width="21dp"
+                android:layout_height="21dp"
+                android:src="@drawable/wenjianjia" />
+
+            <TextView
+                android:id="@+id/fileNameupload"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:layout_weight="1"
+                android:text="这是一个测试文件"
+                app:layout_flexGrow="1" />
+
+            <TextView
+                android:id="@+id/filetimeupload"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
+                android:layout_weight="1"
+                android:text="2019-07-29 10:00:00" />
+
             <CheckBox
+                android:id="@+id/filecheckupload"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:buttonTint="@color/colorfocus"
                 android:clickable="true"
                 android:focusable="false"
-                android:focusableInTouchMode="false"
-                android:id="@+id/filecheck"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-            <ImageView
-                android:id="@+id/fileimg"
-                android:layout_marginLeft="10dp"
-                android:src="@drawable/dabao"
-                android:layout_width="24dp"
-                android:layout_height="24dp" />
-            <TextView
-                android:id="@+id/fileName"
-                android:text="图片文件"
-                android:layout_marginLeft="15dp"
-                android:layout_width="110dp"
-                android:layout_height="wrap_content" />
-            <TextView
-                android:id="@+id/filetime"
-                android:layout_marginLeft="5dp"
-                app:layout_flexGrow="1"
-                android:layout_marginRight="10dp"
-                android:text="2019-07-29 10:00:00"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-        </com.google.android.flexbox.FlexboxLayout>
+                android:focusableInTouchMode="false" />
+        </LinearLayout>
     </LinearLayout>
-</android.support.constraint.ConstraintLayout>
+</LinearLayout>

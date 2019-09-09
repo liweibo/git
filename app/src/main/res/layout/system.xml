@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".SystemActivity">
+    tools:context=".HomeActivity">
 
     <com.google.android.flexbox.FlexboxLayout
         app:flexDirection="column"
@@ -12,110 +12,113 @@
         android:layout_height="match_parent">
 
         <com.google.android.flexbox.FlexboxLayout
-            android:layout_margin="30dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="30dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
             app:alignItems="center"
             app:flexDirection="column"
             app:layout_flexGrow="1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+
+
+
             <LinearLayout
                 android:divider="@drawable/title"
                 android:showDividers="end"
                 android:layout_width="match_parent"
                 android:orientation="vertical"
-                android:layout_height="50dp">
+                android:layout_height="60dp">
                 <com.google.android.flexbox.FlexboxLayout
                     app:alignItems="center"
                     android:layout_width="match_parent"
-                    android:layout_height="49dp">
+                    android:layout_height="59dp">
                     <TextView
                         app:layout_flexGrow="1"
                         android:text="WIFI下自动上传文件"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
-                    <ImageView
-                        android:id="@+id/networkset"
-                        android:src="@drawable/kaiqi_c"
-                        android:layout_width="46dp"
-                        android:layout_height="wrap_content" />
+                    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        xmlns:app="http://schemas.android.com/apk/res-auto"
+                        android:orientation="vertical">
+
+                        <com.suke.widget.SwitchButton
+                            android:id="@+id/switch_buttonWifi"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:sb_checked_color="@color/colorfocus"
+                            />
+
+                    </LinearLayout>
+
                 </com.google.android.flexbox.FlexboxLayout>
             </LinearLayout>
+
+
             <LinearLayout
                 android:divider="@drawable/title"
                 android:showDividers="end"
                 android:layout_width="match_parent"
                 android:orientation="vertical"
-                android:layout_height="50dp">
+                android:layout_height="60dp">
                 <com.google.android.flexbox.FlexboxLayout
                     app:alignItems="center"
                     android:layout_width="match_parent"
-                    android:layout_height="49dp">
+                    android:layout_height="59dp">
                     <TextView
                         app:layout_flexGrow="1"
                         android:text="4G下继续上传文件"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
-                    <ImageView
-                        android:id="@+id/wifiset"
-                        android:src="@drawable/kaiqi_c"
-                        android:layout_width="46dp"
-                        android:layout_height="wrap_content" />
+
+                    <com.suke.widget.SwitchButton
+                        android:id="@+id/switch_button4G"
+                        app:sb_checked_color="@color/colorfocus"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
                 </com.google.android.flexbox.FlexboxLayout>
             </LinearLayout>
+
+
             <LinearLayout
                 android:id="@+id/toFileView"
                 android:divider="@drawable/title"
                 android:showDividers="end"
                 android:layout_width="match_parent"
+                android:background="@drawable/selectorll"
+                android:clickable="true"
                 android:orientation="vertical"
-                android:layout_height="50dp">
+                android:layout_height="60dp">
                 <com.google.android.flexbox.FlexboxLayout
                     app:alignItems="center"
                     android:layout_width="match_parent"
-                    android:layout_height="49dp">
+                    android:layout_height="59dp">
                     <TextView
                         app:layout_flexGrow="1"
                         android:text="下载文件本地目录查看"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
                     <ImageView
-                        android:layout_marginRight="10dp"
                         android:src="@drawable/expandablelistview_indicator_up"
-                        android:layout_width="12dp"
-                        android:layout_height="wrap_content" />
+                        android:layout_width="30dp"
+                        android:layout_height="30dp" />
                 </com.google.android.flexbox.FlexboxLayout>
             </LinearLayout>
+
             <LinearLayout
                 android:divider="@drawable/title"
                 android:showDividers="end"
                 android:layout_width="match_parent"
                 android:orientation="vertical"
-                android:layout_height="50dp">
-                <com.google.android.flexbox.FlexboxLayout
-                    app:alignItems="center"
-                    android:layout_width="match_parent"
-                    android:layout_height="49dp">
-                    <TextView
-                        app:layout_flexGrow="1"
-                        android:text="车辆设备信息设置"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
-                    <ImageView
-                        android:layout_marginRight="10dp"
-                        android:src="@drawable/expandablelistview_indicator_up"
-                        android:layout_width="12dp"
-                        android:layout_height="wrap_content" />
-                </com.google.android.flexbox.FlexboxLayout>
-            </LinearLayout>
-            <LinearLayout
-                android:divider="@drawable/title"
-                android:showDividers="end"
-                android:layout_width="match_parent"
-                android:orientation="vertical"
-                android:layout_height="50dp">
+                android:layout_height="60dp">
                 <LinearLayout
+                    android:gravity="center_vertical"
                     android:layout_width="match_parent"
-                    android:layout_height="49dp">
+                    android:layout_height="59dp">
                     <TextView
                         android:text="已下载文件删除设置"
                         android:layout_width="0dp"
@@ -128,7 +131,7 @@
                         android:id="@+id/edit_spinnerDelete"
                         android:layout_width="0dp"
                         android:layout_weight="1"
-                        android:layout_height="wrap_content"
+                        android:layout_height="49dp"
 
                         android:textSize="16dp"
                         app:arrowTint="@color/colorfocus"

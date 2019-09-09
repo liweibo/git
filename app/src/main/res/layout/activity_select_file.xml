@@ -8,13 +8,14 @@
     tools:context=".selectFileActivity">
 
     <LinearLayout
+        android:padding="20dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
         <LinearLayout
             android:layout_marginBottom="20dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="5dp"
             android:id="@+id/lll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

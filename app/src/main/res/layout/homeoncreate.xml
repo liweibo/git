@@ -6,11 +6,16 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <android.support.v4.view.ViewPager
+
+
+
+    <com.example.zhuanchu.service.MultiViewPager
         android:id="@+id/vp_horizontal_ntbhome"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"/>
+        android:layout_weight="1">
+
+    </com.example.zhuanchu.service.MultiViewPager>
 
     <devlight.io.library.ntb.NavigationTabBar
         android:id="@+id/ntb_horizontalhome"

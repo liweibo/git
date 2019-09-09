@@ -26,6 +26,9 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v4.view.PagerAdapter;
@@ -60,11 +63,17 @@ import com.example.zhuanchu.service.AuthService;
 import com.example.zhuanchu.service.CompressOperate_zip4j;
 import com.example.zhuanchu.service.ExMultipartBody;
 import com.example.zhuanchu.service.GetInfoForMultiList;
+import com.example.zhuanchu.service.MultiViewPager;
 import com.example.zhuanchu.service.UploadProgressListener;
+import com.example.zhuanchu.service.ViewFindUtils;
+import com.flyco.tablayout.SegmentTabLayout;
+import com.flyco.tablayout.listener.OnTabSelectListener;
+import com.flyco.tablayout.widget.MsgView;
 import com.githang.statusbar.StatusBarCompat;
 import com.google.android.flexbox.FlexboxLayout;
 import com.google.android.flexbox.FlexboxLayoutManager;
 import com.scottyab.aescrypt.AESCrypt;
+import com.suke.widget.SwitchButton;
 
 import org.angmarch.views.NiceSpinner;
 import org.angmarch.views.OnSpinnerItemSelectedListener;
@@ -164,6 +173,11 @@ public class HomeActivity extends AppCompatActivity {
 
     JSONArray jsonArray = null;
 
+    View mDecorView;
+    SegmentTabLayout mTabLayout_3;
+    String[] mTitles_3 = {"已上传", "未上传"};
+    ArrayList<Fragment> mFragments = new ArrayList<>();
+    ArrayList<Fragment> mFragments2 = new ArrayList<>();
 
     Context context;
     private JSONArray jsonArrayup = null;
@@ -202,8 +216,15 @@ public class HomeActivity extends AppCompatActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
         StatusBarCompat.setStatusBarColor(this, getResources().getColor(R.color.colorfocus), true);
 
-        initUI();
     }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        initUI();
+
+    }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -219,7 +240,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void initUI() {
-        final ViewPager viewPager = (ViewPager) findViewById(R.id.vp_horizontal_ntbhome);
+        final MultiViewPager viewPager = (MultiViewPager) findViewById(R.id.vp_horizontal_ntbhome);
         viewPager.setAdapter(new PagerAdapter() {
             @Override
             public int getCount() {
@@ -233,7 +254,7 @@ public class HomeActivity extends AppCompatActivity {
 
             @Override
             public void destroyItem(final View container, final int position, final Object object) {
-                ((ViewPager) container).removeView((View) object);
+                ((MultiViewPager) container).removeView((View) object);
             }
 
             @Override
@@ -249,7 +270,8 @@ public class HomeActivity extends AppCompatActivity {
                     initPack(view);
                 } else if (position == 2) {
                     view = LayoutInflater.from(
-                            getBaseContext()).inflate(R.layout.upload, null, false);
+                            getBaseContext()).inflate(R.layout.upload_ntb, null, false);
+
                     initUpload(view);
                 } else if (position == 3) {
                     view = LayoutInflater.from(
@@ -302,7 +324,7 @@ public class HomeActivity extends AppCompatActivity {
 
         navigationTabBar.setModels(models);
         navigationTabBar.setViewPager(viewPager, tabnum);
-        navigationTabBar.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        navigationTabBar.setOnPageChangeListener(new MultiViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(final int position, final float positionOffset, final int positionOffsetPixels) {
 
@@ -581,6 +603,110 @@ public class HomeActivity extends AppCompatActivity {
 
     //3   init上传首页的UI组件，以及逻辑代码，...
     public void initUpload(View view) {
+
+
+        mFragments.add(new SimpleCardFragment());
+        mFragments.add(SimpleCardFragmentYishangchuan.getInstance("Switch ViewPager "));
+        //view
+        mTabLayout_3 =(SegmentTabLayout)view.findViewById(R.id.tl_3);
+        tl_3(view);
+
+
+
+
+
+//
+//        try {
+//            String path = Environment.getExternalStorageDirectory() + "/CRRC";
+//            File file = new File(path);
+//
+//            if (!file.exists()) {
+//                file.mkdir();
+//            }
+//
+//            path = Environment.getExternalStorageDirectory() + "/CRRC/UPLOAD";
+//
+//            file = new File(path);
+//            if (!file.exists()) {
+//                file.mkdir();
+//            }
+//
+//            String filename = "";
+//            jsonArrayup = new JSONArray();
+//
+//            File[] files = file.listFiles();
+//            for (File spec : files) {
+//                JSONObject jsonObject = new JSONObject();
+//                jsonObject.put("name", spec.getName());
+//                java.text.SimpleDateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//                String dateTime = df.format(new Date(spec.lastModified()));
+//                jsonObject.put("time", dateTime);
+//                jsonObject.put("file", spec);
+//                jsonObject.put("check", false);
+//                jsonArrayup.put(jsonObject);
+//                //filename += spec.getName();
+//            }
+//
+//            TextView textView1 = view.findViewById(R.id.files);
+//            textView1.setText(jsonArrayup.getJSONObject(0).getString("name"));
+//        } catch (Exception e) {
+//
+//        }
+//
+//
+//        RecyclerView recyclerView = view.findViewById(R.id.listUpload);
+//        FlexboxLayoutManager flexboxLayoutManager = new FlexboxLayoutManager(this);
+//        recyclerView.setLayoutManager(flexboxLayoutManager);
+//
+//        recyclerView.setAdapter(new UploadAdapter(this, jsonArrayup));
+//
+//
+//        view.findViewById(R.id.uploadbtn).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//                /*
+//                 * 判断是否有网络
+//                 * */
+//                boolean network = isNetworkAvailable(HomeActivity.this);
+//                if (!network) {
+//
+//                    Toast.makeText(HomeActivity.this, "没有检测到网络", Toast.LENGTH_LONG).show();
+//                    return;
+//                }
+//
+//                boolean mobile = isMobile(HomeActivity.this);
+//                sharedPreferencesUp = getSharedPreferences("data", MODE_PRIVATE);
+//
+//                boolean networkinit = sharedPreferencesUp.getBoolean("network", false);//4g
+//
+//                System.out.println(networkinit);
+//
+//                if (mobile && !networkinit) {
+//                    android.app.AlertDialog.Builder dialog = new android.app.AlertDialog.Builder(HomeActivity.this);
+//                    dialog.setTitle("网络检测");
+//                    TextView textView1 = new TextView(HomeActivity.this);
+//                    textView1.setText("当前为4G网络，要继续上传吗?");
+//                    dialog.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+//                        @Override
+//                        public void onClick(DialogInterface dialog, int which) {
+//                            sharedPreferencesUp.edit().putBoolean("network",true).commit();
+//                            uploadFile(HomeActivity.this);
+//                        }
+//                    });
+//                    dialog.setNegativeButton("取消", null);
+//                    dialog.show();
+//                    return;
+//                }
+//
+//                uploadFile(HomeActivity.this);
+//
+//            }
+//        });
+    }
+
+
+    public void fragmnetWeishangchuan(View view) {
         try {
             String path = Environment.getExternalStorageDirectory() + "/CRRC";
             File file = new File(path);
@@ -595,10 +721,8 @@ public class HomeActivity extends AppCompatActivity {
             if (!file.exists()) {
                 file.mkdir();
             }
-
             String filename = "";
             jsonArrayup = new JSONArray();
-
             File[] files = file.listFiles();
             for (File spec : files) {
                 JSONObject jsonObject = new JSONObject();
@@ -618,18 +742,13 @@ public class HomeActivity extends AppCompatActivity {
 
         }
 
-
         RecyclerView recyclerView = view.findViewById(R.id.listUpload);
         FlexboxLayoutManager flexboxLayoutManager = new FlexboxLayoutManager(this);
         recyclerView.setLayoutManager(flexboxLayoutManager);
-
         recyclerView.setAdapter(new UploadAdapter(this, jsonArrayup));
-
-
         view.findViewById(R.id.uploadbtn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 /*
                  * 判断是否有网络
                  * */
@@ -643,7 +762,7 @@ public class HomeActivity extends AppCompatActivity {
                 boolean mobile = isMobile(HomeActivity.this);
                 sharedPreferencesUp = getSharedPreferences("data", MODE_PRIVATE);
 
-                boolean networkinit = sharedPreferencesUp.getBoolean("network", false);
+                boolean networkinit = sharedPreferencesUp.getBoolean("network", false);//4g
 
                 System.out.println(networkinit);
 
@@ -655,6 +774,7 @@ public class HomeActivity extends AppCompatActivity {
                     dialog.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
+                            sharedPreferencesUp.edit().putBoolean("network", true).commit();
                             uploadFile(HomeActivity.this);
                         }
                     });
@@ -662,13 +782,119 @@ public class HomeActivity extends AppCompatActivity {
                     dialog.show();
                     return;
                 }
-
                 uploadFile(HomeActivity.this);
-
             }
         });
     }
 
+
+    private void tl_3(View view) {
+        final ViewPager viewPager = (ViewPager) view.findViewById(R.id.vp_2);
+        viewPager.setAdapter(new PagerAdapter() {
+            @Override
+            public int getCount() {
+                return 2;
+            }
+            @Override
+            public boolean isViewFromObject(final View view, final Object object) {
+                return view.equals(object);
+            }
+            @Override
+            public void destroyItem(final View container, final int position, final Object object) {
+                ((ViewPager) container).removeView((View) object);
+            }
+            @Override
+            public Object instantiateItem(final ViewGroup container, final int position) {
+                View view = null;
+                if (position == 0) {
+
+                    view = LayoutInflater.from(
+                            getBaseContext()).inflate(R.layout.fragment_simple_card_fragment_yishagchuan, null, false);
+                    initYishangchuan(view);
+
+
+                } else if (position == 1) {
+                    view = LayoutInflater.from(
+                            getBaseContext()).inflate(R.layout.fr_simple_card, null, false);
+                    initWeishangchaun(view);
+                }
+                container.addView(view);
+                return view;
+            }
+        });
+
+
+
+
+
+        mTabLayout_3.setTabData(mTitles_3);
+        mTabLayout_3.setOnTabSelectListener(new OnTabSelectListener() {
+            @Override
+            public void onTabSelect(int position) {
+                viewPager.setCurrentItem(position);
+            }
+
+            @Override
+            public void onTabReselect(int position) {
+            }
+        });
+
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+
+                mTabLayout_3.setCurrentTab(position);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+        viewPager.setCurrentItem(1);
+    }
+
+//    private class MyPagerAdapter extends FragmentPagerAdapter {
+//        public MyPagerAdapter(FragmentManager fm) {
+//            super(fm);
+//        }
+//
+//        @Override
+//        public int getCount() {
+//            return 2;
+//        }
+//
+//        @Override
+//        public CharSequence getPageTitle(int position) {
+//            System.out.println("当前fragment的TItle："+ mTitles_3[position]);
+//
+//            return mTitles_3[position];
+//
+//        }
+//
+//        @Override
+//        public Fragment getItem(int position) {
+//            System.out.println("当前fragment："+mFragments.get(position));
+//            return mFragments.get(position);
+//
+//        }
+//
+//
+//    }
+
+    public void initWeishangchaun(View view){
+        fragmnetWeishangchuan(view);
+    }
+
+    public void initYishangchuan(View view){
+        fragmnetWeishangchuan(view);
+
+    }
     //4   init设置首页的UI组件，以及逻辑代码，...
     public void initSet(final View view) {
 
@@ -676,58 +902,40 @@ public class HomeActivity extends AppCompatActivity {
         sharedPreferencesSet = getSharedPreferences("data", MODE_PRIVATE);
         final SharedPreferences.Editor editor = sharedPreferencesSet.edit();
 
-        /*
-         * 初始化wifi,4g打开按钮
-         * */
-        boolean networkinit = sharedPreferencesSet.getBoolean("network", false);
-        boolean wifiinit = sharedPreferencesSet.getBoolean("wifi", false);
-        ImageView networkImg = view.findViewById(R.id.networkset);
-        ImageView wifiImg = view.findViewById(R.id.wifiset);
-        if (networkinit) {
-            networkImg.setImageResource(R.drawable.kaiqi);
-        } else {
-            networkImg.setImageResource(R.drawable.kaiqi_c);
-        }
-        if (wifiinit) {
-            wifiImg.setImageResource(R.drawable.kaiqi);
-        } else {
-            wifiImg.setImageResource(R.drawable.kaiqi_c);
-        }
-
-
-        view.findViewById(R.id.networkset).setOnClickListener(new View.OnClickListener() {
+//wifi下自动上传
+        com.suke.widget.SwitchButton switchButtonwifi = (com.suke.widget.SwitchButton)
+                view.findViewById(R.id.switch_buttonWifi);
+        boolean networkstatecome = sharedPreferencesSet.getBoolean("wifi", false);
+        switchButtonwifi.setChecked(networkstatecome);//初始化的值是开启还是关闭
+        switchButtonwifi.setOnCheckedChangeListener(new SwitchButton.OnCheckedChangeListener() {
             @Override
-            public void onClick(View v) {
-                boolean networkstate = sharedPreferencesSet.getBoolean("network", false);
+            public void onCheckedChanged(SwitchButton view, boolean isChecked) {
+                if (!isChecked) {
+                    editor.putBoolean("wifi", false);
+                } else {
+                    editor.putBoolean("wifi", true);
+                }
+                editor.commit();
+            }
+        });
 
-                ImageView imageView = view.findViewById(R.id.networkset);
-                if (networkstate) {
-                    imageView.setImageResource(R.drawable.kaiqi_c);
+//4g下是否继续上传
+        com.suke.widget.SwitchButton switchButton4G = (com.suke.widget.SwitchButton)
+                view.findViewById(R.id.switch_button4G);
+        boolean networkstatecome4G = sharedPreferencesSet.getBoolean("network", false);
+        switchButtonwifi.setChecked(networkstatecome4G);//初始化的值是开启还是关闭
+        switchButtonwifi.setOnCheckedChangeListener(new SwitchButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(SwitchButton view, boolean isChecked) {
+                if (!isChecked) {
                     editor.putBoolean("network", false);
                 } else {
-                    imageView.setImageResource(R.drawable.kaiqi);
                     editor.putBoolean("network", true);
                 }
                 editor.commit();
             }
         });
 
-        view.findViewById(R.id.wifiset).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                boolean wifistate = sharedPreferencesSet.getBoolean("wifi", false);
-
-                ImageView imageView = view.findViewById(R.id.wifiset);
-                if (wifistate) {
-                    imageView.setImageResource(R.drawable.kaiqi_c);
-                    editor.putBoolean("wifi", false);
-                } else {
-                    imageView.setImageResource(R.drawable.kaiqi);
-                    editor.putBoolean("wifi", true);
-                }
-                editor.commit();
-            }
-        });
 
         view.findViewById(R.id.toFileView).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -735,7 +943,7 @@ public class HomeActivity extends AppCompatActivity {
                 startActivity(new Intent(HomeActivity.this, FileView.class));
             }
         });
-        NiceSpinner ns = (NiceSpinner)view.findViewById(R.id.edit_spinnerDelete);
+        NiceSpinner ns = (NiceSpinner) view.findViewById(R.id.edit_spinnerDelete);
         List<String> ncdataList = new ArrayList<>();
         ncdataList.add("请选择");
         ncdataList.add("上传完删除");
@@ -2127,10 +2335,6 @@ public class HomeActivity extends AppCompatActivity {
         return bitmap;
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-    }
 
     @Override
     public void onStop() {

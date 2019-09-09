@@ -630,7 +630,7 @@ public class selectFileActivity extends AppCompatActivity implements OnClickList
         }
 
         protected void onProgressUpdate(Long... values) {
-            pdialog.setTitle("文件:" + downloadingFileName);
+            pdialog.setTitle("文件:" + downloadingFileName+"正在下载");
             pdialog.show();
             long a = Long.valueOf(values[0].toString());
             int value = (int) a;

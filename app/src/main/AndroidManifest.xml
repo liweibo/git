@@ -36,7 +36,6 @@
         <activity android:name=".HomeActivity"
             android:windowSoftInputMode="adjustPan"
             />
-        <activity android:name=".SystemActivity" />
         <activity android:name=".NavbarActivity" />
         <activity android:name=".FilelistActivity" />
         <activity android:name=".PackActivity" />
