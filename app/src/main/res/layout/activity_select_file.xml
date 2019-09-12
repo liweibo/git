@@ -8,17 +8,17 @@
     tools:context=".selectFileActivity">
 
     <LinearLayout
-        android:padding="20dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="20dp">
 
         <LinearLayout
-            android:layout_marginBottom="20dp"
-            android:layout_marginTop="5dp"
             android:id="@+id/lll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="20dp"
             android:orientation="horizontal">
 
             <TextView
@@ -65,25 +65,40 @@
             android:paddingLeft="10dp"
             android:paddingRight="10dp">
 
-            <Button
-                android:id="@+id/bttest"
+            <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="38dp"
-                android:layout_marginRight="5dp"
                 android:layout_weight="1"
+                android:layout_height="38dp"
                 android:background="@drawable/btn"
-                android:text="下载"
-                android:textColor="#fff" />
+                android:layout_marginRight="5dp"
+                android:orientation="horizontal">
 
-            <Button
-                android:id="@+id/parent"
+                <Button
+                    android:id="@+id/bttest"
+                    android:layout_width="match_parent"
+                    android:layout_height="38dp"
+                    android:background="@drawable/btnclick"
+                    android:text="下载"
+                    android:textColor="#fff" />
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="38dp"
                 android:layout_marginLeft="5dp"
-                android:layout_weight="1"
                 android:background="@drawable/btn"
-                android:text="返回上级目录"
-                android:textColor="#fff" />
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/parent"
+                    android:layout_width="match_parent"
+                    android:layout_height="38dp"
+                    android:background="@drawable/btnclick"
+                    android:text="返回上级目录"
+                    android:textColor="#fff" />
+            </LinearLayout>
+
         </LinearLayout>
 
     </LinearLayout>

@@ -18,7 +18,7 @@
             android:layout_marginTop="10dp"
             android:layout_gravity="center_horizontal"
             android:layout_width="match_parent"
-            android:layout_height="320dp"
+            android:layout_height="300dp"
             app:cardCornerRadius="6dp"
             app:cardElevation="3dp"
             app:cardUseCompatPadding="true"
@@ -67,5 +67,13 @@
             android:layout_gravity="center_horizontal|top" />
     </FrameLayout>
 
+    <ImageView
+        android:layout_width="290dp"
+        android:layout_marginBottom="40dp"
+        android:layout_height="wrap_content"
+        android:src="@drawable/logo_crrc"
+        android:layout_alignParentBottom="true"
+        android:layout_centerInParent="true"
 
+        />
 </RelativeLayout>
