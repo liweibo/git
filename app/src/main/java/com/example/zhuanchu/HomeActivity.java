@@ -3,12 +3,14 @@ package com.example.zhuanchu;
 import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -22,13 +24,13 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v4.view.PagerAdapter;
@@ -41,6 +43,7 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -48,15 +51,14 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.alibaba.android.arouter.launcher.ARouter;
 import com.alibaba.fastjson.JSON;
 import com.example.zhuanchu.adapter.UploadAdapter;
 import com.example.zhuanchu.adapter.VerticalAdapter;
+import com.example.zhuanchu.bean.UploadFile;
 import com.example.zhuanchu.bean.javaBean.JsonRootBean;
 import com.example.zhuanchu.bean.pojo15.JsonRootBean15;
 import com.example.zhuanchu.service.AuthService;
@@ -64,13 +66,11 @@ import com.example.zhuanchu.service.CompressOperate_zip4j;
 import com.example.zhuanchu.service.ExMultipartBody;
 import com.example.zhuanchu.service.GetInfoForMultiList;
 import com.example.zhuanchu.service.MultiViewPager;
+import com.example.zhuanchu.service.SqlHelper;
 import com.example.zhuanchu.service.UploadProgressListener;
-import com.example.zhuanchu.service.ViewFindUtils;
 import com.flyco.tablayout.SegmentTabLayout;
 import com.flyco.tablayout.listener.OnTabSelectListener;
-import com.flyco.tablayout.widget.MsgView;
 import com.githang.statusbar.StatusBarCompat;
-import com.google.android.flexbox.FlexboxLayout;
 import com.google.android.flexbox.FlexboxLayoutManager;
 import com.scottyab.aescrypt.AESCrypt;
 import com.suke.widget.SwitchButton;
@@ -97,6 +97,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
@@ -188,6 +189,23 @@ public class HomeActivity extends AppCompatActivity {
     SharedPreferences sharedPreferencesSet = null;
     ActionBar actionBar = null;
     View uploadView = null;
+    UploadAdapter uploadAdapter = null;
+    List<String> arrs = new ArrayList<>();
+    SqlHelper sqlHelper = null;
+    SQLiteDatabase sqLiteDatabase = null;
+    int uploadIndex = 0;
+    private static final int COMPLETED = 0;
+    private Handler handler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            if (msg.what == COMPLETED) {
+                fragmnetWeishangchuan(uploadView, uploadIndex);
+            }
+        }
+    };
+    RecyclerView recyclerView = null;
+    FlexboxLayoutManager flexboxLayoutManager = null;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -223,7 +241,6 @@ public class HomeActivity extends AppCompatActivity {
     public void onStart() {
         super.onStart();
         initUI();
-
     }
 
 
@@ -258,6 +275,7 @@ public class HomeActivity extends AppCompatActivity {
                 ((MultiViewPager) container).removeView((View) object);
             }
 
+            @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public Object instantiateItem(final ViewGroup container, final int position) {
                 View view = null;
@@ -340,7 +358,7 @@ public class HomeActivity extends AppCompatActivity {
                 } else if (position == 2) {
                     actionBar.setTitle("文件上传");
                     if( uploadView != null ){
-                        fragmnetWeishangchuan(uploadView);
+                        fragmnetWeishangchuan(uploadView, uploadIndex);
                     }
                 } else if (position == 1) {
                     actionBar.setTitle("文件打包");
@@ -620,150 +638,115 @@ public class HomeActivity extends AppCompatActivity {
 
 
     //3   init上传首页的UI组件，以及逻辑代码，...
+    @RequiresApi(api = Build.VERSION_CODES.M)
     public void initUpload(View view) {
 
+        sqlHelper = new SqlHelper(HomeActivity.this);
+        sqLiteDatabase = sqlHelper.getWritableDatabase();
 
-        mFragments.add(new SimpleCardFragment());
-        mFragments.add(SimpleCardFragmentYishangchuan.getInstance("Switch ViewPager "));
+        //Cursor cursor = sqLiteDatabase.query("upload", null, null, null, null, null, null);
+        //System.out.println( cursor.getCount() );
+
+
         //view
         mTabLayout_3 =(SegmentTabLayout)view.findViewById(R.id.tl_3);
         tl_3(view);
-
-
-
-
-
-//
-//        try {
-//            String path = Environment.getExternalStorageDirectory() + "/CRRC";
-//            File file = new File(path);
-//
-//            if (!file.exists()) {
-//                file.mkdir();
-//            }
-//
-//            path = Environment.getExternalStorageDirectory() + "/CRRC/UPLOAD";
-//
-//            file = new File(path);
-//            if (!file.exists()) {
-//                file.mkdir();
-//            }
-//
-//            String filename = "";
-//            jsonArrayup = new JSONArray();
-//
-//            File[] files = file.listFiles();
-//            for (File spec : files) {
-//                JSONObject jsonObject = new JSONObject();
-//                jsonObject.put("name", spec.getName());
-//                java.text.SimpleDateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//                String dateTime = df.format(new Date(spec.lastModified()));
-//                jsonObject.put("time", dateTime);
-//                jsonObject.put("file", spec);
-//                jsonObject.put("check", false);
-//                jsonArrayup.put(jsonObject);
-//                //filename += spec.getName();
-//            }
-//
-//            TextView textView1 = view.findViewById(R.id.files);
-//            textView1.setText(jsonArrayup.getJSONObject(0).getString("name"));
-//        } catch (Exception e) {
-//
-//        }
-//
-//
-//        RecyclerView recyclerView = view.findViewById(R.id.listUpload);
-//        FlexboxLayoutManager flexboxLayoutManager = new FlexboxLayoutManager(this);
-//        recyclerView.setLayoutManager(flexboxLayoutManager);
-//
-//        recyclerView.setAdapter(new UploadAdapter(this, jsonArrayup));
-//
-//
-//        view.findViewById(R.id.uploadbtn).setOnClickListener(new View.OnClickListener() {
+//        mTabLayout_3.setOnTabSelectListener(new OnTabSelectListener() {
 //            @Override
-//            public void onClick(View v) {
+//            public void onTabSelect(int position) {
+//                System.out.println(position + "-===========================");
+//                uploadIndex = position;
+//                fragmnetWeishangchuan(uploadView, uploadIndex);
+//            }
 //
-//                /*
-//                 * 判断是否有网络
-//                 * */
-//                boolean network = isNetworkAvailable(HomeActivity.this);
-//                if (!network) {
-//
-//                    Toast.makeText(HomeActivity.this, "没有检测到网络", Toast.LENGTH_LONG).show();
-//                    return;
-//                }
-//
-//                boolean mobile = isMobile(HomeActivity.this);
-//                sharedPreferencesUp = getSharedPreferences("data", MODE_PRIVATE);
-//
-//                boolean networkinit = sharedPreferencesUp.getBoolean("network", false);//4g
-//
-//                System.out.println(networkinit);
-//
-//                if (mobile && !networkinit) {
-//                    android.app.AlertDialog.Builder dialog = new android.app.AlertDialog.Builder(HomeActivity.this);
-//                    dialog.setTitle("网络检测");
-//                    TextView textView1 = new TextView(HomeActivity.this);
-//                    textView1.setText("当前为4G网络，要继续上传吗?");
-//                    dialog.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-//                        @Override
-//                        public void onClick(DialogInterface dialog, int which) {
-//                            sharedPreferencesUp.edit().putBoolean("network",true).commit();
-//                            uploadFile(HomeActivity.this);
-//                        }
-//                    });
-//                    dialog.setNegativeButton("取消", null);
-//                    dialog.show();
-//                    return;
-//                }
-//
-//                uploadFile(HomeActivity.this);
+//            @Override
+//            public void onTabReselect(int position) {
 //
 //            }
 //        });
+
     }
 
 
-    public void fragmnetWeishangchuan(View view) {
-        try {
-            String path = Environment.getExternalStorageDirectory() + "/CRRC";
-            File file = new File(path);
+    public void fragmnetWeishangchuan(View view, int number) {
+        System.out.println( "未上传2" );
+        File[] files = getUploadFiles();
+        removedata(jsonArrayup);
 
-            if (!file.exists()) {
-                file.mkdir();
+        if( number == 1 ){
+            try {
+                for (File spec : files) {
+                    Cursor cursor = sqLiteDatabase.query("upload", null, "name='"+ spec.getName() +"'", null, null, null, null);
+                    while(cursor.moveToNext())
+                    {
+                        //光标移动成功
+                        //把数据取出
+                        System.out.println( cursor.getString(cursor.getColumnIndex("name")) );
+                    }
+
+
+                    if( cursor.getCount() == 0 ){
+                        JSONObject jsonObject = new JSONObject();
+                        jsonObject.put("name", spec.getName());
+                        java.text.SimpleDateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        String dateTime = df.format(new Date(spec.lastModified()));
+                        jsonObject.put("time", dateTime);
+                        jsonObject.put("file", spec);
+                        jsonObject.put("check", false);
+                        jsonArrayup.put(jsonObject);
+                    }
+                }
+
+
+            } catch (Exception e) {
+
             }
-            System.out.println( 9874655 );
-            path = Environment.getExternalStorageDirectory() + "/CRRC/UPLOAD";
 
-            file = new File(path);
-            if (!file.exists()) {
-                file.mkdir();
-            }
-            String filename = "";
-            jsonArrayup = new JSONArray();
-            File[] files = file.listFiles();
-            for (File spec : files) {
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("name", spec.getName());
-                java.text.SimpleDateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                String dateTime = df.format(new Date(spec.lastModified()));
-                jsonObject.put("time", dateTime);
-                jsonObject.put("file", spec);
-                jsonObject.put("check", false);
-                jsonArrayup.put(jsonObject);
-                //filename += spec.getName();
-            }
+            uploadAdapter = new UploadAdapter(this, jsonArrayup);
 
-            TextView textView1 = view.findViewById(R.id.files);
-            textView1.setText(jsonArrayup.getJSONObject(0).getString("name"));
-        } catch (Exception e) {
-
+            recyclerView = view.findViewById(R.id.listUpload);
+            flexboxLayoutManager = new FlexboxLayoutManager(this);
+            recyclerView.setLayoutManager(flexboxLayoutManager);
+            recyclerView.setAdapter( uploadAdapter );
         }
 
-        RecyclerView recyclerView = view.findViewById(R.id.listUpload);
-        FlexboxLayoutManager flexboxLayoutManager = new FlexboxLayoutManager(this);
-        recyclerView.setLayoutManager(flexboxLayoutManager);
-        recyclerView.setAdapter(new UploadAdapter(this, jsonArrayup));
+        if( number == 0 ){
+            try {
+                for (File spec : files) {
+                    Cursor cursor = sqLiteDatabase.query("upload", null, "name='"+ spec.getName() +"'", null, null, null, null);
+                    while(cursor.moveToNext())
+                    {
+                        //光标移动成功
+                        //把数据取出
+                        System.out.println( cursor.getString(cursor.getColumnIndex("name")) );
+                    }
+
+
+                    if( cursor.getCount() > 0 ){
+                        JSONObject jsonObject = new JSONObject();
+                        jsonObject.put("name", spec.getName());
+                        java.text.SimpleDateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        String dateTime = df.format(new Date(spec.lastModified()));
+                        jsonObject.put("time", dateTime);
+                        jsonObject.put("file", spec);
+                        jsonObject.put("check", false);
+                        jsonArrayup.put(jsonObject);
+                    }
+                }
+
+
+            } catch (Exception e) {
+
+            }
+
+            uploadAdapter = new UploadAdapter(this, jsonArrayup);
+            recyclerView = view.findViewById(R.id.listUpload_ready);
+            flexboxLayoutManager = new FlexboxLayoutManager(this);
+            recyclerView.setLayoutManager(flexboxLayoutManager);
+            recyclerView.setAdapter( uploadAdapter );
+        }
+
+
         view.findViewById(R.id.uploadbtn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -782,7 +765,7 @@ public class HomeActivity extends AppCompatActivity {
 
                 boolean networkinit = sharedPreferencesUp.getBoolean("network", false);//4g
 
-                System.out.println(networkinit);
+                System.out.println(networkinit + "=--====");
 
                 if (mobile && !networkinit) {
                     android.app.AlertDialog.Builder dialog = new android.app.AlertDialog.Builder(HomeActivity.this);
@@ -808,6 +791,31 @@ public class HomeActivity extends AppCompatActivity {
 
     private void tl_3(View view) {
         final ViewPager viewPager = (ViewPager) view.findViewById(R.id.vp_2);
+
+        //同时，还要给Viewpager设置选中监听，才能使SegmentTablayout和ViewPager双向同步。
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int
+                    positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                uploadIndex = position;
+                System.out.println( "position=" + position );
+                if( uploadAdapter != null ){
+                    fragmnetWeishangchuan(uploadView, uploadIndex);
+                }
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
         viewPager.setAdapter(new PagerAdapter() {
             @Override
             public int getCount() {
@@ -825,16 +833,15 @@ public class HomeActivity extends AppCompatActivity {
             public Object instantiateItem(final ViewGroup container, final int position) {
                 View view = null;
                 if (position == 0) {
-
                     view = LayoutInflater.from(
                             getBaseContext()).inflate(R.layout.fragment_simple_card_fragment_yishagchuan, null, false);
-                    initYishangchuan(view);
+                    //initYishangchuan(view);
 
 
                 } else if (position == 1) {
                     view = LayoutInflater.from(
                             getBaseContext()).inflate(R.layout.fr_simple_card, null, false);
-                    initWeishangchaun(view);
+                    //initWeishangchaun(view);
                 }
                 container.addView(view);
                 return view;
@@ -865,7 +872,6 @@ public class HomeActivity extends AppCompatActivity {
 
             @Override
             public void onPageSelected(int position) {
-
                 mTabLayout_3.setCurrentTab(position);
             }
 
@@ -905,14 +911,40 @@ public class HomeActivity extends AppCompatActivity {
 //
 //    }
 
-    public void initWeishangchaun(View view){
-        fragmnetWeishangchuan(view);
+
+    public File[] getUploadFiles(){
+        File[] files = null;
+        try {
+            String path = Environment.getExternalStorageDirectory() + "/CRRC";
+            File file = new File(path);
+
+            if (!file.exists()) {
+                file.mkdir();
+            }
+            path = Environment.getExternalStorageDirectory() + "/CRRC/UPLOAD";
+
+            file = new File(path);
+            if (!file.exists()) {
+                file.mkdir();
+            }
+            String filename = "";
+            jsonArrayup = new JSONArray();
+            files = file.listFiles();
+
+            return files;
+        } catch (Exception e) {
+
+        }
+        return files;
     }
 
-    public void initYishangchuan(View view){
-        fragmnetWeishangchuan(view);
-
+    public void removedata(JSONArray jsonArray){
+        if( jsonArray.length() > 0 ){
+            jsonArray.remove( 0 );
+            removedata(jsonArray);
+        }
     }
+
     //4   init设置首页的UI组件，以及逻辑代码，...
     public void initSet(final View view) {
 
@@ -991,6 +1023,7 @@ public class HomeActivity extends AppCompatActivity {
                 .setType(MultipartBody.FORM);
         MediaType MutilPart_Form_Data = MediaType.parse("application/x-www-form-urlencoded;charset=utf-8");
 
+        arrs.clear();
 
         for (int i = 0; i < jsonArrayup.length(); i++) {
             try {
@@ -999,12 +1032,14 @@ public class HomeActivity extends AppCompatActivity {
                 System.out.println(jsonArrayup.getJSONObject(i).getString("file"));
                 if (jsonArrayup.getJSONObject(i).getBoolean("check")) {
                     File fileOne = new File(jsonArrayup.getJSONObject(i).getString("file")); //生成文件
+                    arrs.add(jsonArrayup.getJSONObject(i).getString("name"));
                     requestBodyBuilder.addFormDataPart("file", jsonArrayup.getJSONObject(i).getString("file"), RequestBody.create(MutilPart_Form_Data, fileOne));
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
+
 
         //接口测试
         requestBodyBuilder.addFormDataPart("type", "aa");
@@ -1030,9 +1065,9 @@ public class HomeActivity extends AppCompatActivity {
         System.out.println(8888);
         //String url = "https://www.baidu.com";
         OkHttpClient okHttpClient = new OkHttpClient();
-//        okHttpClient.newBuilder().connectTimeout(60 * 1000, TimeUnit.MILLISECONDS)
-//                .readTimeout(5 * 60 * 1000, TimeUnit.MILLISECONDS)
-//                .writeTimeout(5 * 60 * 1000, TimeUnit.MILLISECONDS);
+        okHttpClient.newBuilder().connectTimeout(60 * 1000, TimeUnit.MILLISECONDS)
+                .readTimeout(5 * 60 * 1000, TimeUnit.MILLISECONDS)
+                .writeTimeout(5 * 60 * 1000, TimeUnit.MILLISECONDS);
 
         System.out.println(url);
 
@@ -1042,14 +1077,29 @@ public class HomeActivity extends AppCompatActivity {
                 .build();
         final Call call = okHttpClient.newCall(request);
 
+
+
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
                     Response response = call.execute();
+
+                    for(int i=0;i<arrs.size();i++){
+                        Cursor cursor = sqLiteDatabase.query("upload", null, "name='"+ arrs.get(i) +"'", null, null, null, null);
+                        System.out.println( cursor.getCount() + "------" );
+                        System.out.println( arrs.get(i) );
+                        if( cursor.getCount() == 0 ){
+                            sqLiteDatabase.execSQL("insert into upload(name) values('"+ arrs.get(i)+"')");
+                        }
+                    }
+                    Message message = new Message();
+                    message.what = COMPLETED;
+                    handler.sendMessage(message);
                     Looper.prepare();
                     Toast.makeText(getApplicationContext(), "上传文件成功", Toast.LENGTH_LONG).show();
                     Looper.loop();
+
                 } catch (IOException e) {
                     Looper.prepare();
                     Toast.makeText(getApplicationContext(), "上传文件失败", Toast.LENGTH_LONG).show();
