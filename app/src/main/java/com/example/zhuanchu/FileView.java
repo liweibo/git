@@ -1,26 +1,16 @@
 package com.example.zhuanchu;
 
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.net.wifi.WifiConfiguration;
-import android.net.wifi.WifiInfo;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.Toast;
 
-import com.alibaba.android.arouter.facade.annotation.Route;
-import com.alibaba.android.arouter.launcher.ARouter;
-import com.example.zhuanchu.adapter.UploadAdapter;
 import com.example.zhuanchu.adapter.ViewAdapter;
-import com.example.zhuanchu.adapter.WifiAdapter;
 import com.google.android.flexbox.FlexboxLayoutManager;
 
 import org.json.JSONArray;
@@ -29,10 +19,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
-import java.util.List;
 
 import me.leefeng.promptlibrary.PromptDialog;
 

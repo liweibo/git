@@ -2,6 +2,7 @@
 <network-security-config>
     <domain-config>
         <domain includeSubdomains="true">www.rongswift.com</domain>
+        <domain includeSubdomains="true">www.mro.csrzic.com</domain>
         <!--<trust-anchors>-->
             <!--<certificates src="@raw/my_ca"/>-->
         <!--</trust-anchors>-->

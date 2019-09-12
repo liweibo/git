@@ -7,17 +7,12 @@ import net.lingala.zip4j.util.Zip4jConstants;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.Message;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.example.zhuanchu.PackActivity;
-
 import java.io.File;
-import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 

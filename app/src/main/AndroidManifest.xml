@@ -23,7 +23,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".HorizontalNtbActivity"></activity>
         <activity
             android:name=".SplashActivity"
             android:theme="@style/BaseAppTheme.Trans">
@@ -36,15 +35,9 @@
         <activity android:name=".HomeActivity"
             android:windowSoftInputMode="adjustPan"
             />
-        <activity android:name=".NavbarActivity" />
         <activity android:name=".FilelistActivity" />
-        <activity android:name=".PackActivity" />
-        <activity android:name=".UploadActivity" />
-        <activity android:name=".DownActivity" />
         <activity android:name=".selectFileActivity" />
-        <activity android:name=".MainActivity" />
         <activity android:name=".AuthActivity" />
-        <activity android:name=".WifiActivity" />
         <activity android:name=".AuthfailActivity" />
         <activity android:name=".FileView" /> <!-- FileProvider配置访问路径，适配7.0及其以上 -->
         <provider

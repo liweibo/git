@@ -32,6 +32,8 @@ import com.alibaba.android.arouter.launcher.ARouter;
 import com.example.zhuanchu.adapter.MyAdapter;
 import com.example.zhuanchu.service.FtpUtils;
 import com.githang.statusbar.StatusBarCompat;
+import com.kongzue.dialog.v2.DialogSettings;
+import com.kongzue.dialog.v2.MessageDialog;
 
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
@@ -48,6 +50,8 @@ import java.util.Date;
 import java.util.List;
 
 import me.leefeng.promptlibrary.PromptDialog;
+
+import static com.kongzue.dialog.v2.DialogSettings.STYLE_IOS;
 
 public class selectFileActivity extends AppCompatActivity implements OnClickListener {
     int countValue;
@@ -271,11 +275,17 @@ public class selectFileActivity extends AppCompatActivity implements OnClickList
     public void onClick(View view) {
 //        if (currentParent.equals("") && currentFiles == null) {
         if (backDir.size() - 2 < 0) {
-            new AlertDialog.Builder(this)
-                    .setTitle("提示")
-                    .setMessage("已经是顶级目录！")
-                    .setPositiveButton("确定", null)
-                    .show();
+
+            DialogSettings.style = STYLE_IOS;
+            DialogSettings.use_blur = true;
+            DialogSettings.blur_alpha = 200;
+            MessageDialog.show(selectFileActivity.this,
+                    "提示", "已经是顶级目录！", "知道了", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    });
+
         } else {
             String portStr = new Integer(port).toString();
             String can[] = new String[5];
@@ -416,20 +426,16 @@ public class selectFileActivity extends AppCompatActivity implements OnClickList
             System.out.println("这个父亲文件夹为：" + parentPath);
             System.out.println("处理结果函数内部");
             if (list == null || list.size() == 0) {
-                System.out.println("空文件夹或者访问出错");
-                new AlertDialog.Builder(mContext)
-                        .setTitle("提示")
-                        .setMessage("该文件夹为空文件夹！")
-                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                promptDialog.dismiss();
+                DialogSettings.style = STYLE_IOS;
+                DialogSettings.use_blur = true;
+                DialogSettings.blur_alpha = 200;
+                MessageDialog.show(selectFileActivity.this,
+                        "提示", "该文件夹为空文件夹！", "知道了", new DialogInterface.OnClickListener() {
                             @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-
-                                promptDialog.dismiss();
-
-
+                            public void onClick(DialogInterface dialog, int which) {
                             }
-                        })
-                        .show();
+                        });
 
             } else {
                 System.out.println("找到了！！");
@@ -550,20 +556,16 @@ public class selectFileActivity extends AppCompatActivity implements OnClickList
             System.out.println("这个父亲文件夹为：" + parentPath);
             System.out.println("处理结果函数内部");
             if (list == null || list.size() == 0) {
-                System.out.println("空文件夹或者访问出错");
-                new AlertDialog.Builder(mContext)
-                        .setTitle("提示")
-                        .setMessage("该文件夹为空文件夹！")
-                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                promptDialog.dismiss();
+                DialogSettings.style = STYLE_IOS;
+                DialogSettings.use_blur = true;
+                DialogSettings.blur_alpha = 200;
+                MessageDialog.show(selectFileActivity.this,
+                        "提示", "该文件夹为空文件夹！", "知道了", new DialogInterface.OnClickListener() {
                             @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-
-                                promptDialog.dismiss();
-
-
+                            public void onClick(DialogInterface dialog, int which) {
                             }
-                        })
-                        .show();
+                        });
 
             } else {
                 System.out.println("找到了！！");
@@ -674,9 +676,7 @@ public class selectFileActivity extends AppCompatActivity implements OnClickList
             boolean textb = false;
 
             if (ItemChooseData.getFilePath().size() > 0) {
-                System.out.println("xxxxx");
                 textb = download(downloadPath, downname);
-
             }
 
 
@@ -858,11 +858,15 @@ public class selectFileActivity extends AppCompatActivity implements OnClickList
                 });
 
                 downSucOrFail = false;
-                new AlertDialog.Builder(mContext)
-                        .setTitle("提示")
-                        .setMessage(downloadingFileName + "抱歉，下载过程中出现错误，请重新尝试")
-                        .setPositiveButton("确定", null)
-                        .show();
+                DialogSettings.style = STYLE_IOS;
+                DialogSettings.use_blur = true;
+                DialogSettings.blur_alpha = 200;
+                MessageDialog.show(selectFileActivity.this,
+                        "提示", "抱歉，下载过程中出现错误，请重新尝试", "知道了", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        });
 
             } else if (countValue == 100) {
                 runOnUiThread(new Runnable() {
@@ -893,27 +897,45 @@ public class selectFileActivity extends AppCompatActivity implements OnClickList
     }
 
 
-    public static void crSDFile(String... folder) {
+    public  void crSDFile(String... folder) {
 
         int length = folder.length;
-        String genFolder = Environment.getExternalStorageDirectory().getPath().toString() +
+
+        String genFolder8 = Environment.getExternalStorageDirectory().getPath().toString() +
                 File.separator + "CRRC" + File.separator;
-        File file, file2, file3;
+        File file, file2, file3,file4,file8;
+        file8 = new File(genFolder8);
+        if (!file8.exists()) {
+            file8.mkdir();
+        }
+
+        String genFolder = genFolder8 +
+                File.separator + "DOWNLOAD" + File.separator;
         file2 = new File(genFolder);
         if (!file2.exists()) {
             file2.mkdir();
         }
-
+        SharedPreferences sharedPreferences = getSharedPreferences("filedirname",
+                Activity.MODE_PRIVATE);
+        String dir1 = sharedPreferences.getString("filedirnamevalue", "");
+        String dir2 = sharedPreferences.getString("shebeinamevalue", "");
 
         String genFolder1 = genFolder +
-                File.separator + "DOWNLOAD" + File.separator;
+                File.separator + dir1 + File.separator;
         file3 = new File(genFolder1);
         if (!file3.exists()) {
             file3.mkdir();
         }
 
+        String genFolder2 = genFolder1 +
+                File.separator + dir2 + File.separator;
+        file4 = new File(genFolder1);
+        if (!file4.exists()) {
+            file4.mkdir();
+        }
 
-        String str = genFolder1;
+
+        String str = genFolder2;
         for (int i = 0; i < length; i++) {
 
             str = str + folder[i] + "/";

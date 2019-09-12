@@ -72,6 +72,9 @@ import com.flyco.tablayout.widget.MsgView;
 import com.githang.statusbar.StatusBarCompat;
 import com.google.android.flexbox.FlexboxLayout;
 import com.google.android.flexbox.FlexboxLayoutManager;
+import com.kongzue.dialog.v2.DialogSettings;
+import com.kongzue.dialog.v2.MessageDialog;
+import com.kongzue.dialog.v2.SelectDialog;
 import com.scottyab.aescrypt.AESCrypt;
 import com.suke.widget.SwitchButton;
 
@@ -92,6 +95,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -104,6 +108,7 @@ import javax.crypto.spec.SecretKeySpec;
 import devlight.io.library.ntb.NavigationTabBar;
 import me.leefeng.promptlibrary.PromptDialog;
 import okhttp3.Call;
+import okhttp3.Callback;
 import okhttp3.FormBody;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -111,6 +116,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+
+import static com.kongzue.dialog.v2.DialogSettings.STYLE_IOS;
 
 public class HomeActivity extends AppCompatActivity {
     private List<String> datajutiCheXing = new ArrayList<>();
@@ -124,7 +131,8 @@ public class HomeActivity extends AppCompatActivity {
     private String cmdValue = " ";
     private String shebeiValue = "";
 
-
+   private String token = "";
+   private  boolean getToken = false;
     private WifiManager wifiManager;
     private Socket socket;
     OutputStream outputStream;
@@ -188,6 +196,7 @@ public class HomeActivity extends AppCompatActivity {
     SharedPreferences sharedPreferencesSet = null;
     ActionBar actionBar = null;
     View uploadView = null;
+    View packView = null;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -198,7 +207,7 @@ public class HomeActivity extends AppCompatActivity {
                 Activity.MODE_PRIVATE);
         int tabnum = sharedPreferences.getInt("tabnum", 0);
 
-        System.out.println("oncreat进来时tabnum值："+tabnum);
+        System.out.println("oncreat进来时tabnum值：" + tabnum);
 
         actionBar = this.getSupportActionBar();
         if (tabnum == 3) {
@@ -268,6 +277,7 @@ public class HomeActivity extends AppCompatActivity {
                 } else if (position == 1) {
                     view = LayoutInflater.from(
                             getBaseContext()).inflate(R.layout.pack, null, false);
+                    packView = view;
                     initPack(view);
                 } else if (position == 2) {
                     view = LayoutInflater.from(
@@ -323,7 +333,7 @@ public class HomeActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences("tab",
                 Activity.MODE_PRIVATE);
         int tabnum = sharedPreferences.getInt("tabnum", 0);
-        System.out.println("设置的tab"+tabnum);
+        System.out.println("设置的tab" + tabnum);
         navigationTabBar.setModels(models);
         navigationTabBar.setViewPager(viewPager, tabnum);
         navigationTabBar.setOnPageChangeListener(new MultiViewPager.OnPageChangeListener() {
@@ -339,11 +349,12 @@ public class HomeActivity extends AppCompatActivity {
                     actionBar.setTitle("系统设置");
                 } else if (position == 2) {
                     actionBar.setTitle("文件上传");
-                    if( uploadView != null ){
+                    if (uploadView != null) {
                         fragmnetWeishangchuan(uploadView);
                     }
                 } else if (position == 1) {
                     actionBar.setTitle("文件打包");
+                    initPack(packView);
 
                 } else if (position == 0) {
                     actionBar.setTitle("信息配置");
@@ -504,9 +515,15 @@ public class HomeActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 if (jsonArray == null || jsonArray.length() == 0) {
-                    AlertDialog.Builder alertDialog = new AlertDialog.Builder(HomeActivity.this);
-                    alertDialog.setMessage("请选择需要打包的目录");
-                    alertDialog.show();
+                    DialogSettings.style = STYLE_IOS;
+                    DialogSettings.use_blur = true;
+                    DialogSettings.blur_alpha = 200;
+                    MessageDialog.show(HomeActivity.this,
+                            "提示", "请选择需要打包的目录", "知道了", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                }
+                            });
                     return;
                 }
                 try {
@@ -532,7 +549,7 @@ public class HomeActivity extends AppCompatActivity {
                     java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("yyyyMMddHH:mm:ss");
                     String packtime = dateFormat.format(new Date());
 
-                    final String packname = choose.getString("name") + "_" + packtime + "_" + "A" + "_重庆机务段.zip";
+                    final String packname = choose.getString("name") + ".zip";
 
                     pdialog.setTitle("文件正在压缩打包");
                     pdialog.setMessage("敬请等待...");
@@ -621,106 +638,9 @@ public class HomeActivity extends AppCompatActivity {
 
     //3   init上传首页的UI组件，以及逻辑代码，...
     public void initUpload(View view) {
-
-
-        mFragments.add(new SimpleCardFragment());
-        mFragments.add(SimpleCardFragmentYishangchuan.getInstance("Switch ViewPager "));
         //view
-        mTabLayout_3 =(SegmentTabLayout)view.findViewById(R.id.tl_3);
+        mTabLayout_3 = (SegmentTabLayout) view.findViewById(R.id.tl_3);
         tl_3(view);
-
-
-
-
-
-//
-//        try {
-//            String path = Environment.getExternalStorageDirectory() + "/CRRC";
-//            File file = new File(path);
-//
-//            if (!file.exists()) {
-//                file.mkdir();
-//            }
-//
-//            path = Environment.getExternalStorageDirectory() + "/CRRC/UPLOAD";
-//
-//            file = new File(path);
-//            if (!file.exists()) {
-//                file.mkdir();
-//            }
-//
-//            String filename = "";
-//            jsonArrayup = new JSONArray();
-//
-//            File[] files = file.listFiles();
-//            for (File spec : files) {
-//                JSONObject jsonObject = new JSONObject();
-//                jsonObject.put("name", spec.getName());
-//                java.text.SimpleDateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//                String dateTime = df.format(new Date(spec.lastModified()));
-//                jsonObject.put("time", dateTime);
-//                jsonObject.put("file", spec);
-//                jsonObject.put("check", false);
-//                jsonArrayup.put(jsonObject);
-//                //filename += spec.getName();
-//            }
-//
-//            TextView textView1 = view.findViewById(R.id.files);
-//            textView1.setText(jsonArrayup.getJSONObject(0).getString("name"));
-//        } catch (Exception e) {
-//
-//        }
-//
-//
-//        RecyclerView recyclerView = view.findViewById(R.id.listUpload);
-//        FlexboxLayoutManager flexboxLayoutManager = new FlexboxLayoutManager(this);
-//        recyclerView.setLayoutManager(flexboxLayoutManager);
-//
-//        recyclerView.setAdapter(new UploadAdapter(this, jsonArrayup));
-//
-//
-//        view.findViewById(R.id.uploadbtn).setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//                /*
-//                 * 判断是否有网络
-//                 * */
-//                boolean network = isNetworkAvailable(HomeActivity.this);
-//                if (!network) {
-//
-//                    Toast.makeText(HomeActivity.this, "没有检测到网络", Toast.LENGTH_LONG).show();
-//                    return;
-//                }
-//
-//                boolean mobile = isMobile(HomeActivity.this);
-//                sharedPreferencesUp = getSharedPreferences("data", MODE_PRIVATE);
-//
-//                boolean networkinit = sharedPreferencesUp.getBoolean("network", false);//4g
-//
-//                System.out.println(networkinit);
-//
-//                if (mobile && !networkinit) {
-//                    android.app.AlertDialog.Builder dialog = new android.app.AlertDialog.Builder(HomeActivity.this);
-//                    dialog.setTitle("网络检测");
-//                    TextView textView1 = new TextView(HomeActivity.this);
-//                    textView1.setText("当前为4G网络，要继续上传吗?");
-//                    dialog.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-//                        @Override
-//                        public void onClick(DialogInterface dialog, int which) {
-//                            sharedPreferencesUp.edit().putBoolean("network",true).commit();
-//                            uploadFile(HomeActivity.this);
-//                        }
-//                    });
-//                    dialog.setNegativeButton("取消", null);
-//                    dialog.show();
-//                    return;
-//                }
-//
-//                uploadFile(HomeActivity.this);
-//
-//            }
-//        });
     }
 
 
@@ -732,7 +652,7 @@ public class HomeActivity extends AppCompatActivity {
             if (!file.exists()) {
                 file.mkdir();
             }
-            System.out.println( 9874655 );
+            System.out.println(9874655);
             path = Environment.getExternalStorageDirectory() + "/CRRC/UPLOAD";
 
             file = new File(path);
@@ -785,19 +705,20 @@ public class HomeActivity extends AppCompatActivity {
                 System.out.println(networkinit);
 
                 if (mobile && !networkinit) {
-                    android.app.AlertDialog.Builder dialog = new android.app.AlertDialog.Builder(HomeActivity.this);
-                    dialog.setTitle("网络检测");
-                    TextView textView1 = new TextView(HomeActivity.this);
-                    textView1.setText("当前为4G网络，要继续上传吗?");
-                    dialog.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    DialogSettings.style = STYLE_IOS;
+                    DialogSettings.use_blur = true;
+                    DialogSettings.blur_alpha = 200;
+                    SelectDialog.show(context, "网络检测", "当前为4G网络，要继续上传吗?", "确定", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             sharedPreferencesUp.edit().putBoolean("network", true).commit();
                             uploadFile(HomeActivity.this);
                         }
+                    }, "取消", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
                     });
-                    dialog.setNegativeButton("取消", null);
-                    dialog.show();
                     return;
                 }
                 uploadFile(HomeActivity.this);
@@ -813,14 +734,17 @@ public class HomeActivity extends AppCompatActivity {
             public int getCount() {
                 return 2;
             }
+
             @Override
             public boolean isViewFromObject(final View view, final Object object) {
                 return view.equals(object);
             }
+
             @Override
             public void destroyItem(final View container, final int position, final Object object) {
                 ((ViewPager) container).removeView((View) object);
             }
+
             @Override
             public Object instantiateItem(final ViewGroup container, final int position) {
                 View view = null;
@@ -840,9 +764,6 @@ public class HomeActivity extends AppCompatActivity {
                 return view;
             }
         });
-
-
-
 
 
         mTabLayout_3.setTabData(mTitles_3);
@@ -878,15 +799,15 @@ public class HomeActivity extends AppCompatActivity {
     }
 
 
-
-    public void initWeishangchaun(View view){
+    public void initWeishangchaun(View view) {
         fragmnetWeishangchuan(view);
     }
 
-    public void initYishangchuan(View view){
+    public void initYishangchuan(View view) {
         fragmnetWeishangchuan(view);
 
     }
+
     //4   init设置首页的UI组件，以及逻辑代码，...
     public void initSet(final View view) {
 
@@ -1092,6 +1013,11 @@ public class HomeActivity extends AppCompatActivity {
             byte[] buffer = new byte[lenght];
             is.read(buffer);
             result = new String(buffer, "utf8");
+
+
+            ////////
+
+
             String keys = "ijijkjkjkjlkklok";
             try {
                 xkl = AESCrypt.decrypt(keys, result);
@@ -1505,11 +1431,15 @@ public class HomeActivity extends AppCompatActivity {
                             editor.commit();
                         } else//信息填写不完整 则弹出提示框
                         {
-                            new android.app.AlertDialog.Builder(HomeActivity.this)
-                                    .setTitle("信息填写不完整")
-                                    .setMessage("请继续填写信息")
-                                    .setPositiveButton("确定", null)
-                                    .show();
+                            DialogSettings.style = STYLE_IOS;
+                            DialogSettings.use_blur = true;
+                            DialogSettings.blur_alpha = 200;
+                            MessageDialog.show(HomeActivity.this,
+                                    "提示", "信息填写不完整", "知道了", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                        }
+                                    });
                             cb_remember.setChecked(false);
                         }
                     } else {
@@ -1534,11 +1464,15 @@ public class HomeActivity extends AppCompatActivity {
                             editor.commit();
                         } else//信息填写不完整 则弹出提示框
                         {
-                            new android.app.AlertDialog.Builder(HomeActivity.this)
-                                    .setTitle("信息填写不完整")
-                                    .setMessage("请继续填写信息")
-                                    .setPositiveButton("确定", null)
-                                    .show();
+                            DialogSettings.style = STYLE_IOS;
+                            DialogSettings.use_blur = true;
+                            DialogSettings.blur_alpha = 200;
+                            MessageDialog.show(HomeActivity.this,
+                                    "提示", "信息填写不完整", "知道了", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                        }
+                                    });
                             cb_remember.setChecked(false);
                         }
                     }
@@ -1592,31 +1526,119 @@ public class HomeActivity extends AppCompatActivity {
                     chexianghaoValue = " ";
                 } else {
                     chexianghaoValue = edit_spinnerCheXingCheHao.getText().toString();
-
+                    System.out.println("带测试" + chexianghaoValue);
                 }
                 shebeiValue = edit_spinnerCheXingCheHaoSheBei.getText().toString();
 
-                List<String> jutichexingchehaoshebeicmdpswIp = GetInfoForMultiList.jiDongChengCheXingCheHaoSheBeiCMDipUserPsw(jsonRe, JsonRootBean15.class,
-                        chexingValue, jutiChexingValue, chexianghaoValue, shebeiValue, cmdValue);
+                List<String> jutichexingchehaoshebeicmdpswIp =
+                        GetInfoForMultiList.jiDongChengCheXingCheHaoSheBeiCMDipUserPsw(
+                                jsonRe, JsonRootBean15.class,
+                                chexingValue, jutiChexingValue, chexianghaoValue, shebeiValue, cmdValue);
                 System.out.println("值：" + chexianghaoValue);
                 dataIpPswUser.clear();
                 dataIpPswUser.addAll(jutichexingchehaoshebeicmdpswIp);
 
-                new android.app.AlertDialog.Builder(HomeActivity.this)
-                        .setTitle("ip,user,psw")
-                        .setMessage(dataIpPswUser.toString())
-                        .setPositiveButton("确定", null)
-                        .show();
+                Toast.makeText(HomeActivity.this, dataIpPswUser.toString(), Toast.LENGTH_LONG).show();
+
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+                //获取当前时间
+                Date date = new Date(System.currentTimeMillis());
+                String timeva = simpleDateFormat.format(date);
+                System.out.println("当前时间：" + timeva);
+                //生成一级和二级文件夹的名字 保存在sharepreference
+                boolean flagNum = false;
+                if (chexianghaoValue == " ") {
+                    chexianghaoValue = "NA";
+                } else {
+                    if (chexianghaoValue.equals("") || chexianghaoValue.equals("A") || chexianghaoValue.equals("B")
+                            || chexianghaoValue.equals("C")) {
+                    } else {//chexianghaoValue=1,2,3,4,5.....
+                        if (Integer.parseInt(chexianghaoValue) < 10) {
+                            chexianghaoValue = "0" + chexianghaoValue;
+                            flagNum = true;
+                        }
+                    }
+                }
+
+                String dirname1 = "";
+                SharedPreferences sharedPreferences = getSharedPreferences("filedirname",
+                        Activity.MODE_PRIVATE);
+                String timeHis = sharedPreferences.getString("historyTime", "");
+                String jutichexingHis = sharedPreferences.getString("historyjutichexing", "");
+                String chehaoHis = sharedPreferences.getString("historychehao", "");
+                String historychexianghao = sharedPreferences.getString("historychexianghao", "");
+                String historypeishu = sharedPreferences.getString("historypeishu", "");
+
+                String chexinaghao = "";
+                if (flagNum) {
+                    chexinaghao = "0" + edit_spinnerCheXingCheHao.getText().toString().trim();
+                } else {
+                    chexinaghao = edit_spinnerCheXingCheHao.getText().toString().trim();
+                }
+                boolean histime = false;
+
+                if (jutichexingHis.equals(edit_spinnerjuTiCheXing.getText().toString().trim())
+                        && chehaoHis.equals(editext_chehao.getText().toString().trim())
+                        && historychexianghao.equals(chexinaghao)
+                        && historypeishu.equals(editext_peishu.getText().toString().trim())) {
+                    //车型车号车相号，配属一样，则接下来判断是否存的有时间
+                    if (timeHis.length() > 5) {//存的有时间
+                        //用历史的时间
+                        histime = true;
+                        dirname1 = chexingValue + "_" + jutiChexingValue + "_" + timeHis + "_" + chexinaghao + "_" + editext_peishu.getText().toString().trim();
+                    } else {
+                        //直接用最新的时间
+                        dirname1 = chexingValue + "_" + jutiChexingValue + "_" + timeva + "_" + chexianghaoValue + "_" + editext_peishu.getText().toString().trim();
+                    }
+                } else {
+                    //车型 或 车号等 有一个不一样，则新建文件夹，且时间也是最新的
+                    dirname1 = chexingValue + "_" + jutiChexingValue + "_" + timeva + "_" + chexianghaoValue + "_" + editext_peishu.getText().toString().trim();
+                }
 
 
-                String can[] = new String[4];
-                can[0] = _host;
-                can[1] = _port;
-                can[2] = _user;
-                can[3] = _pass;
-                LogTask task = new LogTask(HomeActivity.this);
-                task.execute(can);
-                //ARouter.getInstance().build("/app/down").navigation();
+                //先检查信息是否填写完毕完整
+                String chehao = editext_chehao.getText().toString().trim();
+                String peishu = editext_peishu.getText().toString().trim();
+                if (chehao.length() != 0
+                        && peishu.length() != 0 && dataIpPswUser.toString().length() > 7) {
+
+                    String chehaoNow = editext_chehao.getText().toString().trim();
+                    SharedPreferences pref = HomeActivity.this.getSharedPreferences("filedirname", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = pref.edit();
+                    editor.putString("filedirnamevalue", dirname1);//一级
+                    editor.putString("shebeinamevalue", shebeiValue);//二级
+                    if (!histime) {//bu是用的历史时间
+                        System.out.println("布尔测试");
+                        editor.putString("historyTime", timeva);//历史时间
+                    }
+                    editor.putString("historyjutichexing", jutiChexingValue);//上次具体车型
+                    editor.putString("historychehao", chehaoNow);//上次车号
+                    editor.putString("historychexianghao", chexianghaoValue);//上次车箱号
+                    editor.putString("historypeishu", peishu);//上次配属用户
+                    editor.commit();
+
+
+                    String can[] = new String[4];
+                    can[0] = _host;
+                    can[1] = _port;
+                    can[2] = _user;
+                    can[3] = _pass;
+                    LogTask task = new LogTask(HomeActivity.this);
+                    task.execute(can);
+
+                } else {
+                    DialogSettings.style = STYLE_IOS;
+                    DialogSettings.use_blur = true;
+                    DialogSettings.blur_alpha = 200;
+                    MessageDialog.show(HomeActivity.this,
+                            "无法登陆", "请检查是否连接无线工装WIFI以及信息填写是否完整无误", "知道了", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                }
+                            });
+                }
+
+
             }
         });
 
@@ -1686,11 +1708,6 @@ public class HomeActivity extends AppCompatActivity {
                 intent.putExtra("port", Integer.parseInt(_port));
                 startActivity(intent);
             } else {
-                new android.app.AlertDialog.Builder(mContext)
-                        .setTitle("无法连接")
-                        .setMessage("请检查是否连接无线工装WIFI以及信息填写是否无误！")
-                        .setPositiveButton("确定", null)
-                        .show();
 
             }
         }
@@ -2149,57 +2166,71 @@ public class HomeActivity extends AppCompatActivity {
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
-
-                                String token = AuthService.getAuth();
-
-
-                                System.out.println("大小：" + img64.getBytes().length);
-                                RequestBody formBody = new FormBody.Builder()
-                                        .add("image", img64)
-                                        .build();
-
-                                OkHttpClient client = new OkHttpClient();
-                                Request request = new Request.Builder()
-                                        .url("https://aip.baidubce.com/rest/2.0/ocr/v1/numbers?access_token=" + token)
-                                        .addHeader("content-type", "application/x-www-form-urlencoded")
-                                        // .post(RequestBody.create(MEDIA_TYPE_TEXT, postBody))
-                                        .post(formBody)
-                                        // 表单提交
-                                        .build();
-                                try {
-                                    Response response = client.newCall(request).execute();
-                                    if (response.isSuccessful()) {
-                                        String json = response.body().string();
-                                        System.out.println("测试OCR：" + json);
-                                        String post = JSON.parseObject(json).getString("postBody");
-
-                                        JsonRootBean jr = JSON.parseObject(json, JsonRootBean.class);
-                                        String ocrNum = "";
-                                        for (int i = 0; i < jr.getWords_result().size(); i++) {
-                                            ocrNum += jr.getWords_result().get(i).getWords();
-                                        }
-                                        System.out.println("得到的识别数字：" + ocrNum);
-
-                                        final String finalOcrNum = ocrNum;
-                                        runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                editext_chehao.setText(finalOcrNum);
-                                                if (!haveDismiss) {
-                                                    promptDialog.dismiss();
-                                                }
-                                            }
-                                        });
-                                    }
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-
-
+                              token = AuthService.getAuth();
+                                getToken = true;
                             }
                         }).start();
+                        System.out.println("token值：" + token);
+                        System.out.println("大小：" + img64.getBytes().length);
+                        RequestBody formBody = new FormBody.Builder()
+                                .add("image", img64)
+                                .build();
 
-                        Log.i("hxl", "img========================================" + img64);
+                        OkHttpClient client = new OkHttpClient();
+                        Request request = new Request.Builder()
+                                .url("https://aip.baidubce.com/rest/2.0/ocr/v1/numbers?access_token=" + token)
+                                .addHeader("content-type", "application/x-www-form-urlencoded")
+                                // .post(RequestBody.create(MEDIA_TYPE_TEXT, postBody))
+                                .post(formBody)
+                                // 表单提交
+                                .build();
+                        //                                    Response response = client.newCall(request).execute();
+                        if (getToken){
+                        client.newCall(request).enqueue(new Callback() {
+                            @Override
+                            public void onFailure(Call call, IOException e) {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        DialogSettings.style = STYLE_IOS;
+                                        DialogSettings.use_blur = true;
+                                        DialogSettings.blur_alpha = 200;
+                                        MessageDialog.show(HomeActivity.this,
+                                                "提示", "网络状况不佳", "知道了", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                    }
+                                                });
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onResponse(Call call, Response response) throws IOException {
+                                String json = response.body().string();
+                                System.out.println("OCR数据：" + json);
+                                String post = JSON.parseObject(json).getString("postBody");
+                                JsonRootBean jr = JSON.parseObject(json, JsonRootBean.class);
+                                String ocrNum = "";
+                                for (int i = 0; i < jr.getWords_result().size(); i++) {
+                                    ocrNum += jr.getWords_result().get(i).getWords();
+                                }
+                                System.out.println("得到的识别数字：" + ocrNum);
+
+                                final String finalOcrNum = ocrNum;
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        editext_chehao.setText(finalOcrNum);
+                                        if (!haveDismiss) {
+                                            promptDialog.dismiss();
+                                        }
+                                    }
+                                });
+                            }
+                        });}
+
+
                     }
                 }
             }

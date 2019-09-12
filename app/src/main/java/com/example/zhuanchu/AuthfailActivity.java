@@ -33,7 +33,7 @@ public class AuthfailActivity extends AppCompatActivity {
                 animateRevealClose();
             }
         });
-        StatusBarCompat.setStatusBarColor(this, getResources().getColor(R.color.gplus_color_2), true);
+        StatusBarCompat.setStatusBarColor(this, getResources().getColor(R.color.authbar), true);
 
     }
 

@@ -1,1 +1,1 @@
-include ':app', ':lib', ':lteditspinner', ':diy_view', ':corebd', ':uidialog', ':core', ':uiasr', ':app1', ':mylibraryApp', ':uidialogYUYIN', ':appYUYIN', ':coreYUYIN', ':uiasrYUYIN'
+include ':app', ':lib', ':lteditspinner', ':diy_view', ':corebd', ':uidialog', ':core', ':uiasr', ':app1', ':mylibraryApp', ':uidialogYUYIN', ':appYUYIN', ':coreYUYIN', ':uiasrYUYIN', ':CBDialoglibrary'
