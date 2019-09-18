@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -26,11 +27,19 @@ public class ViewAdapter extends RecyclerView.Adapter<ViewAdapter.ViewViewHolder
     JSONArray lists = new JSONArray();
 
     private  OnItemClickListener mOnItemClickListener;
+    private  SItemClickListener sOnItemClickListener;
     public void setOnItemClickListener(OnItemClickListener listener) {
         this.mOnItemClickListener = listener;
     }
+    public void selectOnItemClickListener(SItemClickListener listener){
+        this.sOnItemClickListener = listener;
+    }
     public interface OnItemClickListener {
         void tClick(int i);
+    }
+
+    public interface SItemClickListener{
+        void sClick(int i);
     }
 
     public ViewAdapter( @NonNull Context context, JSONArray lists ){
@@ -55,6 +64,16 @@ public class ViewAdapter extends RecyclerView.Adapter<ViewAdapter.ViewViewHolder
             }else{
                 viewViewHolder.imageView.setImageResource(R.drawable.wenjian);
             }
+            if( lists.getJSONObject(i).getBoolean("check") ){
+                viewViewHolder.checkBox.setVisibility(View.VISIBLE);
+            }else{
+                viewViewHolder.checkBox.setVisibility(View.GONE);
+            }
+            if( lists.getJSONObject(i).getString("select").equals("0") ){
+                viewViewHolder.checkBox.setChecked( false );
+            }else {
+                viewViewHolder.checkBox.setChecked( true );
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -73,6 +92,15 @@ public class ViewAdapter extends RecyclerView.Adapter<ViewAdapter.ViewViewHolder
             }
         });
 
+        viewViewHolder.checkBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if( sOnItemClickListener != null ){
+                    sOnItemClickListener.sClick( i );
+                }
+            }
+        });
+
     }
 
     @Override
@@ -84,12 +112,14 @@ public class ViewAdapter extends RecyclerView.Adapter<ViewAdapter.ViewViewHolder
 
         TextView textView, fileTime;
         ImageView imageView;
+        CheckBox checkBox;
 
         public ViewViewHolder(@NonNull View itemView) {
             super(itemView);
             textView = itemView.findViewById(R.id.fileName);
             fileTime = itemView.findViewById(R.id.filetime);
             imageView = itemView.findViewById(R.id.fileimg);
+            checkBox = itemView.findViewById(R.id.removecheck);
         }
     }
 }

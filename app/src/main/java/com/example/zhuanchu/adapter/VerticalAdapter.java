@@ -52,6 +52,11 @@ public class VerticalAdapter extends RecyclerView.Adapter<VerticalAdapter.Vertic
             holder.textView.setText( lists.getJSONObject(i).getString("name") );
             holder.fileTime.setText( lists.getJSONObject(i).getString("time") );
             holder.checkBox.setChecked( lists.getJSONObject(i).getBoolean("check") );
+            if( lists.getJSONObject(i).getString("state") == "1" ){
+                holder.uploadstate.setVisibility( View.VISIBLE );
+            }else{
+                holder.uploadstate.setVisibility( View.GONE );
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -89,7 +94,7 @@ public class VerticalAdapter extends RecyclerView.Adapter<VerticalAdapter.Vertic
 
     public class VerticalViewHolder extends RecyclerView.ViewHolder{
 
-        TextView textView, fileTime;
+        TextView textView, fileTime, uploadstate;
         CheckBox checkBox;
 
         public VerticalViewHolder(@NonNull View itemView) {
@@ -97,6 +102,7 @@ public class VerticalAdapter extends RecyclerView.Adapter<VerticalAdapter.Vertic
             textView = itemView.findViewById(R.id.fileName);
             fileTime = itemView.findViewById(R.id.filetime);
             checkBox = itemView.findViewById(R.id.filecheck);
+            uploadstate = itemView.findViewById(R.id.uploadstate);
         }
     }
 

@@ -20,6 +20,14 @@
             android:paddingBottom="10dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+            <CheckBox
+                android:id="@+id/removecheck"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:buttonTint="@color/colorfocus"
+                android:clickable="true"
+                android:focusable="false"
+                android:focusableInTouchMode="false" />
             <ImageView
                 android:id="@+id/fileimg"
                 android:layout_marginLeft="10dp"
@@ -30,9 +38,10 @@
             <TextView
                 android:id="@+id/fileName"
                 app:layout_flexGrow="1"
+                android:layout_weight="1"
                 android:text="图片文件"
                 android:layout_marginLeft="15dp"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content" />
             <TextView
                 android:id="@+id/filetime"
