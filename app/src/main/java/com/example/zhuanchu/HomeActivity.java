@@ -3,18 +3,21 @@ package com.example.zhuanchu;
 import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -22,9 +25,13 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
+import android.preference.Preference;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -41,6 +48,7 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -57,6 +65,7 @@ import com.alibaba.android.arouter.launcher.ARouter;
 import com.alibaba.fastjson.JSON;
 import com.example.zhuanchu.adapter.UploadAdapter;
 import com.example.zhuanchu.adapter.VerticalAdapter;
+import com.example.zhuanchu.bean.UploadFile;
 import com.example.zhuanchu.bean.javaBean.JsonRootBean;
 import com.example.zhuanchu.bean.pojo15.JsonRootBean15;
 import com.example.zhuanchu.service.AuthService;
@@ -64,6 +73,7 @@ import com.example.zhuanchu.service.CompressOperate_zip4j;
 import com.example.zhuanchu.service.ExMultipartBody;
 import com.example.zhuanchu.service.GetInfoForMultiList;
 import com.example.zhuanchu.service.MultiViewPager;
+import com.example.zhuanchu.service.SqlHelper;
 import com.example.zhuanchu.service.UploadProgressListener;
 import com.example.zhuanchu.service.ViewFindUtils;
 import com.flyco.tablayout.SegmentTabLayout;
@@ -101,6 +111,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
@@ -196,6 +207,25 @@ public class HomeActivity extends AppCompatActivity {
     SharedPreferences sharedPreferencesSet = null;
     ActionBar actionBar = null;
     View uploadView = null;
+    UploadAdapter uploadAdapter = null;
+    VerticalAdapter verticalAdapter = null;
+    List<String> arrs = new ArrayList<>();
+    List<String> removeUoloads = new ArrayList<>();
+    SqlHelper sqlHelper = null;
+    SQLiteDatabase sqLiteDatabase = null;
+    int uploadIndex = 0;
+    private static final int COMPLETED = 0;
+    private Handler handler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            if (msg.what == COMPLETED) {
+                fragmnetWeishangchuan(uploadView, uploadIndex);
+            }
+        }
+    };
+    RecyclerView recyclerView = null;
+    FlexboxLayoutManager flexboxLayoutManager = null;
+
     View packView = null;
 
     @Override
@@ -207,7 +237,6 @@ public class HomeActivity extends AppCompatActivity {
                 Activity.MODE_PRIVATE);
         int tabnum = sharedPreferences.getInt("tabnum", 0);
 
-        System.out.println("oncreat进来时tabnum值：" + tabnum);
 
         actionBar = this.getSupportActionBar();
         if (tabnum == 3) {
@@ -267,6 +296,7 @@ public class HomeActivity extends AppCompatActivity {
                 ((MultiViewPager) container).removeView((View) object);
             }
 
+            @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public Object instantiateItem(final ViewGroup container, final int position) {
                 View view = null;
@@ -333,7 +363,7 @@ public class HomeActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences("tab",
                 Activity.MODE_PRIVATE);
         int tabnum = sharedPreferences.getInt("tabnum", 0);
-        System.out.println("设置的tab" + tabnum);
+
         navigationTabBar.setModels(models);
         navigationTabBar.setViewPager(viewPager, tabnum);
         navigationTabBar.setOnPageChangeListener(new MultiViewPager.OnPageChangeListener() {
@@ -349,8 +379,8 @@ public class HomeActivity extends AppCompatActivity {
                     actionBar.setTitle("系统设置");
                 } else if (position == 2) {
                     actionBar.setTitle("文件上传");
-                    if (uploadView != null) {
-                        fragmnetWeishangchuan(uploadView);
+                    if( uploadView != null ){
+                        fragmnetWeishangchuan(uploadView, uploadIndex);
                     }
                 } else if (position == 1) {
                     actionBar.setTitle("文件打包");
@@ -504,7 +534,7 @@ public class HomeActivity extends AppCompatActivity {
 
 
     //2  init打包首页的UI组件，以及逻辑代码，...
-    public void initPack(View view) {
+    public void initPack(final View view) {
 
         final ProgressDialog pdialog = new ProgressDialog(HomeActivity.this);
 
@@ -569,16 +599,25 @@ public class HomeActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             try {
-                                CompressOperate_zip4j.compressZip4j(path + "/DOWNLOAD/" + finalChoose.getString("name"), path2 + "/" + packname, "123456", pdialog, HomeActivity.this);
+                                CompressOperate_zip4j.compressZip4j(path + "/DOWNLOAD/" + finalChoose.getString("name"), path2 + "/" + packname, "123456", pdialog, HomeActivity.this, finalChoose.getString("name"));
                                 //pdialog.dismiss();
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
 
+
+
                             //Toast.makeText(getApplicationContext(), "打包成功", Toast.LENGTH_LONG).show();
                         }
                     });
                     thread.start();
+
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        if (jsonArray.getJSONObject(i).getBoolean("check")) {
+                            jsonArray.getJSONObject(i).put("state", "1");
+                        }
+                    }
+                    verticalAdapter.notifyDataSetChanged();
 
 
                 } catch (Exception e) {
@@ -615,6 +654,14 @@ public class HomeActivity extends AppCompatActivity {
                 java.text.SimpleDateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 String dateTime = df.format(new Date(spec.lastModified()));
                 jsonObject.put("time", dateTime);
+                jsonObject.put("check", false);
+
+                Cursor cursor = sqLiteDatabase.query("package", null, "name='"+ spec.getName() +"'", null, null, null, null);
+                if( cursor.getCount() > 0 ){
+                    jsonObject.put("state", "1");
+                }else{
+                    jsonObject.put("state", "0");
+                }
                 jsonArray.put(jsonObject);
 
                 //filename += spec.getName();
@@ -626,64 +673,206 @@ public class HomeActivity extends AppCompatActivity {
 
         }
 
+        verticalAdapter = new VerticalAdapter(this, jsonArray);
 
         RecyclerView recyclerView = view.findViewById(R.id.listView);
         FlexboxLayoutManager flexboxLayoutManager = new FlexboxLayoutManager(this);
         recyclerView.setLayoutManager(flexboxLayoutManager);
 
-        recyclerView.setAdapter(new VerticalAdapter(this, jsonArray));
+        recyclerView.setAdapter( verticalAdapter );
 
     }
 
 
     //3   init上传首页的UI组件，以及逻辑代码，...
+    @RequiresApi(api = Build.VERSION_CODES.M)
     public void initUpload(View view) {
+
+        sqlHelper = new SqlHelper(HomeActivity.this);
+        sqLiteDatabase = sqlHelper.getWritableDatabase();
+
+        //Cursor cursor = sqLiteDatabase.query("upload", null, null, null, null, null, null);
+        //System.out.println( cursor.getCount() );
+
+
         //view
-        mTabLayout_3 = (SegmentTabLayout) view.findViewById(R.id.tl_3);
+        mTabLayout_3 =(SegmentTabLayout)view.findViewById(R.id.tl_3);
         tl_3(view);
+
+
+
+
+
+//
+//        try {
+//            String path = Environment.getExternalStorageDirectory() + "/CRRC";
+//            File file = new File(path);
+//
+//            if (!file.exists()) {
+//                file.mkdir();
+//            }
+//
+//            path = Environment.getExternalStorageDirectory() + "/CRRC/UPLOAD";
+//
+//            file = new File(path);
+//            if (!file.exists()) {
+//                file.mkdir();
+//            }
+//
+//            String filename = "";
+//            jsonArrayup = new JSONArray();
+//
+//            File[] files = file.listFiles();
+//            for (File spec : files) {
+//                JSONObject jsonObject = new JSONObject();
+//                jsonObject.put("name", spec.getName());
+//                java.text.SimpleDateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//                String dateTime = df.format(new Date(spec.lastModified()));
+//                jsonObject.put("time", dateTime);
+//                jsonObject.put("file", spec);
+//                jsonObject.put("check", false);
+//                jsonArrayup.put(jsonObject);
+//                //filename += spec.getName();
+//            }
+//
+//            TextView textView1 = view.findViewById(R.id.files);
+//            textView1.setText(jsonArrayup.getJSONObject(0).getString("name"));
+//        } catch (Exception e) {
+//
+//        }
+//
+//
+//        RecyclerView recyclerView = view.findViewById(R.id.listUpload);
+//        FlexboxLayoutManager flexboxLayoutManager = new FlexboxLayoutManager(this);
+//        recyclerView.setLayoutManager(flexboxLayoutManager);
+//
+//        recyclerView.setAdapter(new UploadAdapter(this, jsonArrayup));
+//
+//
+//        view.findViewById(R.id.uploadbtn).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//                /*
+//                 * 判断是否有网络
+//                 * */
+//                boolean network = isNetworkAvailable(HomeActivity.this);
+//                if (!network) {
+//
+//                    Toast.makeText(HomeActivity.this, "没有检测到网络", Toast.LENGTH_LONG).show();
+//                    return;
+//                }
+//
+//                boolean mobile = isMobile(HomeActivity.this);
+//                sharedPreferencesUp = getSharedPreferences("data", MODE_PRIVATE);
+//
+//                boolean networkinit = sharedPreferencesUp.getBoolean("network", false);//4g
+//
+//                System.out.println(networkinit);
+//
+//                if (mobile && !networkinit) {
+//                    android.app.AlertDialog.Builder dialog = new android.app.AlertDialog.Builder(HomeActivity.this);
+//                    dialog.setTitle("网络检测");
+//                    TextView textView1 = new TextView(HomeActivity.this);
+//                    textView1.setText("当前为4G网络，要继续上传吗?");
+//                    dialog.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+//                        @Override
+//                        public void onClick(DialogInterface dialog, int which) {
+//                            sharedPreferencesUp.edit().putBoolean("network",true).commit();
+//                            uploadFile(HomeActivity.this);
+//                        }
+//                    });
+//                    dialog.setNegativeButton("取消", null);
+//                    dialog.show();
+//                    return;
+//                }
+//
+//                uploadFile(HomeActivity.this);
+//
+//            }
+//        });
     }
 
 
-    public void fragmnetWeishangchuan(View view) {
-        try {
-            String path = Environment.getExternalStorageDirectory() + "/CRRC";
-            File file = new File(path);
+    public void fragmnetWeishangchuan(View view, int number) {
+        System.out.println( "未上传2" );
+        File[] files = getUploadFiles();
+        removedata(jsonArrayup);
 
-            if (!file.exists()) {
-                file.mkdir();
+        if( number == 1 ){
+            try {
+                for (File spec : files) {
+                    Cursor cursor = sqLiteDatabase.query("upload", null, "name='"+ spec.getName() +"'", null, null, null, null);
+                    while(cursor.moveToNext())
+                    {
+                        //光标移动成功
+                        //把数据取出
+                        System.out.println( cursor.getString(cursor.getColumnIndex("name")) );
+                    }
+
+
+                    if( cursor.getCount() == 0 ){
+                        JSONObject jsonObject = new JSONObject();
+                        jsonObject.put("name", spec.getName());
+                        java.text.SimpleDateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        String dateTime = df.format(new Date(spec.lastModified()));
+                        jsonObject.put("time", dateTime);
+                        jsonObject.put("file", spec);
+                        jsonObject.put("check", false);
+                        jsonArrayup.put(jsonObject);
+                    }
+                }
+
+
+            } catch (Exception e) {
+
             }
-            System.out.println(9874655);
-            path = Environment.getExternalStorageDirectory() + "/CRRC/UPLOAD";
 
-            file = new File(path);
-            if (!file.exists()) {
-                file.mkdir();
-            }
-            String filename = "";
-            jsonArrayup = new JSONArray();
-            File[] files = file.listFiles();
-            for (File spec : files) {
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("name", spec.getName());
-                java.text.SimpleDateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                String dateTime = df.format(new Date(spec.lastModified()));
-                jsonObject.put("time", dateTime);
-                jsonObject.put("file", spec);
-                jsonObject.put("check", false);
-                jsonArrayup.put(jsonObject);
-                //filename += spec.getName();
-            }
+            uploadAdapter = new UploadAdapter(this, jsonArrayup);
 
-            TextView textView1 = view.findViewById(R.id.files);
-            textView1.setText(jsonArrayup.getJSONObject(0).getString("name"));
-        } catch (Exception e) {
-
+            recyclerView = view.findViewById(R.id.listUpload);
+            flexboxLayoutManager = new FlexboxLayoutManager(this);
+            recyclerView.setLayoutManager(flexboxLayoutManager);
+            recyclerView.setAdapter( uploadAdapter );
         }
 
-        RecyclerView recyclerView = view.findViewById(R.id.listUpload);
-        FlexboxLayoutManager flexboxLayoutManager = new FlexboxLayoutManager(this);
-        recyclerView.setLayoutManager(flexboxLayoutManager);
-        recyclerView.setAdapter(new UploadAdapter(this, jsonArrayup));
+        if( number == 0 ){
+            try {
+                for (File spec : files) {
+                    Cursor cursor = sqLiteDatabase.query("upload", null, "name='"+ spec.getName() +"'", null, null, null, null);
+                    while(cursor.moveToNext())
+                    {
+                        //光标移动成功
+                        //把数据取出
+                        System.out.println( cursor.getString(cursor.getColumnIndex("name")) );
+                    }
+
+
+                    if( cursor.getCount() > 0 ){
+                        JSONObject jsonObject = new JSONObject();
+                        jsonObject.put("name", spec.getName());
+                        java.text.SimpleDateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        String dateTime = df.format(new Date(spec.lastModified()));
+                        jsonObject.put("time", dateTime);
+                        jsonObject.put("file", spec);
+                        jsonObject.put("check", false);
+                        jsonArrayup.put(jsonObject);
+                    }
+                }
+
+
+            } catch (Exception e) {
+
+            }
+
+            uploadAdapter = new UploadAdapter(this, jsonArrayup);
+            recyclerView = view.findViewById(R.id.listUpload_ready);
+            flexboxLayoutManager = new FlexboxLayoutManager(this);
+            recyclerView.setLayoutManager(flexboxLayoutManager);
+            recyclerView.setAdapter( uploadAdapter );
+        }
+
+
         view.findViewById(R.id.uploadbtn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -694,6 +883,27 @@ public class HomeActivity extends AppCompatActivity {
                 if (!network) {
 
                     Toast.makeText(HomeActivity.this, "没有检测到网络", Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                String wifiresult = getSSID();
+                System.out.println( wifiresult );
+                if( wifiresult.indexOf( "SHGZ" ) >= 0 ){
+                    DialogSettings.style = STYLE_IOS;
+                    DialogSettings.use_blur = true;
+                    DialogSettings.blur_alpha = 200;
+                    SelectDialog.show(HomeActivity.this, "WIFI设置", "请切换能上网的WIFI", "确定", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent i = new Intent();
+                            i = new Intent(Settings.ACTION_WIFI_SETTINGS);
+                            startActivity(i);
+                        }
+                    }, "取消", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    });
                     return;
                 }
 
@@ -729,41 +939,65 @@ public class HomeActivity extends AppCompatActivity {
 
     private void tl_3(View view) {
         final ViewPager viewPager = (ViewPager) view.findViewById(R.id.vp_2);
+
+        //同时，还要给Viewpager设置选中监听，才能使SegmentTablayout和ViewPager双向同步。
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int
+                    positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                uploadIndex = position;
+                System.out.println( "position=" + position );
+                if( uploadAdapter != null ){
+                    fragmnetWeishangchuan(uploadView, uploadIndex);
+                }
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
         viewPager.setAdapter(new PagerAdapter() {
             @Override
             public int getCount() {
                 return 2;
             }
-
             @Override
             public boolean isViewFromObject(final View view, final Object object) {
                 return view.equals(object);
             }
-
             @Override
             public void destroyItem(final View container, final int position, final Object object) {
                 ((ViewPager) container).removeView((View) object);
             }
-
             @Override
             public Object instantiateItem(final ViewGroup container, final int position) {
                 View view = null;
                 if (position == 0) {
-
                     view = LayoutInflater.from(
                             getBaseContext()).inflate(R.layout.fragment_simple_card_fragment_yishagchuan, null, false);
-                    initYishangchuan(view);
+                    //initYishangchuan(view);
 
 
                 } else if (position == 1) {
                     view = LayoutInflater.from(
                             getBaseContext()).inflate(R.layout.fr_simple_card, null, false);
-                    initWeishangchaun(view);
+                    //initWeishangchaun(view);
                 }
                 container.addView(view);
                 return view;
             }
         });
+
+
+
 
 
         mTabLayout_3.setTabData(mTitles_3);
@@ -798,14 +1032,66 @@ public class HomeActivity extends AppCompatActivity {
         viewPager.setCurrentItem(1);
     }
 
+//    private class MyPagerAdapter extends FragmentPagerAdapter {
+//        public MyPagerAdapter(FragmentManager fm) {
+//            super(fm);
+//        }
+//
+//        @Override
+//        public int getCount() {
+//            return 2;
+//        }
+//
+//        @Override
+//        public CharSequence getPageTitle(int position) {
+//            System.out.println("当前fragment的TItle："+ mTitles_3[position]);
+//
+//            return mTitles_3[position];
+//
+//        }
+//
+//        @Override
+//        public Fragment getItem(int position) {
+//            System.out.println("当前fragment："+mFragments.get(position));
+//            return mFragments.get(position);
+//
+//        }
+//
+//
+//    }
 
-    public void initWeishangchaun(View view) {
-        fragmnetWeishangchuan(view);
+
+    public File[] getUploadFiles(){
+        File[] files = null;
+        try {
+            String path = Environment.getExternalStorageDirectory() + "/CRRC";
+            File file = new File(path);
+
+            if (!file.exists()) {
+                file.mkdir();
+            }
+            path = Environment.getExternalStorageDirectory() + "/CRRC/UPLOAD";
+
+            file = new File(path);
+            if (!file.exists()) {
+                file.mkdir();
+            }
+            String filename = "";
+            jsonArrayup = new JSONArray();
+            files = file.listFiles();
+
+            return files;
+        } catch (Exception e) {
+
+        }
+        return files;
     }
 
-    public void initYishangchuan(View view) {
-        fragmnetWeishangchuan(view);
-
+    public void removedata(JSONArray jsonArray){
+        if( jsonArray.length() > 0 ){
+            jsonArray.remove( 0 );
+            removedata(jsonArray);
+        }
     }
 
     //4   init设置首页的UI组件，以及逻辑代码，...
@@ -865,8 +1151,28 @@ public class HomeActivity extends AppCompatActivity {
         ncdataList.add("保留三天删除");
         ncdataList.add("保留一周删除");
 
+        SharedPreferences preupload = HomeActivity.this.getSharedPreferences("data", MODE_PRIVATE);
+        SharedPreferences.Editor editorupload = preupload.edit();
+        int selectNumber = preupload.getInt("uploadinfo", 4);
+
         List<String> ncdata = new ArrayList<>(ncdataList);
         ns.attachDataSource(ncdata);
+        ns.setSelectedIndex(selectNumber);
+
+        ns.setOnSpinnerItemSelectedListener(new OnSpinnerItemSelectedListener() {
+            @Override
+            public void onItemSelected(NiceSpinner parent, View view, int position, long id) {
+                System.out.println( position );
+                SharedPreferences preupload = HomeActivity.this.getSharedPreferences("data", MODE_PRIVATE);
+                SharedPreferences.Editor editorupload = preupload.edit();
+
+                preupload.edit().putInt("uploadinfo", position).commit();
+
+                System.out.println( preupload.getInt("uploadinfo", 4) );
+
+            }
+        });
+
     }
 
     public void uploadFile(Context context) {
@@ -886,6 +1192,7 @@ public class HomeActivity extends AppCompatActivity {
                 .setType(MultipartBody.FORM);
         MediaType MutilPart_Form_Data = MediaType.parse("application/x-www-form-urlencoded;charset=utf-8");
 
+        arrs.clear();
 
         for (int i = 0; i < jsonArrayup.length(); i++) {
             try {
@@ -894,6 +1201,8 @@ public class HomeActivity extends AppCompatActivity {
                 System.out.println(jsonArrayup.getJSONObject(i).getString("file"));
                 if (jsonArrayup.getJSONObject(i).getBoolean("check")) {
                     File fileOne = new File(jsonArrayup.getJSONObject(i).getString("file")); //生成文件
+                    arrs.add(jsonArrayup.getJSONObject(i).getString("name"));
+                    removeUoloads.add( jsonArrayup.getJSONObject(i).getString("file") );
                     requestBodyBuilder.addFormDataPart("file", jsonArrayup.getJSONObject(i).getString("file"), RequestBody.create(MutilPart_Form_Data, fileOne));
                 }
             } catch (JSONException e) {
@@ -925,11 +1234,14 @@ public class HomeActivity extends AppCompatActivity {
         System.out.println(8888);
         //String url = "https://www.baidu.com";
         OkHttpClient okHttpClient = new OkHttpClient();
-//        okHttpClient.newBuilder().connectTimeout(60 * 1000, TimeUnit.MILLISECONDS)
-//                .readTimeout(5 * 60 * 1000, TimeUnit.MILLISECONDS)
-//                .writeTimeout(5 * 60 * 1000, TimeUnit.MILLISECONDS);
+        okHttpClient.newBuilder().connectTimeout(60 * 1000, TimeUnit.MILLISECONDS)
+                .readTimeout(5 * 60 * 1000, TimeUnit.MILLISECONDS)
+                .writeTimeout(5 * 60 * 1000, TimeUnit.MILLISECONDS);
 
         System.out.println(url);
+        SharedPreferences preupload = HomeActivity.this.getSharedPreferences("data", MODE_PRIVATE);
+        SharedPreferences.Editor editorupload = preupload.edit();
+        final int selectNumber = preupload.getInt("uploadinfo", 4);
 
         Request request = new Request.Builder()
                 .url(url)
@@ -942,6 +1254,27 @@ public class HomeActivity extends AppCompatActivity {
             public void run() {
                 try {
                     Response response = call.execute();
+
+                    for(int i=0;i<arrs.size();i++){
+                        Cursor cursor = sqLiteDatabase.query("upload", null, "name='"+ arrs.get(i) +"'", null, null, null, null);
+                        System.out.println( cursor.getCount() + "------" );
+                        System.out.println( arrs.get(i) );
+                        if( cursor.getCount() == 0 ){
+                            sqLiteDatabase.execSQL("insert into upload(name) values('"+ arrs.get(i)+"')");
+                        }
+                    }
+
+                    if( selectNumber == 1 ){
+                        for( int i = 0; i < removeUoloads.size(); i++ ){
+                            DeleteFolder( removeUoloads.get(i) );
+                        }
+                    }
+
+
+
+                    Message message = new Message();
+                    message.what = COMPLETED;
+                    handler.sendMessage(message);
                     Looper.prepare();
                     Toast.makeText(getApplicationContext(), "上传文件成功", Toast.LENGTH_LONG).show();
                     Looper.loop();
@@ -953,6 +1286,90 @@ public class HomeActivity extends AppCompatActivity {
                 }
             }
         }).start();
+    }
+
+    /**
+     * 删除单个文件
+     * @param   filePath    被删除文件的文件名
+     * @return 文件删除成功返回true，否则返回false
+     */
+    public boolean deleteFile(String filePath) {
+        File file = new File(filePath);
+        if (file.isFile() && file.exists()) {
+            return file.delete();
+        }
+        return false;
+    }
+
+    /**
+     * 删除文件夹以及目录下的文件
+     * @param   filePath 被删除目录的文件路径
+     * @return  目录删除成功返回true，否则返回false
+     */
+    public boolean deleteDirectory(String filePath) {
+        boolean flag = false;
+        //如果filePath不以文件分隔符结尾，自动添加文件分隔符
+        if (!filePath.endsWith(File.separator)) {
+            filePath = filePath + File.separator;
+        }
+        File dirFile = new File(filePath);
+        if (!dirFile.exists() || !dirFile.isDirectory()) {
+            return false;
+        }
+        flag = true;
+        File[] files = dirFile.listFiles();
+        //遍历删除文件夹下的所有文件(包括子目录)
+        for (int i = 0; i < files.length; i++) {
+            if (files[i].isFile()) {
+                //删除子文件
+                flag = deleteFile(files[i].getAbsolutePath());
+                if (!flag) break;
+            } else {
+                //删除子目录
+                flag = deleteDirectory(files[i].getAbsolutePath());
+                if (!flag) break;
+            }
+        }
+        if (!flag) return false;
+        //删除当前空目录
+        return dirFile.delete();
+    }
+
+    /**
+     *  根据路径删除指定的目录或文件，无论存在与否
+     *@param filePath  要删除的目录或文件
+     *@return 删除成功返回 true，否则返回 false。
+     */
+    public boolean DeleteFolder(String filePath) {
+        File file = new File(filePath);
+        if (!file.exists()) {
+            return false;
+        } else {
+            if (file.isFile()) {
+                // 为文件时调用删除文件方法
+                return deleteFile(filePath);
+            } else {
+                // 为目录时调用删除目录方法
+                return deleteDirectory(filePath);
+            }
+        }
+    }
+
+    /**
+     * 获取当前连接WIFI的SSID
+     */
+    public String getSSID() {
+        WifiManager wm = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
+        if (wm != null) {
+            WifiInfo winfo = wm.getConnectionInfo();
+            if (winfo != null) {
+                String s = winfo.getSSID();
+                if (s.length() > 2 && s.charAt(0) == '"' && s.charAt(s.length() - 1) == '"') {
+                    return s.substring(1, s.length() - 1);
+                }
+            }
+        }
+        return "";
     }
 
     /**
@@ -1013,11 +1430,6 @@ public class HomeActivity extends AppCompatActivity {
             byte[] buffer = new byte[lenght];
             is.read(buffer);
             result = new String(buffer, "utf8");
-
-
-            ////////
-
-
             String keys = "ijijkjkjkjlkklok";
             try {
                 xkl = AESCrypt.decrypt(keys, result);
@@ -1508,6 +1920,32 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+                //判断wifi是不是连接了设备
+                boolean wfstate = isWifi(HomeActivity.this);
+                System.out.println( wfstate + "------------------" );
+
+                String wifiresult = getSSID();
+                System.out.println( wifiresult + "------------------" );
+                if( wifiresult.indexOf( "SHGZ" ) < 0 ){
+                    DialogSettings.style = STYLE_IOS;
+                    DialogSettings.use_blur = true;
+                    DialogSettings.blur_alpha = 200;
+                    SelectDialog.show(HomeActivity.this, "WIFI设置", "未检测到连接设备，去设置WIFI", "确定", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent i = new Intent();
+                            i = new Intent(Settings.ACTION_WIFI_SETTINGS);
+                            startActivity(i);
+                        }
+                    }, "取消", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    });
+                    return;
+                }
+
+
                 //从json数据中获取用户名 密码 ip
                 if (edit_spinnerCheXingCheHaoCMD.getText().toString().length() > 0 && fl_cmd.getVisibility() == View.VISIBLE) {
                     cmdValue = edit_spinnerCheXingCheHaoCMD.getText().toString();
@@ -1708,6 +2146,11 @@ public class HomeActivity extends AppCompatActivity {
                 intent.putExtra("port", Integer.parseInt(_port));
                 startActivity(intent);
             } else {
+                new android.app.AlertDialog.Builder(mContext)
+                        .setTitle("无法连接")
+                        .setMessage("请检查是否连接无线工装WIFI以及信息填写是否无误！")
+                        .setPositiveButton("确定", null)
+                        .show();
 
             }
         }

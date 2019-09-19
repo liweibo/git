@@ -7,14 +7,24 @@ import net.lingala.zip4j.util.Zip4jConstants;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
+
+import com.example.zhuanchu.HomeActivity;
+import com.example.zhuanchu.adapter.VerticalAdapter;
 
 import java.io.File;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import devlight.io.library.ntb.NavigationTabBar;
 
 
 public class CompressOperate_zip4j {
@@ -23,7 +33,16 @@ public class CompressOperate_zip4j {
     private static int result = 0; //状态返回值
 
     private static final String TAG = "CompressOperate_zip4j";
-    static Handler handler;
+    private static  SqlHelper sqlHelper = null;
+    private static SQLiteDatabase sqLiteDatabase = null;
+    private static final int COMPLETED = 0;
+    private static Handler handler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            System.out.println( 8888 );
+        }
+    };
+
 
     /**
      *  zip4j压缩
@@ -32,7 +51,11 @@ public class CompressOperate_zip4j {
      * @param password  密码
      * @return 状态返回值
      */
-    public static int compressZip4j(String filePath, String zipFilePath, String password, final ProgressDialog pdialog, final Context context) {
+    public static int compressZip4j(final String filePath, String zipFilePath, String password, final ProgressDialog pdialog, final Context context, final String filename) {
+
+        sqlHelper = new SqlHelper(context);
+        sqLiteDatabase = sqlHelper.getWritableDatabase();
+
         File sourceFile = new File(filePath);
         File zipFile_ = new File(zipFilePath);
 //        try {
@@ -103,7 +126,12 @@ public class CompressOperate_zip4j {
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
+
+
+
                 boolean qidong = true;
+                Cursor cursor = sqLiteDatabase.query("package", null, "name='"+ filename +"'", null, null, null, null);
+
                 while (qidong){
 
                     System.out.println("Percentage done: " + progressMonitor.getPercentDone());
@@ -112,6 +140,11 @@ public class CompressOperate_zip4j {
                     if( ( progressMonitor.getPercentDone() >= 99 && progressMonitor.getFileName() != null ) || progressMonitor.getFileName() == null ){
                         qidong = false;
                         pdialog.dismiss();
+
+                        if( cursor.getCount() == 0 ){
+                            sqLiteDatabase.execSQL("insert into package(name) values('"+ filename +"')");
+                        }
+
                         Looper.prepare();
                         Toast.makeText(context.getApplicationContext(), "打包成功", Toast.LENGTH_LONG).show();
                         Looper.loop();
