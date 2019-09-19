@@ -131,8 +131,8 @@ public class HomeActivity extends AppCompatActivity {
     private String cmdValue = " ";
     private String shebeiValue = "";
 
-   private String token = "";
-   private  boolean getToken = false;
+    private String token = "";
+    private boolean getToken = false;
     private WifiManager wifiManager;
     private Socket socket;
     OutputStream outputStream;
@@ -513,7 +513,7 @@ public class HomeActivity extends AppCompatActivity {
         view.findViewById(R.id.packbtn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+//                startActivity(new Intent(HomeActivity.this, IpActivity.class));
                 if (jsonArray == null || jsonArray.length() == 0) {
                     DialogSettings.style = STYLE_IOS;
                     DialogSettings.use_blur = true;
@@ -2166,7 +2166,7 @@ public class HomeActivity extends AppCompatActivity {
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
-                              token = AuthService.getAuth();
+                                token = AuthService.getAuth();
                                 getToken = true;
                             }
                         }).start();
@@ -2185,50 +2185,51 @@ public class HomeActivity extends AppCompatActivity {
                                 // 表单提交
                                 .build();
                         //                                    Response response = client.newCall(request).execute();
-                        if (getToken){
-                        client.newCall(request).enqueue(new Callback() {
-                            @Override
-                            public void onFailure(Call call, IOException e) {
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        DialogSettings.style = STYLE_IOS;
-                                        DialogSettings.use_blur = true;
-                                        DialogSettings.blur_alpha = 200;
-                                        MessageDialog.show(HomeActivity.this,
-                                                "提示", "网络状况不佳", "知道了", new DialogInterface.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialog, int which) {
-                                                    }
-                                                });
-                                    }
-                                });
-                            }
-
-                            @Override
-                            public void onResponse(Call call, Response response) throws IOException {
-                                String json = response.body().string();
-                                System.out.println("OCR数据：" + json);
-                                String post = JSON.parseObject(json).getString("postBody");
-                                JsonRootBean jr = JSON.parseObject(json, JsonRootBean.class);
-                                String ocrNum = "";
-                                for (int i = 0; i < jr.getWords_result().size(); i++) {
-                                    ocrNum += jr.getWords_result().get(i).getWords();
-                                }
-                                System.out.println("得到的识别数字：" + ocrNum);
-
-                                final String finalOcrNum = ocrNum;
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        editext_chehao.setText(finalOcrNum);
-                                        if (!haveDismiss) {
-                                            promptDialog.dismiss();
+                        if (getToken) {
+                            client.newCall(request).enqueue(new Callback() {
+                                @Override
+                                public void onFailure(Call call, IOException e) {
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            DialogSettings.style = STYLE_IOS;
+                                            DialogSettings.use_blur = true;
+                                            DialogSettings.blur_alpha = 200;
+                                            MessageDialog.show(HomeActivity.this,
+                                                    "提示", "网络状况不佳", "知道了", new DialogInterface.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(DialogInterface dialog, int which) {
+                                                        }
+                                                    });
                                         }
+                                    });
+                                }
+
+                                @Override
+                                public void onResponse(Call call, Response response) throws IOException {
+                                    String json = response.body().string();
+                                    System.out.println("OCR数据：" + json);
+                                    String post = JSON.parseObject(json).getString("postBody");
+                                    JsonRootBean jr = JSON.parseObject(json, JsonRootBean.class);
+                                    String ocrNum = "";
+                                    for (int i = 0; i < jr.getWords_result().size(); i++) {
+                                        ocrNum += jr.getWords_result().get(i).getWords();
                                     }
-                                });
-                            }
-                        });}
+                                    System.out.println("得到的识别数字：" + ocrNum);
+
+                                    final String finalOcrNum = ocrNum;
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            editext_chehao.setText(finalOcrNum);
+                                            if (!haveDismiss) {
+                                                promptDialog.dismiss();
+                                            }
+                                        }
+                                    });
+                                }
+                            });
+                        }
 
 
                     }
