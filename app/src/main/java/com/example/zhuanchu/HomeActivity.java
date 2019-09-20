@@ -379,10 +379,16 @@ public class HomeActivity extends AppCompatActivity {
                     actionBar.setTitle("系统设置");
                 } else if (position == 2) {
                     actionBar.setTitle("文件上传");
+
+                    System.out.println( uploadView + "--987--" );
+
                     if( uploadView != null ){
                         fragmnetWeishangchuan(uploadView, uploadIndex);
                     }
                 } else if (position == 1) {
+
+                    System.out.println( packView + "--987--" );
+
                     actionBar.setTitle("文件打包");
                     initPack(packView);
 
@@ -539,6 +545,16 @@ public class HomeActivity extends AppCompatActivity {
         final ProgressDialog pdialog = new ProgressDialog(HomeActivity.this);
 
         Context context;
+
+        int permission = ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            // We don't have permission so prompt the user
+            ActivityCompat.requestPermissions(
+                    this,
+                    PERMISSIONS_STORAGE,
+                    REQUEST_EXTERNAL_STORAGE
+            );
+        }
 
         view.findViewById(R.id.packbtn).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -699,98 +715,6 @@ public class HomeActivity extends AppCompatActivity {
         mTabLayout_3 =(SegmentTabLayout)view.findViewById(R.id.tl_3);
         tl_3(view);
 
-
-
-
-
-//
-//        try {
-//            String path = Environment.getExternalStorageDirectory() + "/CRRC";
-//            File file = new File(path);
-//
-//            if (!file.exists()) {
-//                file.mkdir();
-//            }
-//
-//            path = Environment.getExternalStorageDirectory() + "/CRRC/UPLOAD";
-//
-//            file = new File(path);
-//            if (!file.exists()) {
-//                file.mkdir();
-//            }
-//
-//            String filename = "";
-//            jsonArrayup = new JSONArray();
-//
-//            File[] files = file.listFiles();
-//            for (File spec : files) {
-//                JSONObject jsonObject = new JSONObject();
-//                jsonObject.put("name", spec.getName());
-//                java.text.SimpleDateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//                String dateTime = df.format(new Date(spec.lastModified()));
-//                jsonObject.put("time", dateTime);
-//                jsonObject.put("file", spec);
-//                jsonObject.put("check", false);
-//                jsonArrayup.put(jsonObject);
-//                //filename += spec.getName();
-//            }
-//
-//            TextView textView1 = view.findViewById(R.id.files);
-//            textView1.setText(jsonArrayup.getJSONObject(0).getString("name"));
-//        } catch (Exception e) {
-//
-//        }
-//
-//
-//        RecyclerView recyclerView = view.findViewById(R.id.listUpload);
-//        FlexboxLayoutManager flexboxLayoutManager = new FlexboxLayoutManager(this);
-//        recyclerView.setLayoutManager(flexboxLayoutManager);
-//
-//        recyclerView.setAdapter(new UploadAdapter(this, jsonArrayup));
-//
-//
-//        view.findViewById(R.id.uploadbtn).setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//                /*
-//                 * 判断是否有网络
-//                 * */
-//                boolean network = isNetworkAvailable(HomeActivity.this);
-//                if (!network) {
-//
-//                    Toast.makeText(HomeActivity.this, "没有检测到网络", Toast.LENGTH_LONG).show();
-//                    return;
-//                }
-//
-//                boolean mobile = isMobile(HomeActivity.this);
-//                sharedPreferencesUp = getSharedPreferences("data", MODE_PRIVATE);
-//
-//                boolean networkinit = sharedPreferencesUp.getBoolean("network", false);//4g
-//
-//                System.out.println(networkinit);
-//
-//                if (mobile && !networkinit) {
-//                    android.app.AlertDialog.Builder dialog = new android.app.AlertDialog.Builder(HomeActivity.this);
-//                    dialog.setTitle("网络检测");
-//                    TextView textView1 = new TextView(HomeActivity.this);
-//                    textView1.setText("当前为4G网络，要继续上传吗?");
-//                    dialog.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-//                        @Override
-//                        public void onClick(DialogInterface dialog, int which) {
-//                            sharedPreferencesUp.edit().putBoolean("network",true).commit();
-//                            uploadFile(HomeActivity.this);
-//                        }
-//                    });
-//                    dialog.setNegativeButton("取消", null);
-//                    dialog.show();
-//                    return;
-//                }
-//
-//                uploadFile(HomeActivity.this);
-//
-//            }
-//        });
     }
 
 
@@ -830,8 +754,17 @@ public class HomeActivity extends AppCompatActivity {
 
             uploadAdapter = new UploadAdapter(this, jsonArrayup);
 
+            System.out.println( jsonArrayup.length() );
+            System.out.println( view );
+
             recyclerView = view.findViewById(R.id.listUpload);
+
+            System.out.println( recyclerView );
+
             flexboxLayoutManager = new FlexboxLayoutManager(this);
+
+            System.out.println( flexboxLayoutManager );
+
             recyclerView.setLayoutManager(flexboxLayoutManager);
             recyclerView.setAdapter( uploadAdapter );
         }
@@ -1065,6 +998,9 @@ public class HomeActivity extends AppCompatActivity {
         File[] files = null;
         try {
             String path = Environment.getExternalStorageDirectory() + "/CRRC";
+
+            System.out.println( path );
+
             File file = new File(path);
 
             if (!file.exists()) {
