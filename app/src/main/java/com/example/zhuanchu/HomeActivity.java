@@ -142,8 +142,8 @@ public class HomeActivity extends AppCompatActivity {
     private String cmdValue = " ";
     private String shebeiValue = "";
 
-    private String token = "";
-    private boolean getToken = false;
+   private String token = "";
+   private  boolean getToken = false;
     private WifiManager wifiManager;
     private Socket socket;
     OutputStream outputStream;
@@ -547,10 +547,20 @@ public class HomeActivity extends AppCompatActivity {
 
         Context context;
 
+        int permission = ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            // We don't have permission so prompt the user
+            ActivityCompat.requestPermissions(
+                    this,
+                    PERMISSIONS_STORAGE,
+                    REQUEST_EXTERNAL_STORAGE
+            );
+        }
+
         view.findViewById(R.id.packbtn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                startActivity(new Intent(HomeActivity.this, IpActivity.class));
+
                 if (jsonArray == null || jsonArray.length() == 0) {
                     DialogSettings.style = STYLE_IOS;
                     DialogSettings.use_blur = true;
@@ -696,6 +706,7 @@ public class HomeActivity extends AppCompatActivity {
         //view
         mTabLayout_3 = (SegmentTabLayout) view.findViewById(R.id.tl_3);
         tl_3(view);
+
     }
 
 
@@ -834,7 +845,7 @@ public class HomeActivity extends AppCompatActivity {
 
                     boolean networkinit = sharedPreferencesUp.getBoolean("network", false);//4g
 
-                    System.out.println(networkinit);
+                System.out.println(networkinit);
 
                     if (mobile && !networkinit) {
                         DialogSettings.style = STYLE_IOS;
@@ -1046,9 +1057,9 @@ public class HomeActivity extends AppCompatActivity {
         return files;
     }
 
-    public void removedata(JSONArray jsonArray) {
-        if (jsonArray.length() > 0) {
-            jsonArray.remove(0);
+    public void removedata(JSONArray jsonArray){
+        if( jsonArray.length() > 0 ){
+            jsonArray.remove( 0 );
             removedata(jsonArray);
         }
     }
@@ -1121,13 +1132,13 @@ public class HomeActivity extends AppCompatActivity {
         ns.setOnSpinnerItemSelectedListener(new OnSpinnerItemSelectedListener() {
             @Override
             public void onItemSelected(NiceSpinner parent, View view, int position, long id) {
-                System.out.println(position);
+                System.out.println( position );
                 SharedPreferences preupload = HomeActivity.this.getSharedPreferences("data", MODE_PRIVATE);
                 SharedPreferences.Editor editorupload = preupload.edit();
 
                 preupload.edit().putInt("uploadinfo", position).commit();
 
-                System.out.println(preupload.getInt("uploadinfo", 4));
+                System.out.println( preupload.getInt("uploadinfo", 4) );
 
             }
         });
@@ -1161,7 +1172,7 @@ public class HomeActivity extends AppCompatActivity {
                 if (jsonArrayup.getJSONObject(i).getBoolean("check")) {
                     File fileOne = new File(jsonArrayup.getJSONObject(i).getString("file")); //生成文件
                     arrs.add(jsonArrayup.getJSONObject(i).getString("name"));
-                    removeUoloads.add(jsonArrayup.getJSONObject(i).getString("file"));
+                    removeUoloads.add( jsonArrayup.getJSONObject(i).getString("file") );
                     requestBodyBuilder.addFormDataPart("file", jsonArrayup.getJSONObject(i).getString("file"), RequestBody.create(MutilPart_Form_Data, fileOne));
                 }
             } catch (JSONException e) {
@@ -1214,18 +1225,18 @@ public class HomeActivity extends AppCompatActivity {
                 try {
                     Response response = call.execute();
 
-                    for (int i = 0; i < arrs.size(); i++) {
-                        Cursor cursor = sqLiteDatabase.query("upload", null, "name='" + arrs.get(i) + "'", null, null, null, null);
-                        System.out.println(cursor.getCount() + "------");
-                        System.out.println(arrs.get(i));
-                        if (cursor.getCount() == 0) {
-                            sqLiteDatabase.execSQL("insert into upload(name) values('" + arrs.get(i) + "')");
+                    for(int i=0;i<arrs.size();i++){
+                        Cursor cursor = sqLiteDatabase.query("upload", null, "name='"+ arrs.get(i) +"'", null, null, null, null);
+                        System.out.println( cursor.getCount() + "------" );
+                        System.out.println( arrs.get(i) );
+                        if( cursor.getCount() == 0 ){
+                            sqLiteDatabase.execSQL("insert into upload(name) values('"+ arrs.get(i)+"')");
                         }
                     }
 
-                    if (selectNumber == 1) {
-                        for (int i = 0; i < removeUoloads.size(); i++) {
-                            DeleteFolder(removeUoloads.get(i));
+                    if( selectNumber == 1 ){
+                        for( int i = 0; i < removeUoloads.size(); i++ ){
+                            DeleteFolder( removeUoloads.get(i) );
                         }
                     }
 
@@ -1248,8 +1259,7 @@ public class HomeActivity extends AppCompatActivity {
 
     /**
      * 删除单个文件
-     *
-     * @param filePath 被删除文件的文件名
+     * @param   filePath    被删除文件的文件名
      * @return 文件删除成功返回true，否则返回false
      */
     public boolean deleteFile(String filePath) {
@@ -1262,9 +1272,8 @@ public class HomeActivity extends AppCompatActivity {
 
     /**
      * 删除文件夹以及目录下的文件
-     *
-     * @param filePath 被删除目录的文件路径
-     * @return 目录删除成功返回true，否则返回false
+     * @param   filePath 被删除目录的文件路径
+     * @return  目录删除成功返回true，否则返回false
      */
     public boolean deleteDirectory(String filePath) {
         boolean flag = false;
@@ -1296,10 +1305,9 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     /**
-     * 根据路径删除指定的目录或文件，无论存在与否
-     *
-     * @param filePath 要删除的目录或文件
-     * @return 删除成功返回 true，否则返回 false。
+     *  根据路径删除指定的目录或文件，无论存在与否
+     *@param filePath  要删除的目录或文件
+     *@return 删除成功返回 true，否则返回 false。
      */
     public boolean DeleteFolder(String filePath) {
         File file = new File(filePath);
@@ -1883,11 +1891,11 @@ public class HomeActivity extends AppCompatActivity {
 
                 //判断wifi是不是连接了设备
                 boolean wfstate = isWifi(HomeActivity.this);
-                System.out.println(wfstate + "------------------");
+                System.out.println( wfstate + "------------------" );
 
                 String wifiresult = getSSID();
-                System.out.println(wifiresult + "------------------");
-                if (wifiresult.indexOf("SHGZ") < 0) {
+                System.out.println( wifiresult + "------------------" );
+                if( wifiresult.indexOf( "SHGZ" ) < 0 ){
                     DialogSettings.style = STYLE_IOS;
                     DialogSettings.use_blur = true;
                     DialogSettings.blur_alpha = 200;
@@ -2584,7 +2592,7 @@ public class HomeActivity extends AppCompatActivity {
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
-                                token = AuthService.getAuth();
+                              token = AuthService.getAuth();
                                 getToken = true;
                             }
                         }).start();
