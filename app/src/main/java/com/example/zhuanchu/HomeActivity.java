@@ -155,9 +155,9 @@ public class HomeActivity extends AppCompatActivity {
     private String cameraPath;
     private String imgFileName;
 
-    View viewWeishangchuan =null;
-    View viewYishangchuan =null;
-            // 输入流读取器对象
+    View viewWeishangchuan = null;
+    View viewYishangchuan = null;
+    // 输入流读取器对象
     InputStreamReader isr;
     BufferedReader br;
 
@@ -790,12 +790,11 @@ public class HomeActivity extends AppCompatActivity {
         }
 
 
-
     }
 
-    private void uploadBtn(View view){
-        if (view.equals(viewWeishangchuan)){
-            System.out.println("未上传的view："+view);
+    private void uploadBtn(View view) {
+        if (view.equals(viewWeishangchuan)) {
+            System.out.println("未上传的view：" + view);
             view.findViewById(R.id.uploadbtn).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -857,8 +856,8 @@ public class HomeActivity extends AppCompatActivity {
                     uploadFile(HomeActivity.this);
                 }
             });
-        }else{
-            System.out.println("已上传的view："+view);
+        } else {
+            System.out.println("已上传的view：" + view);
 
             view.findViewById(R.id.uploadbtnyishangchuan).setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -1938,7 +1937,6 @@ public class HomeActivity extends AppCompatActivity {
                 dataIpPswUser.clear();
                 dataIpPswUser.addAll(jutichexingchehaoshebeicmdpswIp);
 
-                Toast.makeText(HomeActivity.this, dataIpPswUser.toString(), Toast.LENGTH_LONG).show();
 
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
                 //获取当前时间
@@ -2018,6 +2016,22 @@ public class HomeActivity extends AppCompatActivity {
                     editor.commit();
 
 
+                    //供测试设备用
+                    if (shebeiValue.equals("ERM")) {//本身是edrm才需要验证 
+                        haveCheck = true;
+                    }
+                    if (shebeiValue.equals("WTD")) {
+                        haveCheck = false;
+                        _host = "";
+                        _user = "admin";
+                        _pass = "8498883-2";
+                    }
+                    if (shebeiValue.equals("TCU1")) {
+                        haveCheck = false;
+                        _host = "";
+                        _user = "admin";
+                        _pass = "8498883-2";
+                    }
                     String can[] = new String[4];
                     can[0] = _host;
                     can[1] = _port;
