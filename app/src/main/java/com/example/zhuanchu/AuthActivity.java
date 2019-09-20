@@ -214,7 +214,6 @@ public class AuthActivity extends AppCompatActivity {
         btGo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                System.out.println("测试1");
 
                 final String users = etUsername.getText().toString().trim();
                 final String psw = etPassword.getText().toString().trim();

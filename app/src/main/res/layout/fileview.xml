@@ -4,18 +4,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <Button
-        android:id="@+id/removefile"
-        android:layout_width="100dp"
-        android:layout_height="38dp"
-        android:layout_gravity="bottom"
-        android:layout_marginLeft="30dp"
-        android:layout_marginTop="10dp"
-        android:background="@drawable/btnclick"
-        android:text="删除文件"
-        android:textColor="#fff"
-        android:textSize="16dp" />
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -27,22 +15,41 @@
         <android.support.v7.widget.RecyclerView
             android:id="@+id/listviews"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-        </android.support.v7.widget.RecyclerView>
+            android:layout_height="match_parent"></android.support.v7.widget.RecyclerView>
     </LinearLayout>
 
-    <Button
-        android:id="@+id/prev"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="38dp"
-        android:layout_gravity="bottom"
-        android:layout_marginLeft="50dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginRight="50dp"
+        android:layout_height="wrap_content"
+        android:gravity="bottom"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="10dp"
         android:layout_marginBottom="30dp"
-        android:background="@drawable/btnclick"
-        android:text="返回上级文件目录"
-        android:textColor="#fff"
-        android:textSize="16dp" />
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/removefile"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="38dp"
+            android:layout_gravity="bottom"
+            android:background="@drawable/bt_shape2"
+            android:stateListAnimator="@drawable/state_list_animator_z"
+            android:text="删除文件"
+            android:textColor="#1296db"
+            android:textSize="16dp" />
+
+        <Button
+            android:layout_marginLeft="20dp"
+            android:id="@+id/prev"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="38dp"
+            android:background="@drawable/btnclick"
+            android:text="返回上级文件目录"
+            android:textColor="#fff"
+            android:textSize="16dp" />
+    </LinearLayout>
+
 </LinearLayout>
