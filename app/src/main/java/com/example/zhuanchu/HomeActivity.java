@@ -3,7 +3,6 @@ package com.example.zhuanchu;
 import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -26,7 +25,6 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.preference.Preference;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -34,21 +32,16 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -56,16 +49,13 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.alibaba.android.arouter.launcher.ARouter;
 import com.alibaba.fastjson.JSON;
 import com.example.zhuanchu.adapter.UploadAdapter;
 import com.example.zhuanchu.adapter.VerticalAdapter;
-import com.example.zhuanchu.bean.UploadFile;
 import com.example.zhuanchu.bean.javaBean.JsonRootBean;
 import com.example.zhuanchu.bean.pojo15.JsonRootBean15;
 import com.example.zhuanchu.service.AuthService;
@@ -75,12 +65,8 @@ import com.example.zhuanchu.service.GetInfoForMultiList;
 import com.example.zhuanchu.service.MultiViewPager;
 import com.example.zhuanchu.service.SqlHelper;
 import com.example.zhuanchu.service.UploadProgressListener;
-import com.example.zhuanchu.service.ViewFindUtils;
 import com.flyco.tablayout.SegmentTabLayout;
-import com.flyco.tablayout.listener.OnTabSelectListener;
-import com.flyco.tablayout.widget.MsgView;
 import com.githang.statusbar.StatusBarCompat;
-import com.google.android.flexbox.FlexboxLayout;
 import com.google.android.flexbox.FlexboxLayoutManager;
 import com.kongzue.dialog.v2.DialogSettings;
 import com.kongzue.dialog.v2.MessageDialog;
@@ -142,8 +128,8 @@ public class HomeActivity extends AppCompatActivity {
     private String cmdValue = " ";
     private String shebeiValue = "";
 
-   private String token = "";
-   private  boolean getToken = false;
+    private String token = "";
+    private boolean getToken = false;
     private WifiManager wifiManager;
     private Socket socket;
     OutputStream outputStream;
@@ -212,15 +198,17 @@ public class HomeActivity extends AppCompatActivity {
     VerticalAdapter verticalAdapter = null;
     List<String> arrs = new ArrayList<>();
     List<String> removeUoloads = new ArrayList<>();
+    List<Integer> itemYIshangchuan = new ArrayList<>();
     SqlHelper sqlHelper = null;
     SQLiteDatabase sqLiteDatabase = null;
     int uploadIndex = 0;
     private static final int COMPLETED = 0;
+    View viewRE = null;
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             if (msg.what == COMPLETED) {
-                fragmnetWeishangchuan(uploadIndex);
+                fragmnetWeishangchuan(viewRE);
             }
         }
     };
@@ -316,9 +304,9 @@ public class HomeActivity extends AppCompatActivity {
                     initPack(view);
                 } else if (position == 2) {
                     view = LayoutInflater.from(
-                            getBaseContext()).inflate(R.layout.upload_ntb, null, false);
+                            getBaseContext()).inflate(R.layout.upload, null, false);
                     uploadView = view;
-
+                    viewRE = view;
                     initUpload(view);
                 } else if (position == 3) {
                     view = LayoutInflater.from(
@@ -343,14 +331,14 @@ public class HomeActivity extends AppCompatActivity {
                 new NavigationTabBar.Model.Builder(
                         getResources().getDrawable(R.drawable.down),
                         Color.parseColor(colors[0]))
-                        .title("下载")
+                        .title("下载").badgeTitle("")
                         .build()
         );
         models.add(
                 new NavigationTabBar.Model.Builder(
                         getResources().getDrawable(R.drawable.dabao),
                         Color.parseColor(colors[1]))
-                        .title("打包")
+                        .title("打包").badgeTitle("300")
                         .build()
         );
         models.add(
@@ -364,7 +352,7 @@ public class HomeActivity extends AppCompatActivity {
                 new NavigationTabBar.Model.Builder(
                         getResources().getDrawable(R.drawable.sets),
                         Color.parseColor(colors[3]))
-                        .title("设置").badgeTitle("9")
+                        .title("设置").badgeTitle("")
                         .build()
         );
         SharedPreferences sharedPreferences = getSharedPreferences("tab",
@@ -386,9 +374,7 @@ public class HomeActivity extends AppCompatActivity {
                     actionBar.setTitle("系统设置");
                 } else if (position == 2) {
                     actionBar.setTitle("文件上传");
-                    if (uploadView != null) {
-                        fragmnetWeishangchuan(uploadIndex);
-                    }
+                    initUpload(viewRE);
                 } else if (position == 1) {
                     actionBar.setTitle("文件打包");
                     initPack(packView);
@@ -698,336 +684,116 @@ public class HomeActivity extends AppCompatActivity {
 
 
     //3   init上传首页的UI组件，以及逻辑代码，...
-    @RequiresApi(api = Build.VERSION_CODES.M)
     public void initUpload(View view) {
-
         sqlHelper = new SqlHelper(HomeActivity.this);
         sqLiteDatabase = sqlHelper.getWritableDatabase();
-        //view
-        mTabLayout_3 = (SegmentTabLayout) view.findViewById(R.id.tl_3);
-        tl_3(view);
-
+        fragmnetWeishangchuan(view);
     }
 
 
-    public void fragmnetWeishangchuan(int number) {
-        System.out.println("未上传2");
+    public void fragmnetWeishangchuan(View view) {
         File[] files = getUploadFiles();
         removedata(jsonArrayup);
-        View view2 = null;
-        if (number == 1) {
-            try {
-                for (File spec : files) {
-                    Cursor cursor = sqLiteDatabase.query("upload", null, "name='" + spec.getName() + "'", null, null, null, null);
-                    while (cursor.moveToNext()) {
-                        //光标移动成功
-                        //把数据取出
-                        System.out.println(cursor.getString(cursor.getColumnIndex("name")));
-                    }
 
-
-                    if (cursor.getCount() == 0) {
-                        JSONObject jsonObject = new JSONObject();
-                        jsonObject.put("name", spec.getName());
-                        java.text.SimpleDateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                        String dateTime = df.format(new Date(spec.lastModified()));
-                        jsonObject.put("time", dateTime);
-                        jsonObject.put("file", spec);
-                        jsonObject.put("check", false);
-                        jsonArrayup.put(jsonObject);
-                    }
+        try {
+            for (File spec : files) {
+                Cursor cursor = sqLiteDatabase.query("upload", null, "name='" + spec.getName() + "'", null, null, null, null);
+                while (cursor.moveToNext()) {
+                    //光标移动成功
+                    //把数据取出
+                    System.out.println(cursor.getString(cursor.getColumnIndex("name")));
                 }
 
 
-            } catch (Exception e) {
-
-            }
-
-            uploadAdapter = new UploadAdapter(this, jsonArrayup);
-
-            viewWeishangchuan = LayoutInflater.from(
-                    getBaseContext()).inflate(R.layout.upload, null, false);
-            recyclerView = viewWeishangchuan.findViewById(R.id.listUpload);
-            System.out.println(
-                    "打印view：" + uploadView
-            );
-            flexboxLayoutManager = new FlexboxLayoutManager(MyApplication.getContext());
-            recyclerView.setLayoutManager(flexboxLayoutManager);
-            recyclerView.setAdapter(uploadAdapter);
-
-            uploadBtn(viewWeishangchuan);
-
-        }
-
-        if (number == 0) {
-            try {
-                for (File spec : files) {
-                    Cursor cursor = sqLiteDatabase.query("upload", null, "name='" + spec.getName() + "'", null, null, null, null);
-                    while (cursor.moveToNext()) {
-                        //光标移动成功
-                        //把数据取出
-                        System.out.println(cursor.getString(cursor.getColumnIndex("name")));
-                    }
-
-
-                    if (cursor.getCount() > 0) {
-                        JSONObject jsonObject = new JSONObject();
-                        jsonObject.put("name", spec.getName());
-                        java.text.SimpleDateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                        String dateTime = df.format(new Date(spec.lastModified()));
-                        jsonObject.put("time", dateTime);
-                        jsonObject.put("file", spec);
-                        jsonObject.put("check", false);
-                        jsonArrayup.put(jsonObject);
-                    }
+                if (cursor.getCount() == 0) {
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("name", spec.getName());
+                    java.text.SimpleDateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    String dateTime = df.format(new Date(spec.lastModified()));
+                    jsonObject.put("time", dateTime);
+                    jsonObject.put("file", spec);
+                    jsonObject.put("check", false);
+                    jsonArrayup.put(jsonObject);
                 }
-
-
-            } catch (Exception e) {
-
             }
 
-            uploadAdapter = new UploadAdapter(this, jsonArrayup);
 
-            viewYishangchuan = LayoutInflater.from(
-                    getBaseContext()).inflate(R.layout.fragment_simple_card_fragment_yishagchuan, null, false);
+        } catch (Exception e) {
 
-            recyclerView = viewYishangchuan.findViewById(R.id.listUpload_ready);
-            flexboxLayoutManager = new FlexboxLayoutManager(this);
-            recyclerView.setLayoutManager(flexboxLayoutManager);
-            recyclerView.setAdapter(uploadAdapter);
-
-            uploadBtn(viewYishangchuan);
         }
 
+        uploadAdapter = new UploadAdapter(this, jsonArrayup, itemYIshangchuan);
+        recyclerView = view.findViewById(R.id.listUpload2);
+        flexboxLayoutManager = new FlexboxLayoutManager(MyApplication.getContext());
+        recyclerView.setLayoutManager(flexboxLayoutManager);
+        recyclerView.setAdapter(uploadAdapter);
+        uploadBtn(view);
 
     }
 
     private void uploadBtn(View view) {
-        if (view.equals(viewWeishangchuan)) {
-            System.out.println("未上传的view：" + view);
-            view.findViewById(R.id.uploadbtn).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    /*
-                     * 判断是否有网络
-                     * */
-                    boolean network = isNetworkAvailable(HomeActivity.this);
-                    if (!network) {
+        view.findViewById(R.id.uploadbtn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                /*
+                 * 判断是否有网络
+                 * */
+                boolean network = isNetworkAvailable(HomeActivity.this);
+                if (!network) {
 
-                        Toast.makeText(HomeActivity.this, "没有检测到网络", Toast.LENGTH_LONG).show();
-                        return;
-                    }
+                    Toast.makeText(HomeActivity.this, "没有检测到网络", Toast.LENGTH_LONG).show();
+                    return;
+                }
 
-                    String wifiresult = getSSID();
-                    System.out.println(wifiresult);
-                    if (wifiresult.indexOf("SHGZ") >= 0) {
-                        DialogSettings.style = STYLE_IOS;
-                        DialogSettings.use_blur = true;
-                        DialogSettings.blur_alpha = 200;
-                        SelectDialog.show(HomeActivity.this, "WIFI设置", "请切换能上网的WIFI", "确定", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Intent i = new Intent();
-                                i = new Intent(Settings.ACTION_WIFI_SETTINGS);
-                                startActivity(i);
-                            }
-                        }, "取消", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                            }
-                        });
-                        return;
-                    }
+                String wifiresult = getSSID();
+                System.out.println(wifiresult);
+                if (wifiresult.indexOf("SHGZ") >= 0) {
+                    DialogSettings.style = STYLE_IOS;
+                    DialogSettings.use_blur = true;
+                    DialogSettings.blur_alpha = 200;
+                    SelectDialog.show(HomeActivity.this, "WIFI设置", "请切换能上网的WIFI", "确定", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent i = new Intent();
+                            i = new Intent(Settings.ACTION_WIFI_SETTINGS);
+                            startActivity(i);
+                        }
+                    }, "取消", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    });
+                    return;
+                }
 
-                    boolean mobile = isMobile(HomeActivity.this);
-                    sharedPreferencesUp = getSharedPreferences("data", MODE_PRIVATE);
+                boolean mobile = isMobile(HomeActivity.this);
+                sharedPreferencesUp = getSharedPreferences("data", MODE_PRIVATE);
 
-                    boolean networkinit = sharedPreferencesUp.getBoolean("network", false);//4g
+                boolean networkinit = sharedPreferencesUp.getBoolean("network", false);//4g
 
                 System.out.println(networkinit);
 
-                    if (mobile && !networkinit) {
-                        DialogSettings.style = STYLE_IOS;
-                        DialogSettings.use_blur = true;
-                        DialogSettings.blur_alpha = 200;
-                        SelectDialog.show(context, "网络检测", "当前为4G网络，要继续上传吗?", "确定", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                sharedPreferencesUp.edit().putBoolean("network", true).commit();
-                                uploadFile(HomeActivity.this);
-                            }
-                        }, "取消", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                            }
-                        });
-                        return;
-                    }
-                    uploadFile(HomeActivity.this);
+                if (mobile && !networkinit) {
+                    DialogSettings.style = STYLE_IOS;
+                    DialogSettings.use_blur = true;
+                    DialogSettings.blur_alpha = 200;
+                    SelectDialog.show(context, "网络检测", "当前为4G网络，要继续上传吗?", "确定", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            sharedPreferencesUp.edit().putBoolean("network", true).commit();
+                            uploadFile(HomeActivity.this);
+                        }
+                    }, "取消", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    });
+                    return;
                 }
-            });
-        } else {
-            System.out.println("已上传的view：" + view);
-
-            view.findViewById(R.id.uploadbtnyishangchuan).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    /*
-                     * 判断是否有网络
-                     * */
-                    boolean network = isNetworkAvailable(HomeActivity.this);
-                    if (!network) {
-
-                        Toast.makeText(HomeActivity.this, "没有检测到网络", Toast.LENGTH_LONG).show();
-                        return;
-                    }
-
-                    String wifiresult = getSSID();
-                    System.out.println(wifiresult);
-                    if (wifiresult.indexOf("SHGZ") >= 0) {
-                        DialogSettings.style = STYLE_IOS;
-                        DialogSettings.use_blur = true;
-                        DialogSettings.blur_alpha = 200;
-                        SelectDialog.show(HomeActivity.this, "WIFI设置", "请切换能上网的WIFI", "确定", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Intent i = new Intent();
-                                i = new Intent(Settings.ACTION_WIFI_SETTINGS);
-                                startActivity(i);
-                            }
-                        }, "取消", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                            }
-                        });
-                        return;
-                    }
-
-                    boolean mobile = isMobile(HomeActivity.this);
-                    sharedPreferencesUp = getSharedPreferences("data", MODE_PRIVATE);
-
-                    boolean networkinit = sharedPreferencesUp.getBoolean("network", false);//4g
-
-                    System.out.println(networkinit);
-
-                    if (mobile && !networkinit) {
-                        DialogSettings.style = STYLE_IOS;
-                        DialogSettings.use_blur = true;
-                        DialogSettings.blur_alpha = 200;
-                        SelectDialog.show(context, "网络检测", "当前为4G网络，要继续上传吗?", "确定", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                sharedPreferencesUp.edit().putBoolean("network", true).commit();
-                                uploadFile(HomeActivity.this);
-                            }
-                        }, "取消", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                            }
-                        });
-                        return;
-                    }
-                    uploadFile(HomeActivity.this);
-                }
-            });
-        }
-
-    }
-
-    private void tl_3(View view) {
-        final ViewPager viewPager = (ViewPager) view.findViewById(R.id.vp_2);
-
-        //同时，还要给Viewpager设置选中监听，才能使SegmentTablayout和ViewPager双向同步。
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int
-                    positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                uploadIndex = position;
-                System.out.println("position=" + position);
-                if (uploadAdapter != null) {
-                    fragmnetWeishangchuan(uploadIndex);
-                }
-
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
+                uploadFile(HomeActivity.this);
             }
         });
-
-        viewPager.setAdapter(new PagerAdapter() {
-            @Override
-            public int getCount() {
-                return 2;
-            }
-
-            @Override
-            public boolean isViewFromObject(final View view, final Object object) {
-                return view.equals(object);
-            }
-
-            @Override
-            public void destroyItem(final View container, final int position, final Object object) {
-                ((ViewPager) container).removeView((View) object);
-            }
-
-            @Override
-            public Object instantiateItem(final ViewGroup container, final int position) {
-                View view = null;
-                if (position == 0) {
-                    view = LayoutInflater.from(
-                            getBaseContext()).inflate(R.layout.fragment_simple_card_fragment_yishagchuan, null, false);
-                    //initYishangchuan(view);
-
-
-                } else if (position == 1) {
-                    view = LayoutInflater.from(
-                            getBaseContext()).inflate(R.layout.upload, null, false);
-                    //initWeishangchaun(view);
-                }
-                container.addView(view);
-                return view;
-            }
-        });
-
-
-        mTabLayout_3.setTabData(mTitles_3);
-        mTabLayout_3.setOnTabSelectListener(new OnTabSelectListener() {
-            @Override
-            public void onTabSelect(int position) {
-                viewPager.setCurrentItem(position);
-            }
-
-            @Override
-            public void onTabReselect(int position) {
-            }
-        });
-
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-
-                mTabLayout_3.setCurrentTab(position);
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
-        viewPager.setCurrentItem(1);
     }
 
 
@@ -1057,9 +823,9 @@ public class HomeActivity extends AppCompatActivity {
         return files;
     }
 
-    public void removedata(JSONArray jsonArray){
-        if( jsonArray.length() > 0 ){
-            jsonArray.remove( 0 );
+    public void removedata(JSONArray jsonArray) {
+        if (jsonArray.length() > 0) {
+            jsonArray.remove(0);
             removedata(jsonArray);
         }
     }
@@ -1132,13 +898,13 @@ public class HomeActivity extends AppCompatActivity {
         ns.setOnSpinnerItemSelectedListener(new OnSpinnerItemSelectedListener() {
             @Override
             public void onItemSelected(NiceSpinner parent, View view, int position, long id) {
-                System.out.println( position );
+                System.out.println(position);
                 SharedPreferences preupload = HomeActivity.this.getSharedPreferences("data", MODE_PRIVATE);
                 SharedPreferences.Editor editorupload = preupload.edit();
 
                 preupload.edit().putInt("uploadinfo", position).commit();
 
-                System.out.println( preupload.getInt("uploadinfo", 4) );
+                System.out.println(preupload.getInt("uploadinfo", 4));
 
             }
         });
@@ -1172,7 +938,12 @@ public class HomeActivity extends AppCompatActivity {
                 if (jsonArrayup.getJSONObject(i).getBoolean("check")) {
                     File fileOne = new File(jsonArrayup.getJSONObject(i).getString("file")); //生成文件
                     arrs.add(jsonArrayup.getJSONObject(i).getString("name"));
-                    removeUoloads.add( jsonArrayup.getJSONObject(i).getString("file") );
+                    removeUoloads.add(jsonArrayup.getJSONObject(i).getString("file"));
+
+                    //记录上传完的文件的列表位置  从而进行已上传标记
+                    itemYIshangchuan.add(i);
+
+
                     requestBodyBuilder.addFormDataPart("file", jsonArrayup.getJSONObject(i).getString("file"), RequestBody.create(MutilPart_Form_Data, fileOne));
                 }
             } catch (JSONException e) {
@@ -1225,20 +996,33 @@ public class HomeActivity extends AppCompatActivity {
                 try {
                     Response response = call.execute();
 
-                    for(int i=0;i<arrs.size();i++){
-                        Cursor cursor = sqLiteDatabase.query("upload", null, "name='"+ arrs.get(i) +"'", null, null, null, null);
-                        System.out.println( cursor.getCount() + "------" );
-                        System.out.println( arrs.get(i) );
-                        if( cursor.getCount() == 0 ){
-                            sqLiteDatabase.execSQL("insert into upload(name) values('"+ arrs.get(i)+"')");
+                    for (int i = 0; i < arrs.size(); i++) {
+                        Cursor cursor = sqLiteDatabase.query("upload", null, "name='" + arrs.get(i) + "'", null, null, null, null);
+                        System.out.println(cursor.getCount() + "------");
+                        System.out.println(arrs.get(i));
+                        if (cursor.getCount() == 0) {
+                            sqLiteDatabase.execSQL("insert into upload(name) values('" + arrs.get(i) + "')");
                         }
                     }
 
-                    if( selectNumber == 1 ){
-                        for( int i = 0; i < removeUoloads.size(); i++ ){
-                            DeleteFolder( removeUoloads.get(i) );
-                        }
-                    }
+
+                    //上传完后 上传的文件删除
+
+//                        for (int i = 0; i < removeUoloads.size(); i++) {
+//                            DeleteFolder(removeUoloads.get(i));
+//                    }
+
+
+//                    for (int i = 0; i < arrs.size(); i++) {
+//                        try {
+//                            if (jsonArrayup.getJSONObject(i).getBoolean("check")) {
+//                                jsonArrayup.getJSONObject(i).put("state", "1");
+//                            }
+//                        } catch (JSONException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                    verticalAdapter.notifyDataSetChanged();
 
 
                     Message message = new Message();
@@ -1259,7 +1043,8 @@ public class HomeActivity extends AppCompatActivity {
 
     /**
      * 删除单个文件
-     * @param   filePath    被删除文件的文件名
+     *
+     * @param filePath 被删除文件的文件名
      * @return 文件删除成功返回true，否则返回false
      */
     public boolean deleteFile(String filePath) {
@@ -1272,8 +1057,9 @@ public class HomeActivity extends AppCompatActivity {
 
     /**
      * 删除文件夹以及目录下的文件
-     * @param   filePath 被删除目录的文件路径
-     * @return  目录删除成功返回true，否则返回false
+     *
+     * @param filePath 被删除目录的文件路径
+     * @return 目录删除成功返回true，否则返回false
      */
     public boolean deleteDirectory(String filePath) {
         boolean flag = false;
@@ -1305,9 +1091,10 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     /**
-     *  根据路径删除指定的目录或文件，无论存在与否
-     *@param filePath  要删除的目录或文件
-     *@return 删除成功返回 true，否则返回 false。
+     * 根据路径删除指定的目录或文件，无论存在与否
+     *
+     * @param filePath 要删除的目录或文件
+     * @return 删除成功返回 true，否则返回 false。
      */
     public boolean DeleteFolder(String filePath) {
         File file = new File(filePath);
@@ -1344,7 +1131,7 @@ public class HomeActivity extends AppCompatActivity {
     /**
      * 检查是否有网络
      */
-    public static boolean isNetworkAvailable(Context context) {
+    public boolean isNetworkAvailable(Context context) {
 
         NetworkInfo info = getNetworkInfo(context);
         return info != null && info.isAvailable();
@@ -1354,7 +1141,7 @@ public class HomeActivity extends AppCompatActivity {
     /**
      * 检查是否是WIFI
      */
-    public static boolean isWifi(Context context) {
+    public boolean isWifi(Context context) {
 
         NetworkInfo info = getNetworkInfo(context);
         if (info != null) {
@@ -1369,7 +1156,7 @@ public class HomeActivity extends AppCompatActivity {
     /**
      * 检查是否是移动网络
      */
-    public static boolean isMobile(Context context) {
+    public boolean isMobile(Context context) {
 
         NetworkInfo info = getNetworkInfo(context);
         if (info != null) {
@@ -1381,9 +1168,9 @@ public class HomeActivity extends AppCompatActivity {
     }
 
 
-    private static NetworkInfo getNetworkInfo(Context context) {
+    private NetworkInfo getNetworkInfo(Context context) {
 
-        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(
+        ConnectivityManager cm = (ConnectivityManager) getApplicationContext().getSystemService(
                 Context.CONNECTIVITY_SERVICE);
         return cm.getActiveNetworkInfo();
     }
@@ -1891,11 +1678,11 @@ public class HomeActivity extends AppCompatActivity {
 
                 //判断wifi是不是连接了设备
                 boolean wfstate = isWifi(HomeActivity.this);
-                System.out.println( wfstate + "------------------" );
+                System.out.println(wfstate + "------------------");
 
                 String wifiresult = getSSID();
-                System.out.println( wifiresult + "------------------" );
-                if( wifiresult.indexOf( "SHGZ" ) < 0 ){
+                System.out.println(wifiresult + "------------------");
+                if (wifiresult.indexOf("SHGZ") < 0) {
                     DialogSettings.style = STYLE_IOS;
                     DialogSettings.use_blur = true;
                     DialogSettings.blur_alpha = 200;
@@ -2592,7 +2379,7 @@ public class HomeActivity extends AppCompatActivity {
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
-                              token = AuthService.getAuth();
+                                token = AuthService.getAuth();
                                 getToken = true;
                             }
                         }).start();

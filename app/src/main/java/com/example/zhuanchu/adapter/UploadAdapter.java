@@ -34,10 +34,13 @@ public class UploadAdapter extends RecyclerView.Adapter<UploadAdapter.VerticalVi
     //    List<String> lists = new ArrayList<>();
     JSONArray lists = new JSONArray();
     List<PackFile> mData;
+    List<Integer> listYi = new ArrayList<>();
 
-    public UploadAdapter( Context context, JSONArray lists ){
+    public UploadAdapter(Context context, JSONArray lists, List<Integer> yishangchuan) {
         this.context = context;
         this.lists = lists;
+        listYi.clear();
+        listYi.addAll(yishangchuan);
     }
 
     @NonNull
@@ -49,11 +52,27 @@ public class UploadAdapter extends RecyclerView.Adapter<UploadAdapter.VerticalVi
 
     @Override
     public void onBindViewHolder(@NonNull final VerticalViewHolder holder, final int i) {
-        System.out.println( i + "----" + 6555 );
+        System.out.println(i + "----" + 6555);
         try {
-            holder.textView.setText( lists.getJSONObject(i).getString("name") );
-            holder.fileTime.setText( lists.getJSONObject(i).getString("time") );
-            holder.checkBox.setChecked( lists.getJSONObject(i).getBoolean("check") );
+            holder.textView.setText(lists.getJSONObject(i).getString("name"));
+            holder.fileTime.setText(lists.getJSONObject(i).getString("time"));
+            holder.checkBox.setChecked(lists.getJSONObject(i).getBoolean("check"));
+
+            for (int j = 0; j < listYi.size(); j++) {
+                //哪个item的已上传进行标记？
+                if (listYi.get(j)==i){
+                    holder.shangchuanstate.setVisibility(View.VISIBLE);
+                }else
+                {
+                    holder.shangchuanstate.setVisibility(View.INVISIBLE);
+
+                }
+            }
+            if (listYi.size()==0){
+                holder.shangchuanstate.setVisibility(View.INVISIBLE);
+
+            }
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -63,14 +82,14 @@ public class UploadAdapter extends RecyclerView.Adapter<UploadAdapter.VerticalVi
         holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(!buttonView.isPressed())return;
-                try{
+                if (!buttonView.isPressed()) return;
+                try {
 
-                    System.out.println( i + "---" + isChecked );
+                    System.out.println(i + "---" + isChecked);
                     lists.getJSONObject(i).put("check", isChecked);
                     //lists.getJSONObject(i).put("check", true);
 
-                }catch ( Exception e ){
+                } catch (Exception e) {
 
                 }
                 //刷新适配器
@@ -90,21 +109,24 @@ public class UploadAdapter extends RecyclerView.Adapter<UploadAdapter.VerticalVi
         return lists.length();
     }
 
-    public class VerticalViewHolder extends RecyclerView.ViewHolder{
+    public class VerticalViewHolder extends RecyclerView.ViewHolder {
 
-        TextView textView, fileTime;
+        TextView textView, fileTime, shangchuanstate;
         CheckBox checkBox;
 
         public VerticalViewHolder(@NonNull View itemView) {
             super(itemView);
             textView = itemView.findViewById(R.id.fileNameupload);
             fileTime = itemView.findViewById(R.id.filetimeupload);
+            shangchuanstate = itemView.findViewById(R.id.shangchuanstate);
+
             checkBox = itemView.findViewById(R.id.filecheckupload);
         }
     }
 
     /**
      * 时间戳转换成字符窜
+     *
      * @param milSecond
      * @param pattern
      * @return
