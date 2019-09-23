@@ -10,6 +10,7 @@
 
 
     <TextView
+        android:id="@+id/tv_wei"
         android:layout_marginBottom="20dp"
         android:layout_marginLeft="10dp"
         android:layout_width="wrap_content"
@@ -39,7 +40,7 @@
             android:layout_height="38dp"
             android:layout_gravity="bottom"
             android:background="@drawable/btnclick"
-            android:text="确定"
+            android:text="上传"
             android:textColor="#fff"
             android:textSize="16dp" />
     </LinearLayout>
