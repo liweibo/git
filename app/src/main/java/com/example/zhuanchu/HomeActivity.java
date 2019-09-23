@@ -3,6 +3,7 @@ package com.example.zhuanchu;
 import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -25,6 +26,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.preference.Preference;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -32,30 +34,39 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.alibaba.android.arouter.launcher.ARouter;
 import com.alibaba.fastjson.JSON;
 import com.example.zhuanchu.adapter.UploadAdapter;
 import com.example.zhuanchu.adapter.VerticalAdapter;
+import com.example.zhuanchu.bean.UploadFile;
 import com.example.zhuanchu.bean.javaBean.JsonRootBean;
 import com.example.zhuanchu.bean.pojo15.JsonRootBean15;
 import com.example.zhuanchu.service.AuthService;
@@ -65,8 +76,12 @@ import com.example.zhuanchu.service.GetInfoForMultiList;
 import com.example.zhuanchu.service.MultiViewPager;
 import com.example.zhuanchu.service.SqlHelper;
 import com.example.zhuanchu.service.UploadProgressListener;
+import com.example.zhuanchu.service.ViewFindUtils;
 import com.flyco.tablayout.SegmentTabLayout;
+import com.flyco.tablayout.listener.OnTabSelectListener;
+import com.flyco.tablayout.widget.MsgView;
 import com.githang.statusbar.StatusBarCompat;
+import com.google.android.flexbox.FlexboxLayout;
 import com.google.android.flexbox.FlexboxLayoutManager;
 import com.kongzue.dialog.v2.DialogSettings;
 import com.kongzue.dialog.v2.MessageDialog;
@@ -208,7 +223,11 @@ public class HomeActivity extends AppCompatActivity {
         @Override
         public void handleMessage(Message msg) {
             if (msg.what == COMPLETED) {
-                fragmnetWeishangchuan(viewRE);
+                if( uploadindex == 1 ){
+                    fragmnetWeishangchuan( viewRE );
+                }else{
+                    fragmnetReadyshangchuan( viewRE );
+                }
             }
         }
     };
@@ -216,6 +235,7 @@ public class HomeActivity extends AppCompatActivity {
     FlexboxLayoutManager flexboxLayoutManager = null;
 
     View packView = null;
+    int uploadindex = 1;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -547,7 +567,19 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                if (jsonArray == null || jsonArray.length() == 0) {
+                System.out.println( "打包数量：" + jsonArray.length() );
+                int packnumber = 0;
+                for(int i = 0; i<jsonArray.length(); i++){
+                    try {
+                        if( jsonArray.getJSONObject(i).getBoolean("check") ){
+                            packnumber ++;
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                if ( packnumber == 0 ) {
                     DialogSettings.style = STYLE_IOS;
                     DialogSettings.use_blur = true;
                     DialogSettings.blur_alpha = 200;
@@ -684,16 +716,57 @@ public class HomeActivity extends AppCompatActivity {
 
 
     //3   init上传首页的UI组件，以及逻辑代码，...
-    public void initUpload(View view) {
+    public void initUpload(final View view) {
         sqlHelper = new SqlHelper(HomeActivity.this);
         sqLiteDatabase = sqlHelper.getWritableDatabase();
         fragmnetWeishangchuan(view);
+        view.findViewById(R.id.noupload).setBackgroundResource(R.drawable.btnclick);
+        Button button = view.findViewById(R.id.noupload);
+        button.setTextColor(getResources().getColor(R.color.white));
+        view.findViewById(R.id.readyupload).setBackgroundResource( R.drawable.bt_shape2 );
+        Button button1 = view.findViewById( R.id.readyupload );
+        button1.setTextColor(getResources().getColor(R.color.colorfocus));
+
+        view.findViewById(R.id.noupload).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                System.out.println( "你点击了未上传" );
+                view.findViewById(R.id.noupload).setBackgroundResource(R.drawable.btnclick);
+                Button button = view.findViewById(R.id.noupload);
+                button.setTextColor(getResources().getColor(R.color.white));
+                view.findViewById(R.id.readyupload).setBackgroundResource( R.drawable.bt_shape2 );
+                Button button1 = view.findViewById( R.id.readyupload );
+                button1.setTextColor(getResources().getColor(R.color.colorfocus));
+                fragmnetWeishangchuan(view);
+                uploadindex = 1;
+            }
+        });
+
+        view.findViewById(R.id.readyupload).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                System.out.println( "你点击了已上传" );
+                view.findViewById(R.id.noupload).setBackgroundResource(R.drawable.bt_shape2);
+                view.findViewById(R.id.readyupload).setBackgroundResource( R.drawable.btnclick );
+                Button button = view.findViewById(R.id.noupload);
+                button.setTextColor(getResources().getColor(R.color.colorfocus));
+                Button button1 = view.findViewById( R.id.readyupload );
+                button1.setTextColor(getResources().getColor(R.color.white));
+                fragmnetReadyshangchuan(view);
+                uploadindex = 2;
+            }
+        });
+
     }
 
-
     public void fragmnetWeishangchuan(View view) {
+
+        if( jsonArrayup != null ){
+            removedata(jsonArrayup);
+        }
         File[] files = getUploadFiles();
-        removedata(jsonArrayup);
+
+        System.out.println( "上传文件总长度为：" + files.length );
 
         try {
             for (File spec : files) {
@@ -731,10 +804,72 @@ public class HomeActivity extends AppCompatActivity {
 
     }
 
+    public void fragmnetReadyshangchuan(View view) {
+
+        if( jsonArrayup != null ){
+            removedata(jsonArrayup);
+        }
+        File[] files = getUploadFiles();
+
+        System.out.println( "上传文件总长度为：" + files.length );
+
+        try {
+            for (File spec : files) {
+                Cursor cursor = sqLiteDatabase.query("upload", null, "name='" + spec.getName() + "'", null, null, null, null);
+                while (cursor.moveToNext()) {
+                    //光标移动成功
+                    //把数据取出
+                    System.out.println(cursor.getString(cursor.getColumnIndex("name")));
+                }
+
+                if (cursor.getCount() > 0) {
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("name", spec.getName());
+                    java.text.SimpleDateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    String dateTime = df.format(new Date(spec.lastModified()));
+                    jsonObject.put("time", dateTime);
+                    jsonObject.put("file", spec);
+                    jsonObject.put("check", false);
+                    jsonArrayup.put(jsonObject);
+                }
+            }
+
+
+        } catch (Exception e) {
+
+        }
+
+        uploadAdapter = new UploadAdapter(this, jsonArrayup, itemYIshangchuan);
+        recyclerView = view.findViewById(R.id.listUpload2);
+        flexboxLayoutManager = new FlexboxLayoutManager(MyApplication.getContext());
+        recyclerView.setLayoutManager(flexboxLayoutManager);
+        recyclerView.setAdapter(uploadAdapter);
+        uploadBtn(view);
+
+    }
+
     private void uploadBtn(View view) {
         view.findViewById(R.id.uploadbtn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                System.out.println( jsonArrayup.length() );
+                int uploadnumber = 0;
+                for( int i = 0;i<jsonArrayup.length();i++ ){
+                    try {
+                        if( jsonArrayup.getJSONObject(i).getBoolean("check") ){
+                            uploadnumber ++;
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                if( uploadnumber == 0 ){
+                    Toast.makeText(HomeActivity.this, "请选择需要打包的文件", Toast.LENGTH_LONG).show();
+                    return;
+                }
+
                 /*
                  * 判断是否有网络
                  * */
@@ -898,13 +1033,13 @@ public class HomeActivity extends AppCompatActivity {
         ns.setOnSpinnerItemSelectedListener(new OnSpinnerItemSelectedListener() {
             @Override
             public void onItemSelected(NiceSpinner parent, View view, int position, long id) {
-                System.out.println(position);
+                System.out.println( position );
                 SharedPreferences preupload = HomeActivity.this.getSharedPreferences("data", MODE_PRIVATE);
                 SharedPreferences.Editor editorupload = preupload.edit();
 
                 preupload.edit().putInt("uploadinfo", position).commit();
 
-                System.out.println(preupload.getInt("uploadinfo", 4));
+                System.out.println( preupload.getInt("uploadinfo", 4) );
 
             }
         });
@@ -996,33 +1131,22 @@ public class HomeActivity extends AppCompatActivity {
                 try {
                     Response response = call.execute();
 
-                    for (int i = 0; i < arrs.size(); i++) {
-                        Cursor cursor = sqLiteDatabase.query("upload", null, "name='" + arrs.get(i) + "'", null, null, null, null);
-                        System.out.println(cursor.getCount() + "------");
-                        System.out.println(arrs.get(i));
-                        if (cursor.getCount() == 0) {
-                            sqLiteDatabase.execSQL("insert into upload(name) values('" + arrs.get(i) + "')");
+                    for(int i=0;i<arrs.size();i++){
+                        Cursor cursor = sqLiteDatabase.query("upload", null, "name='"+ arrs.get(i) +"'", null, null, null, null);
+                        System.out.println( cursor.getCount() + "------" );
+                        System.out.println( arrs.get(i) );
+                        if( cursor.getCount() == 0 ){
+                            sqLiteDatabase.execSQL("insert into upload(name) values('"+ arrs.get(i)+"')");
                         }
                     }
 
+                    System.out.println( "当前设置是：" + selectNumber );
 
-                    //上传完后 上传的文件删除
-
-//                        for (int i = 0; i < removeUoloads.size(); i++) {
-//                            DeleteFolder(removeUoloads.get(i));
-//                    }
-
-
-//                    for (int i = 0; i < arrs.size(); i++) {
-//                        try {
-//                            if (jsonArrayup.getJSONObject(i).getBoolean("check")) {
-//                                jsonArrayup.getJSONObject(i).put("state", "1");
-//                            }
-//                        } catch (JSONException e) {
-//                            e.printStackTrace();
-//                        }
-//                    }
-//                    verticalAdapter.notifyDataSetChanged();
+                    if( selectNumber == 1 ){
+                        for( int i = 0; i < removeUoloads.size(); i++ ){
+                            DeleteFolder( removeUoloads.get(i) );
+                        }
+                    }
 
 
                     Message message = new Message();
@@ -1043,8 +1167,7 @@ public class HomeActivity extends AppCompatActivity {
 
     /**
      * 删除单个文件
-     *
-     * @param filePath 被删除文件的文件名
+     * @param   filePath    被删除文件的文件名
      * @return 文件删除成功返回true，否则返回false
      */
     public boolean deleteFile(String filePath) {
@@ -1057,9 +1180,8 @@ public class HomeActivity extends AppCompatActivity {
 
     /**
      * 删除文件夹以及目录下的文件
-     *
-     * @param filePath 被删除目录的文件路径
-     * @return 目录删除成功返回true，否则返回false
+     * @param   filePath 被删除目录的文件路径
+     * @return  目录删除成功返回true，否则返回false
      */
     public boolean deleteDirectory(String filePath) {
         boolean flag = false;
@@ -1091,10 +1213,9 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     /**
-     * 根据路径删除指定的目录或文件，无论存在与否
-     *
-     * @param filePath 要删除的目录或文件
-     * @return 删除成功返回 true，否则返回 false。
+     *  根据路径删除指定的目录或文件，无论存在与否
+     *@param filePath  要删除的目录或文件
+     *@return 删除成功返回 true，否则返回 false。
      */
     public boolean DeleteFolder(String filePath) {
         File file = new File(filePath);
@@ -1732,6 +1853,7 @@ public class HomeActivity extends AppCompatActivity {
                 dataIpPswUser.clear();
                 dataIpPswUser.addAll(jutichexingchehaoshebeicmdpswIp);
 
+                Toast.makeText(HomeActivity.this, dataIpPswUser.toString(), Toast.LENGTH_LONG).show();
 
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
                 //获取当前时间
@@ -1812,7 +1934,7 @@ public class HomeActivity extends AppCompatActivity {
 
 
                     //供测试设备用
-                    if (shebeiValue.equals("ERM")) {//本身是edrm才需要验证 
+                    if (shebeiValue.equals("ERM")) {//本身是edrm才需要验证
                         haveCheck = true;
                     }
                     if (shebeiValue.equals("WTD")) {
@@ -2379,7 +2501,7 @@ public class HomeActivity extends AppCompatActivity {
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
-                                token = AuthService.getAuth();
+                              token = AuthService.getAuth();
                                 getToken = true;
                             }
                         }).start();

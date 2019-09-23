@@ -9,7 +9,7 @@ import com.example.zhuanchu.HomeActivity;
 public class SqlHelper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "wuxian.db";
-    private static final int DATABASE_VERSION = 5;
+    private static final int DATABASE_VERSION = 7;
 
     public SqlHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);

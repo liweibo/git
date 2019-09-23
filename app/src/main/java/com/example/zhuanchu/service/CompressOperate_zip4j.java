@@ -36,12 +36,6 @@ public class CompressOperate_zip4j {
     private static  SqlHelper sqlHelper = null;
     private static SQLiteDatabase sqLiteDatabase = null;
     private static final int COMPLETED = 0;
-//    private static Handler handler = new Handler(){
-//        @Override
-//        public void handleMessage(Message msg) {
-//            System.out.println( 8888 );
-//        }
-//    };
 
 
     /**
