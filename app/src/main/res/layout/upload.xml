@@ -17,7 +17,7 @@
         android:text="请选择需上传的文件：" />
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/listUpload2"
+        android:id="@+id/listUpload"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">

@@ -36,6 +36,7 @@ public class UploadAdapter extends RecyclerView.Adapter<UploadAdapter.VerticalVi
     List<PackFile> mData;
 
     public UploadAdapter( Context context, JSONArray lists ){
+        System.out.println( context );
         this.context = context;
         this.lists = lists;
     }
@@ -43,6 +44,7 @@ public class UploadAdapter extends RecyclerView.Adapter<UploadAdapter.VerticalVi
     @NonNull
     @Override
     public VerticalViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+        System.out.println( "adapter类上下文是：" + context );
         View view = LayoutInflater.from(context).inflate(R.layout.uploadfile, viewGroup, false);
         return new VerticalViewHolder(view);
     }
@@ -87,6 +89,7 @@ public class UploadAdapter extends RecyclerView.Adapter<UploadAdapter.VerticalVi
 
     @Override
     public int getItemCount() {
+        System.out.println( lists.length() );
         return lists.length();
     }
 

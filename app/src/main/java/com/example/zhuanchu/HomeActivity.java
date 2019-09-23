@@ -43,6 +43,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
 import android.util.Log;
@@ -220,14 +221,15 @@ public class HomeActivity extends AppCompatActivity {
         @Override
         public void handleMessage(Message msg) {
             if (msg.what == COMPLETED) {
-                fragmnetWeishangchuan(uploadIndex);
+                //fragmnetWeishangchuan(uploadIndex);
             }
         }
     };
     RecyclerView recyclerView = null;
-    FlexboxLayoutManager flexboxLayoutManager = null;
+    LinearLayoutManager linearLayout = null;
 
     View packView = null;
+    View uploadViewInit = null;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -387,7 +389,7 @@ public class HomeActivity extends AppCompatActivity {
                 } else if (position == 2) {
                     actionBar.setTitle("文件上传");
                     if (uploadView != null) {
-                        fragmnetWeishangchuan(uploadIndex);
+                        //fragmnetWeishangchuan(uploadIndex);
                     }
                 } else if (position == 1) {
                     actionBar.setTitle("文件打包");
@@ -710,7 +712,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
 
-    public void fragmnetWeishangchuan(int number) {
+    public void fragmnetWeishangchuan(View view, int number) {
         System.out.println("未上传2");
         File[] files = getUploadFiles();
         removedata(jsonArrayup);
@@ -743,19 +745,26 @@ public class HomeActivity extends AppCompatActivity {
 
             }
 
+
             uploadAdapter = new UploadAdapter(this, jsonArrayup);
 
-            viewWeishangchuan = LayoutInflater.from(
-                    getBaseContext()).inflate(R.layout.upload, null, false);
-            recyclerView = viewWeishangchuan.findViewById(R.id.listUpload);
+            System.out.println( "主类是：" + MyApplication.getContext() );
+            System.out.println( "主类2是：" + getBaseContext() );
+            System.out.println( "数量是：" + jsonArrayup.length() );
+            System.out.println( "访问2：" + this );
+            System.out.println( "访问3：" + this );
+
+            //viewWeishangchuan = LayoutInflater.from(this).inflate(R.layout.upload, null, false);
+            recyclerView = view.findViewById(R.id.listUpload);
             System.out.println(
                     "打印view：" + uploadView
             );
-            flexboxLayoutManager = new FlexboxLayoutManager(MyApplication.getContext());
-            recyclerView.setLayoutManager(flexboxLayoutManager);
-            recyclerView.setAdapter(uploadAdapter);
 
-            uploadBtn(viewWeishangchuan);
+            linearLayout = new LinearLayoutManager(getBaseContext());
+            recyclerView.setLayoutManager(linearLayout);
+            recyclerView.setAdapter(uploadAdapter);
+//
+//            uploadBtn(viewWeishangchuan);
 
         }
 
@@ -793,8 +802,8 @@ public class HomeActivity extends AppCompatActivity {
                     getBaseContext()).inflate(R.layout.fragment_simple_card_fragment_yishagchuan, null, false);
 
             recyclerView = viewYishangchuan.findViewById(R.id.listUpload_ready);
-            flexboxLayoutManager = new FlexboxLayoutManager(this);
-            recyclerView.setLayoutManager(flexboxLayoutManager);
+            linearLayout = new LinearLayoutManager(this);
+            recyclerView.setLayoutManager(linearLayout);
             recyclerView.setAdapter(uploadAdapter);
 
             uploadBtn(viewYishangchuan);
@@ -936,7 +945,7 @@ public class HomeActivity extends AppCompatActivity {
 
     }
 
-    private void tl_3(View view) {
+    private void tl_3(final View view) {
         final ViewPager viewPager = (ViewPager) view.findViewById(R.id.vp_2);
 
         //同时，还要给Viewpager设置选中监听，才能使SegmentTablayout和ViewPager双向同步。
@@ -952,7 +961,7 @@ public class HomeActivity extends AppCompatActivity {
                 uploadIndex = position;
                 System.out.println("position=" + position);
                 if (uploadAdapter != null) {
-                    fragmnetWeishangchuan(uploadIndex);
+                    //fragmnetWeishangchuan(uploadIndex);
                 }
 
             }
@@ -987,12 +996,20 @@ public class HomeActivity extends AppCompatActivity {
                             getBaseContext()).inflate(R.layout.fragment_simple_card_fragment_yishagchuan, null, false);
                     //initYishangchuan(view);
 
+                    uploadViewInit = view;
+                    fragmnetWeishangchuan( view, 0 );
 
                 } else if (position == 1) {
                     view = LayoutInflater.from(
                             getBaseContext()).inflate(R.layout.upload, null, false);
-                    //initWeishangchaun(view);
+                    uploadViewInit = view;
+
+                    fragmnetWeishangchuan( view, 1 );
+
                 }
+
+                System.out.println( "访问1：" + this );
+
                 container.addView(view);
                 return view;
             }
@@ -1019,7 +1036,7 @@ public class HomeActivity extends AppCompatActivity {
 
             @Override
             public void onPageSelected(int position) {
-
+                fragmnetWeishangchuan( uploadViewInit, position );
                 mTabLayout_3.setCurrentTab(position);
             }
 
