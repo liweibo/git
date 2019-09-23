@@ -51,6 +51,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -222,7 +223,11 @@ public class HomeActivity extends AppCompatActivity {
         @Override
         public void handleMessage(Message msg) {
             if (msg.what == COMPLETED) {
-                fragmnetWeishangchuan(viewRE);
+                if( uploadindex == 1 ){
+                    fragmnetWeishangchuan( viewRE );
+                }else{
+                    fragmnetReadyshangchuan( viewRE );
+                }
             }
         }
     };
@@ -230,6 +235,7 @@ public class HomeActivity extends AppCompatActivity {
     FlexboxLayoutManager flexboxLayoutManager = null;
 
     View packView = null;
+    int uploadindex = 1;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -561,7 +567,19 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                if (jsonArray == null || jsonArray.length() == 0) {
+                System.out.println( "打包数量：" + jsonArray.length() );
+                int packnumber = 0;
+                for(int i = 0; i<jsonArray.length(); i++){
+                    try {
+                        if( jsonArray.getJSONObject(i).getBoolean("check") ){
+                            packnumber ++;
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                if ( packnumber == 0 ) {
                     DialogSettings.style = STYLE_IOS;
                     DialogSettings.use_blur = true;
                     DialogSettings.blur_alpha = 200;
@@ -698,16 +716,57 @@ public class HomeActivity extends AppCompatActivity {
 
 
     //3   init上传首页的UI组件，以及逻辑代码，...
-    public void initUpload(View view) {
+    public void initUpload(final View view) {
         sqlHelper = new SqlHelper(HomeActivity.this);
         sqLiteDatabase = sqlHelper.getWritableDatabase();
         fragmnetWeishangchuan(view);
+        view.findViewById(R.id.noupload).setBackgroundResource(R.drawable.btnclick);
+        Button button = view.findViewById(R.id.noupload);
+        button.setTextColor(getResources().getColor(R.color.white));
+        view.findViewById(R.id.readyupload).setBackgroundResource( R.drawable.bt_shape2 );
+        Button button1 = view.findViewById( R.id.readyupload );
+        button1.setTextColor(getResources().getColor(R.color.colorfocus));
+
+        view.findViewById(R.id.noupload).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                System.out.println( "你点击了未上传" );
+                view.findViewById(R.id.noupload).setBackgroundResource(R.drawable.btnclick);
+                Button button = view.findViewById(R.id.noupload);
+                button.setTextColor(getResources().getColor(R.color.white));
+                view.findViewById(R.id.readyupload).setBackgroundResource( R.drawable.bt_shape2 );
+                Button button1 = view.findViewById( R.id.readyupload );
+                button1.setTextColor(getResources().getColor(R.color.colorfocus));
+                fragmnetWeishangchuan(view);
+                uploadindex = 1;
+            }
+        });
+
+        view.findViewById(R.id.readyupload).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                System.out.println( "你点击了已上传" );
+                view.findViewById(R.id.noupload).setBackgroundResource(R.drawable.bt_shape2);
+                view.findViewById(R.id.readyupload).setBackgroundResource( R.drawable.btnclick );
+                Button button = view.findViewById(R.id.noupload);
+                button.setTextColor(getResources().getColor(R.color.colorfocus));
+                Button button1 = view.findViewById( R.id.readyupload );
+                button1.setTextColor(getResources().getColor(R.color.white));
+                fragmnetReadyshangchuan(view);
+                uploadindex = 2;
+            }
+        });
+
     }
 
-
     public void fragmnetWeishangchuan(View view) {
+
+        if( jsonArrayup != null ){
+            removedata(jsonArrayup);
+        }
         File[] files = getUploadFiles();
-        removedata(jsonArrayup);
+
+        System.out.println( "上传文件总长度为：" + files.length );
 
         try {
             for (File spec : files) {
@@ -745,10 +804,72 @@ public class HomeActivity extends AppCompatActivity {
 
     }
 
+    public void fragmnetReadyshangchuan(View view) {
+
+        if( jsonArrayup != null ){
+            removedata(jsonArrayup);
+        }
+        File[] files = getUploadFiles();
+
+        System.out.println( "上传文件总长度为：" + files.length );
+
+        try {
+            for (File spec : files) {
+                Cursor cursor = sqLiteDatabase.query("upload", null, "name='" + spec.getName() + "'", null, null, null, null);
+                while (cursor.moveToNext()) {
+                    //光标移动成功
+                    //把数据取出
+                    System.out.println(cursor.getString(cursor.getColumnIndex("name")));
+                }
+
+                if (cursor.getCount() > 0) {
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("name", spec.getName());
+                    java.text.SimpleDateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    String dateTime = df.format(new Date(spec.lastModified()));
+                    jsonObject.put("time", dateTime);
+                    jsonObject.put("file", spec);
+                    jsonObject.put("check", false);
+                    jsonArrayup.put(jsonObject);
+                }
+            }
+
+
+        } catch (Exception e) {
+
+        }
+
+        uploadAdapter = new UploadAdapter(this, jsonArrayup, itemYIshangchuan);
+        recyclerView = view.findViewById(R.id.listUpload2);
+        flexboxLayoutManager = new FlexboxLayoutManager(MyApplication.getContext());
+        recyclerView.setLayoutManager(flexboxLayoutManager);
+        recyclerView.setAdapter(uploadAdapter);
+        uploadBtn(view);
+
+    }
+
     private void uploadBtn(View view) {
         view.findViewById(R.id.uploadbtn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                System.out.println( jsonArrayup.length() );
+                int uploadnumber = 0;
+                for( int i = 0;i<jsonArrayup.length();i++ ){
+                    try {
+                        if( jsonArrayup.getJSONObject(i).getBoolean("check") ){
+                            uploadnumber ++;
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                if( uploadnumber == 0 ){
+                    Toast.makeText(HomeActivity.this, "请选择需要打包的文件", Toast.LENGTH_LONG).show();
+                    return;
+                }
+
                 /*
                  * 判断是否有网络
                  * */
@@ -1018,6 +1139,8 @@ public class HomeActivity extends AppCompatActivity {
                             sqLiteDatabase.execSQL("insert into upload(name) values('"+ arrs.get(i)+"')");
                         }
                     }
+
+                    System.out.println( "当前设置是：" + selectNumber );
 
                     if( selectNumber == 1 ){
                         for( int i = 0; i < removeUoloads.size(); i++ ){

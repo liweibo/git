@@ -8,6 +8,39 @@
     android:paddingRight="20dp"
     android:paddingBottom="30dp">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="bottom"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="30dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/readyupload"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="38dp"
+            android:layout_gravity="bottom"
+            android:background="@drawable/bt_shape2"
+            android:stateListAnimator="@drawable/state_list_animator_z"
+            android:text="已上传"
+            android:textColor="#1296db"
+            android:textSize="16dp" />
+
+        <Button
+            android:layout_marginLeft="20dp"
+            android:id="@+id/noupload"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="38dp"
+            android:background="@drawable/btnclick"
+            android:text="未上传"
+            android:textColor="#fff"
+            android:textSize="16dp" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/tv_wei"
@@ -18,7 +51,7 @@
         android:text="请选择需上传的文件：" />
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/listUpload"
+        android:id="@+id/listUpload2"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
