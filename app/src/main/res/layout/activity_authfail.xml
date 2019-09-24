@@ -39,19 +39,19 @@
                     android:textSize="16sp"
                     android:textStyle="bold"
                     />
-                <TextView
-                    android:textScaleX="1.1"
-                    android:lineSpacingExtra="3dp"
-                    android:layout_marginTop="40dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="50dp"
-                    android:layout_marginEnd="50dp"
-                    android:text="@string/register"
-                    android:textColor="#fff"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    />
+
+                    <TextView
+                        android:lineSpacingExtra="5dp"
+                        android:layout_marginTop="40dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="55dp"
+                        android:layout_marginEnd="50dp"
+                        android:text="@string/register"
+                        android:textColor="#fff"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        />
 
 
 

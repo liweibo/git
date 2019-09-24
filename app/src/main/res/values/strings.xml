@@ -15,7 +15,7 @@
     <string name="repeat_password">Repeat Password</string>
     <string name="next">NEXT</string>
 
-    <string name="register">若无法登陆请联系售后服务中心。电话：0731-28495236</string>
+    <string name="register">若无法登陆或账号密码存在问题，请联系售后服务中心。电话：0731-28495236</string>
     <string name="tishi">提示</string>
 
     <!-- TODO: Remove or change this placeholder text -->

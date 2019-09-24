@@ -32,13 +32,5 @@
         android:textColor="@color/white"
         android:textSize="16dp"
         tools:alpha="1"/>
-    <ImageView
-        android:layout_width="290dp"
-        android:layout_height="wrap_content"
-        android:src="@drawable/logo_crrc"
-        android:layout_gravity="center"
-        android:layout_marginTop="180dp"
 
-
-        />
 </FrameLayout>

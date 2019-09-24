@@ -218,11 +218,14 @@ public class AuthActivity extends AppCompatActivity {
                 final String users = etUsername.getText().toString().trim();
                 final String psw = etPassword.getText().toString().trim();
                 if (users.trim().length() > 0 && psw.trim().length() > 0) {
-                    OkHttpClient okHttpClient = new OkHttpClient();
+                    OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                            .connectTimeout(3, TimeUnit.SECONDS)
+                            .readTimeout(6, TimeUnit.SECONDS)
+                            .build();
+
                     RequestBody formBody = new FormBody.Builder()
                             .add("userid", users).add("password", psw)
                             .build();
-                    OkHttpClient client = new OkHttpClient();
                     Request request = new Request.Builder()
                             .url("http://mro.csrzic.com/comm/mro/authenticateuser")
                             .addHeader("content-type", "application/x-www-form-urlencoded")
@@ -237,7 +240,7 @@ public class AuthActivity extends AppCompatActivity {
 
                         @Override
                         public void onFailure(Call call, IOException e) {
-                            System.out.println("错误：" + e.toString());
+                            System.out.println("超时-错误：" + e.toString());
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
