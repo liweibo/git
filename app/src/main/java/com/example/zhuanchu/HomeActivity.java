@@ -1148,7 +1148,6 @@ public class HomeActivity extends AppCompatActivity {
                         }
                     }
 
-
                     Message message = new Message();
                     message.what = COMPLETED;
                     handler.sendMessage(message);
@@ -1157,6 +1156,7 @@ public class HomeActivity extends AppCompatActivity {
                     Looper.loop();
                 } catch (IOException e) {
                     Looper.prepare();
+                    pdialogUp.dismiss();
                     Toast.makeText(getApplicationContext(), "上传文件失败", Toast.LENGTH_LONG).show();
                     Looper.loop();
                     e.printStackTrace();
