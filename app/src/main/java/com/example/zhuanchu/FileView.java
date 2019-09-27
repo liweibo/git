@@ -1,17 +1,24 @@
 package com.example.zhuanchu;
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.example.zhuanchu.adapter.NavbarAdapter;
 import com.example.zhuanchu.adapter.ViewAdapter;
 import com.google.android.flexbox.FlexboxLayoutManager;
+import com.kongzue.dialog.v2.DialogSettings;
+import com.kongzue.dialog.v2.SelectDialog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,6 +30,8 @@ import java.util.Date;
 
 import me.leefeng.promptlibrary.PromptDialog;
 
+import static com.kongzue.dialog.v2.DialogSettings.STYLE_IOS;
+
 
 public class FileView extends AppCompatActivity {
 
@@ -31,6 +40,7 @@ public class FileView extends AppCompatActivity {
     private String path = "";
     private File file = null;
     private PromptDialog promptDialog;
+    private JSONArray navjson = new JSONArray();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -52,6 +62,27 @@ public class FileView extends AppCompatActivity {
 
         recyclerView.setAdapter(viewAdapter);
 
+        /*
+         * 文件导航
+         * */
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("name", "CRRC");
+            jsonObject.put("path", path);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        };
+        navjson.put(jsonObject);
+
+        RecyclerView recyclerView1 = findViewById(R.id.navlists);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        recyclerView1.setLayoutManager(linearLayoutManager);
+
+        final NavbarAdapter navbarAdapter = new NavbarAdapter(this, navjson);
+
+        recyclerView1.setAdapter(navbarAdapter);
+
         viewAdapter.setOnItemClickListener(new ViewAdapter.OnItemClickListener() {
             @Override
             public void tClick(int i) {
@@ -67,14 +98,50 @@ public class FileView extends AppCompatActivity {
                 try {
                     if( jsonArray.getJSONObject(i).getString("type").equals("1") ){
                         path = path + "/" + jsonArray.getJSONObject(i).getString("name");
+                        JSONObject jo = new JSONObject();
+                        jo.put("name", jsonArray.getJSONObject(i).getString("name"));
+                        jo.put("path", path);
+                        navjson.put( jo );
                         readFile( path );
                         //ViewAdapter viewAdapter = new ViewAdapter( FileView.this, jsonArray);
                         //recyclerView.setAdapter(viewAdapter);
+
+
                         viewAdapter.notifyDataSetChanged();
+                        navbarAdapter.notifyDataSetChanged();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+            }
+        });
+
+
+
+        navbarAdapter.setOnItemClickListener(new NavbarAdapter.OnItemClickListener() {
+            @Override
+            public void tClick(int i) {
+                System.out.println( "你点击的是：" + i );
+                System.out.println( navjson.length() );
+                int slength = navjson.length();
+                for(int k = 0; k < slength; k++){
+                    try {
+                        if( k == i ){
+                            path =navjson.getJSONObject(k).getString("path");
+                        }
+                        if( k > i && k < slength ){
+                            navjson.remove( navjson.length() - 1 );
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+                readFile( path );
+
+                System.out.println( "长度是：" + navjson.length() );
+
+                navbarAdapter.notifyDataSetChanged();
+                viewAdapter.notifyDataSetChanged();
             }
         });
 
@@ -108,26 +175,45 @@ public class FileView extends AppCompatActivity {
                 path = file.getParent();
 
                 readFile( file.getParent() );
+
+                navjson.remove( navjson.length() - 1 );
+
                 viewAdapter.notifyDataSetChanged();
+                navbarAdapter.notifyDataSetChanged();
             }
         });
 
         findViewById(R.id.removefile).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                for(int i = 0; i < jsonArray.length(); i++){
-                    try {
-                        if( jsonArray.getJSONObject(i).getString("select").equals("1") ){
-                            DeleteFolder( path + "/" + jsonArray.getJSONObject(i).getString("name") );
+
+                DialogSettings.style = STYLE_IOS;
+                DialogSettings.use_blur = true;
+                DialogSettings.blur_alpha = 200;
+                SelectDialog.show(FileView.this, "删除文件", "你确定要删除该文件吗", "确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        for(int i = 0; i < jsonArray.length(); i++){
+                            try {
+                                if( jsonArray.getJSONObject(i).getString("select").equals("1") ){
+                                    DeleteFolder( path + "/" + jsonArray.getJSONObject(i).getString("name") );
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                         }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                        readFile( path );
+                        viewAdapter.notifyDataSetChanged();
                     }
-                }
-                readFile( path );
-                viewAdapter.notifyDataSetChanged();
+                }, "取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                });
             }
         });
+
+
 
 //        findViewById(R.id.back).setOnClickListener(new View.OnClickListener() {
 //            @Override

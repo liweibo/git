@@ -202,7 +202,7 @@ public class HomeActivity extends AppCompatActivity {
 
     Context context;
     private JSONArray jsonArrayup = null;
-    private String url = "http://39.108.162.8:8089/chengdu/uploadmore";
+    private String url = "http://lureen.teg.cn/gzdata/uploadFile";
     SharedPreferences sharedPreferencesUp = null;
     private ProgressDialog pdialogUp;
 
