@@ -1,5 +1,12 @@
 package com.example.zhuanchu.service;
 
+
+import android.content.Context;
+import android.net.DhcpInfo;
+import android.net.wifi.WifiManager;
+
+import com.example.zhuanchu.MyApplication;
+
 import java.io.IOException;
 import java.net.Socket;
 import java.net.DatagramSocket;
@@ -19,57 +26,54 @@ public class ChangeIp {
         }
     }
 
-    //获取本机IP
-    public String getIp() {
-        InetAddress ia = null;
-        try {
-            ia = ia.getLocalHost();
-            String localname = ia.getHostName();
-            String localip = ia.getHostAddress();
-            System.out.println("本机名称是：" + localname);
-            System.out.println("本机的ip是 ：" + localip);
-            System.out.println("localHost打印：" + ia);
-            return localip;
-        } catch (Exception e) {
-            e.printStackTrace();
+    public static String getBeforeThteeIp(String sbIP){//传入设备ip 或者网关ip都行
+        int indexLastDot = sbIP.lastIndexOf(".");
+        char[] arrIP = sbIP.toCharArray();
+        String twoDotIp = "";//前三位的ip 去掉了最后一位
+        for (int i = 0; i < indexLastDot; i++) {
+            twoDotIp += arrIP[i];
         }
-        return "";
+        return twoDotIp;
     }
 
-
-    public void socketSend2Para(String comm, String para) {
-        int port = 8001;//本地的端口
-        byte[] data1 = seachCommand.getBytes();
-        for (int i = 0; i <data1.length; i++) {
-            System.out.println("数组打印："+i+"--"+data1[i]);
-        }
+    public void socketSend2ParaTEst(Context context, String command, String para) {
+        String gateWayIp = getGateWayIp(context);//网关地址
+        byte[] data1 = seachCommand.getBytes();//String seachCommand = "www.usr.cn";
         //创建数据报，包含发送的信息
         DatagramPacket datagramPacket = null;
         try {
-            String ip1 = getIp();
-
-//            System.out.println("ip前半部分：" + ip3);
-            String ip4 = "10.0.255.255";
             datagramPacket = new DatagramPacket
-                    (data1, data1.length, InetAddress.getByName(ip4), 48899);
-//            datagramSocket.bind(new InetSocketAddress(InetAddress.getByName(getIp()), port));
+                    (data1, data1.length, InetAddress.getByName(gateWayIp), 48899);
             //发送连接数据包
             datagramSocket.send(datagramPacket);
-            datagramSocket.setSoTimeout(200);
+            datagramSocket.setSoTimeout(1000);
 
+            //receive
+//            byte[] data2s = new byte[1024];
+//            DatagramPacket receive = new DatagramPacket(data2s, data2s.length);
+//            //接收服务器响应的数据
+//            try {
+//                datagramSocket.receive(receive);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//            //读取数据
+//            byte[] dataRe = receive.getData();
+//            String serverData = new String(dataRe, 0, receive.getLength(), "UTF-8");
+//            System.out.println("这里是客户端，服务器端发来的消息：--" + serverData);
 
-            byte[] datas = connectCommand.getBytes();
+            //发送+ok 没有返回数据的
+            byte[] datas = connectCommand.getBytes();//String connectCommand = "+ok";
             datagramPacket = new DatagramPacket
-                    (datas, datas.length, InetAddress.getByName(ip4), 48899);
+                    (datas, datas.length, InetAddress.getByName(gateWayIp), 48899);
             datagramSocket.send(datagramPacket);
-            ////发送UDP数据包
-            datagramSocket.setSoTimeout(200);
+            datagramSocket.setSoTimeout(1000);
 
 
-            if (para != null) {
-                byte[] data = ("AT+" + comm + "=" + para + "\r").getBytes();
+            if (para != "") {//发指令和参数 其实就是设置值
+                byte[] data = ("AT+" + command + "=" + para + "\r").getBytes();
                 datagramPacket = new DatagramPacket
-                        (data, data.length, InetAddress.getByName(ip4), 48899);
+                        (data, data.length, InetAddress.getByName(gateWayIp), 48899);
                 datagramSocket.send(datagramPacket);
             }
 
@@ -84,28 +88,73 @@ public class ChangeIp {
 
     }
 
-
-    public void socketSend1Para(String comm) {
-        byte[] data1 = seachCommand.getBytes();
+//非首次发送修改指令，就不用发连接指令与+ok指令了。
+    public void socketSend2ParaTEstSecond(Context context, String command, String para) {
+        String gateWayIp = getGateWayIp(context);//网关地址
         DatagramPacket datagramPacket = null;
         try {
-            String ip4 = "10.0.255.255";
-            datagramPacket = new DatagramPacket
-                    (data1, data1.length, InetAddress.getByName(ip4), 48899);
-            datagramSocket.send(datagramPacket);
-            datagramSocket.setSoTimeout(200);
-
-            byte[] datas = connectCommand.getBytes();
-            datagramPacket = new DatagramPacket
-                    (datas, datas.length, InetAddress.getByName(ip4), 48899);
-            datagramSocket.send(datagramPacket);
-            ////发送UDP数据包
-            if (comm != null) {
-                byte[] data = ("AT+" + comm + "\r").getBytes();
+            if (para != "") {//发指令和参数 其实就是设置值
+                byte[] data = ("AT+" + command + "=" + para + "\r").getBytes();
                 datagramPacket = new DatagramPacket
-                        (data, data.length, InetAddress.getByName(ip4), 48899);
+                        (data, data.length, InetAddress.getByName(gateWayIp), 48899);
                 datagramSocket.send(datagramPacket);
             }
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        } catch (SocketException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+//发送重启指令
+    public void socketSendQueryCommChongqi( Context context) {
+        DatagramPacket datagramPacket = null;
+        try {
+                byte[] data = ("AT+" + "Z" + "\r").getBytes();
+                datagramPacket = new DatagramPacket
+                        (data, data.length, InetAddress.getByName(getGateWayIp(context)), 48899);
+                datagramSocket.send(datagramPacket);
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        } catch (SocketException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    //发送查询指令
+    public void socketSendQueryComm(String comm, Context context) {
+        DatagramPacket datagramPacket = null;
+        try {
+            if (comm != null && comm != "") {
+                byte[] data = ("AT+" + comm + "\r").getBytes();
+                datagramPacket = new DatagramPacket
+                        (data, data.length, InetAddress.getByName(getGateWayIp(context)), 48899);
+                datagramSocket.send(datagramPacket);
+                datagramSocket.setSoTimeout(1000);
+
+
+                //receive
+                byte[] data2s = new byte[1024];
+                DatagramPacket receive = new DatagramPacket(data2s, data2s.length);
+                //接收服务器响应的数据
+                try {
+                    datagramSocket.receive(receive);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                //读取数据
+                byte[] dataRe = receive.getData();
+                String serverData = new String(dataRe, 0, receive.getLength(), "UTF-8");
+                System.out.println("这里是客户端，服务器端发来的消息，查询值：--------" + serverData);
+
+            }
+
 
         } catch (UnknownHostException e) {
             e.printStackTrace();
@@ -118,10 +167,25 @@ public class ChangeIp {
     }
 
 
+    public String getGateWayIp(Context context) {
+        WifiManager wifiManager = (WifiManager) context.getSystemService(context.WIFI_SERVICE);
+        DhcpInfo info = wifiManager.getDhcpInfo();
+        int gateway = info.gateway;
+        return intToIp(gateway);
+    }
 
-
-
-
+    /**
+     * int值转换为ip
+     *
+     * @param addr
+     * @return
+     */
+    public static String intToIp(int addr) {
+        return ((addr & 0xFF) + "." +
+                ((addr >>>= 8) & 0xFF) + "." +
+                ((addr >>>= 8) & 0xFF) + "." +
+                ((addr >>>= 8) & 0xFF));
+    }
 
 
 }

@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"
+    android:orientation="vertical"
+    android:id="@+id/mainBackgroud"
+    android:background="@mipmap/background"
+    >
+    <ImageView
+        android:id="@+id/login_avatar"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@mipmap/login_icon"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="48dp"/>
+
+    <EditText
+        android:id="@+id/login_host"
+        android:layout_width="320dp"
+        android:layout_height="38dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="16dp"
+        android:paddingLeft="8dp"
+        android:background="@color/colorLoginEditText"
+        android:hint="@string/textlogin_host"
+        android:inputType="textUri" />
+    <EditText
+        android:id="@+id/login_port"
+        android:layout_width="320dp"
+        android:layout_height="38dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:paddingLeft="8dp"
+        android:background="@color/colorLoginEditText"
+        android:hint="@string/textlogin_port"
+        android:inputType="number"/>
+
+    <EditText
+        android:id="@+id/login_id"
+        android:layout_width="320dp"
+        android:layout_height="38dp"
+        android:layout_gravity="center_horizontal"
+        android:paddingLeft="8dp"
+        android:layout_marginTop="10dp"
+        android:background="@color/colorLoginEditText"
+        android:hint="@string/textlogin_id"
+        />
+
+    <EditText
+        android:id="@+id/login_password"
+        android:layout_width="320dp"
+        android:layout_height="38dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:paddingLeft="8dp"
+        android:background="@color/colorLoginEditText"
+        android:hint="@string/textlogin_password"
+        android:inputType="textPassword"/>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:orientation="horizontal"
+        android:layout_gravity="center_horizontal">
+        <Button
+            android:id="@+id/login_button"
+            android:layout_width="100dp"
+            android:layout_height="40dp"
+            android:text="@string/text_loginbutton"
+            android:textSize="20dp"
+            android:background="@color/colorlogin_background"
+            android:textColor="@color/colorLoginEditText"/>
+        <Button
+            android:id="@+id/cancel_button"
+            android:layout_width="100dp"
+            android:layout_height="40dp"
+            android:text="@string/text_cancelbutton"
+            android:textSize="20dp"
+            android:layout_marginLeft="20dp"
+            android:background="@color/colorlogin_background"
+            android:textColor="@color/colorLoginEditText"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:background="#fff"
+        android:layout_marginTop="10dp"
+        android:divider="@drawable/title"
+        android:showDividers="end"
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:layout_height="60dp">
+        <com.google.android.flexbox.FlexboxLayout
+            app:alignItems="center"
+            android:layout_width="match_parent"
+            android:layout_height="59dp">
+            <TextView
+                android:textSize="22sp"
+                app:layout_flexGrow="1"
+                android:textColor="#ff0000"
+                android:text="若测试设备为ERM/EDRM,则打开开关进行校验"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content" />
+            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:orientation="vertical">
+
+                <com.suke.widget.SwitchButton
+                    android:id="@+id/switch_buttoncheck"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:sb_checked_color="@color/colorfocus"
+                    />
+                <!--<Switch-->
+                    <!--android:id="@+id/swh"-->
+
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:textOff="off"-->
+                    <!--android:textOn="on"-->
+                    <!--/>-->
+
+            </LinearLayout>
+
+        </com.google.android.flexbox.FlexboxLayout>
+    </LinearLayout>
+</LinearLayout>

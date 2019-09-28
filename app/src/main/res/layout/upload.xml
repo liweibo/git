@@ -12,8 +12,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="bottom"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="30dp"
         android:orientation="horizontal">
@@ -31,7 +31,6 @@
             android:textSize="16dp" />
 
         <Button
-            android:layout_marginLeft="20dp"
             android:id="@+id/noupload"
             android:layout_width="0dp"
             android:layout_weight="1"
@@ -48,7 +47,7 @@
         android:layout_marginLeft="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="请选择需上传的文件：" />
+        android:text="选择未上传文件进行上传：" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/listUpload2"

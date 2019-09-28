@@ -26,6 +26,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.os.SystemClock;
 import android.preference.Preference;
 import android.provider.MediaStore;
 import android.provider.Settings;
@@ -70,6 +71,7 @@ import com.example.zhuanchu.bean.UploadFile;
 import com.example.zhuanchu.bean.javaBean.JsonRootBean;
 import com.example.zhuanchu.bean.pojo15.JsonRootBean15;
 import com.example.zhuanchu.service.AuthService;
+import com.example.zhuanchu.service.ChangeIp;
 import com.example.zhuanchu.service.CompressOperate_zip4j;
 import com.example.zhuanchu.service.ExMultipartBody;
 import com.example.zhuanchu.service.GetInfoForMultiList;
@@ -155,13 +157,15 @@ public class HomeActivity extends AppCompatActivity {
     private String _pass = "12345678";
     private String cameraPath;
     private String imgFileName;
+    public int weishangchuanCount = 0;
+    public TextView peishutext;
 
     View viewWeishangchuan = null;
     View viewYishangchuan = null;
     // 输入流读取器对象
     InputStreamReader isr;
     BufferedReader br;
-
+    int weiAllPack = 0;
     // 接收服务器发送过来的消息
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static String[] PERMISSIONS_STORAGE = {
@@ -169,7 +173,7 @@ public class HomeActivity extends AppCompatActivity {
             Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
     public static EditText host, port, name, pass;
-    public static boolean haveCheck = true;
+    public static boolean haveCheck = false;
     public ImageButton imbtnOcr;
 
 
@@ -223,10 +227,10 @@ public class HomeActivity extends AppCompatActivity {
         @Override
         public void handleMessage(Message msg) {
             if (msg.what == COMPLETED) {
-                if( uploadindex == 1 ){
-                    fragmnetWeishangchuan( viewRE );
-                }else{
-                    fragmnetReadyshangchuan( viewRE );
+                if (uploadindex == 1) {
+                    fragmnetWeishangchuan(viewRE);
+                } else {
+                    fragmnetReadyshangchuan(viewRE);
                 }
             }
         }
@@ -241,6 +245,7 @@ public class HomeActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.homeoncreate);
+
 
         SharedPreferences sharedPreferences = getSharedPreferences("tab",
                 Activity.MODE_PRIVATE);
@@ -265,6 +270,34 @@ public class HomeActivity extends AppCompatActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
         StatusBarCompat.setStatusBarColor(this, getResources().getColor(R.color.colorfocus), true);
         initUI();
+    }
+
+    public void textMethod(View view) {
+        peishutext = (TextView) view.findViewById(R.id.peishutext);
+        peishutext.setOnClickListener(new View.OnClickListener() {
+            //需要监听几次点击事件数组的长度就为几
+            //如果要监听双击事件则数组长度为2，如果要监听3次连续点击事件则数组长度为3...
+            long[] mHints = new long[4];//初始全部为0
+
+            @Override
+            public void onClick(View v) {
+                System.out.println("点击");
+                //将mHints数组内的所有元素左移一个位置
+                System.arraycopy(mHints, 1, mHints, 0, mHints.length - 1);
+                //获得当前系统已经启动的时间
+                mHints[mHints.length - 1] = SystemClock.uptimeMillis();
+                if (SystemClock.uptimeMillis() - mHints[0] <= 500) {
+                    //跳转到测试界面
+                    Intent intentTest =
+                            new Intent(HomeActivity.this, MainActivity.class);
+                    Toast.makeText(getApplicationContext(),
+                            "连续点击4次", Toast.LENGTH_SHORT).show();
+                    startActivity(intentTest);
+                }
+
+
+            }
+        });
     }
 
     @Override
@@ -351,34 +384,34 @@ public class HomeActivity extends AppCompatActivity {
                 new NavigationTabBar.Model.Builder(
                         getResources().getDrawable(R.drawable.down),
                         Color.parseColor(colors[0]))
-                        .title("下载").badgeTitle("")
+                        .title("下载")
                         .build()
         );
         models.add(
                 new NavigationTabBar.Model.Builder(
                         getResources().getDrawable(R.drawable.dabao),
                         Color.parseColor(colors[1]))
-                        .title("打包").badgeTitle("300")
+                        .title("打包")
                         .build()
         );
         models.add(
                 new NavigationTabBar.Model.Builder(
                         getResources().getDrawable(R.drawable.uploadf),
                         Color.parseColor(colors[2]))
-                        .title("上传").badgeTitle("9")
+                        .title("上传")
                         .build()
         );
         models.add(
                 new NavigationTabBar.Model.Builder(
                         getResources().getDrawable(R.drawable.sets),
                         Color.parseColor(colors[3]))
-                        .title("设置").badgeTitle("")
+                        .title("设置")
                         .build()
         );
         SharedPreferences sharedPreferences = getSharedPreferences("tab",
                 Activity.MODE_PRIVATE);
         int tabnum = sharedPreferences.getInt("tabnum", 0);
-
+        viewPager.setCurrentItem(tabnum);
         navigationTabBar.setModels(models);
         navigationTabBar.setViewPager(viewPager, tabnum);
         navigationTabBar.setOnPageChangeListener(new MultiViewPager.OnPageChangeListener() {
@@ -434,6 +467,8 @@ public class HomeActivity extends AppCompatActivity {
 
     //1  init下载首页的UI组件，以及逻辑代码，也就是homeactivity页面的内容
     public void initdownload(View view) {
+        textMethod(view);
+
         imbtnOcr = (ImageButton) view.findViewById(R.id.imagebtnCamera);
 
         editext_chehao = (EditText) view.findViewById(R.id.editext_chehao);
@@ -548,6 +583,19 @@ public class HomeActivity extends AppCompatActivity {
 
     //2  init打包首页的UI组件，以及逻辑代码，...
     public void initPack(final View view) {
+        int weiPack = 0;
+        if (jsonArray != null) {
+            for (int i = 0; i < jsonArray.length(); i++) {
+                try {
+                    if (jsonArray.getJSONObject(i).getString("state").equals("0")) {
+                        weiPack++;
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            weiAllPack = weiPack;
+        }
 
         final ProgressDialog pdialog = new ProgressDialog(HomeActivity.this);
 
@@ -555,7 +603,6 @@ public class HomeActivity extends AppCompatActivity {
 
         int permission = ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         if (permission != PackageManager.PERMISSION_GRANTED) {
-            // We don't have permission so prompt the user
             ActivityCompat.requestPermissions(
                     this,
                     PERMISSIONS_STORAGE,
@@ -567,19 +614,20 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                System.out.println( "打包数量：" + jsonArray.length() );
+                System.out.println("打包数量：" + jsonArray.length());
                 int packnumber = 0;
-                for(int i = 0; i<jsonArray.length(); i++){
+                for (int i = 0; i < jsonArray.length(); i++) {
                     try {
-                        if( jsonArray.getJSONObject(i).getBoolean("check") ){
-                            packnumber ++;
+                        if (jsonArray.getJSONObject(i).getBoolean("check")) {
+                            packnumber++;
                         }
+
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 }
 
-                if ( packnumber == 0 ) {
+                if (packnumber == 0) {
                     DialogSettings.style = STYLE_IOS;
                     DialogSettings.use_blur = true;
                     DialogSettings.blur_alpha = 200;
@@ -723,19 +771,22 @@ public class HomeActivity extends AppCompatActivity {
         view.findViewById(R.id.noupload).setBackgroundResource(R.drawable.btnclick);
         Button button = view.findViewById(R.id.noupload);
         button.setTextColor(getResources().getColor(R.color.white));
-        view.findViewById(R.id.readyupload).setBackgroundResource( R.drawable.bt_shape2 );
-        Button button1 = view.findViewById( R.id.readyupload );
+        view.findViewById(R.id.readyupload).setBackgroundResource(R.drawable.bt_shape2);
+        Button button1 = view.findViewById(R.id.readyupload);
         button1.setTextColor(getResources().getColor(R.color.colorfocus));
-
+        TextView tv = view.findViewById(R.id.tv_wei);
+        tv.setText("选择未上传文件进行上传：");
         view.findViewById(R.id.noupload).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                System.out.println( "你点击了未上传" );
+                System.out.println("你点击了未上传");
+                TextView tv = view.findViewById(R.id.tv_wei);
+                tv.setText("选择未上传文件进行上传：");
                 view.findViewById(R.id.noupload).setBackgroundResource(R.drawable.btnclick);
                 Button button = view.findViewById(R.id.noupload);
                 button.setTextColor(getResources().getColor(R.color.white));
-                view.findViewById(R.id.readyupload).setBackgroundResource( R.drawable.bt_shape2 );
-                Button button1 = view.findViewById( R.id.readyupload );
+                view.findViewById(R.id.readyupload).setBackgroundResource(R.drawable.bt_shape2);
+                Button button1 = view.findViewById(R.id.readyupload);
                 button1.setTextColor(getResources().getColor(R.color.colorfocus));
                 fragmnetWeishangchuan(view);
                 uploadindex = 1;
@@ -745,12 +796,14 @@ public class HomeActivity extends AppCompatActivity {
         view.findViewById(R.id.readyupload).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                System.out.println( "你点击了已上传" );
+                System.out.println("你点击了已上传");
                 view.findViewById(R.id.noupload).setBackgroundResource(R.drawable.bt_shape2);
-                view.findViewById(R.id.readyupload).setBackgroundResource( R.drawable.btnclick );
+                view.findViewById(R.id.readyupload).setBackgroundResource(R.drawable.btnclick);
+                TextView tv = view.findViewById(R.id.tv_wei);
+                tv.setText("选择已上传文件再次上传：");
                 Button button = view.findViewById(R.id.noupload);
                 button.setTextColor(getResources().getColor(R.color.colorfocus));
-                Button button1 = view.findViewById( R.id.readyupload );
+                Button button1 = view.findViewById(R.id.readyupload);
                 button1.setTextColor(getResources().getColor(R.color.white));
                 fragmnetReadyshangchuan(view);
                 uploadindex = 2;
@@ -761,12 +814,12 @@ public class HomeActivity extends AppCompatActivity {
 
     public void fragmnetWeishangchuan(View view) {
 
-        if( jsonArrayup != null ){
+        if (jsonArrayup != null) {
             removedata(jsonArrayup);
         }
         File[] files = getUploadFiles();
 
-        System.out.println( "上传文件总长度为：" + files.length );
+        System.out.println("上传文件总长度为：" + files.length);
 
         try {
             for (File spec : files) {
@@ -795,6 +848,7 @@ public class HomeActivity extends AppCompatActivity {
 
         }
 
+        weishangchuanCount = jsonArrayup.length();
         uploadAdapter = new UploadAdapter(this, jsonArrayup, itemYIshangchuan);
         recyclerView = view.findViewById(R.id.listUpload2);
         flexboxLayoutManager = new FlexboxLayoutManager(MyApplication.getContext());
@@ -806,12 +860,12 @@ public class HomeActivity extends AppCompatActivity {
 
     public void fragmnetReadyshangchuan(View view) {
 
-        if( jsonArrayup != null ){
+        if (jsonArrayup != null) {
             removedata(jsonArrayup);
         }
         File[] files = getUploadFiles();
 
-        System.out.println( "上传文件总长度为：" + files.length );
+        System.out.println("上传文件总长度为：" + files.length);
 
         try {
             for (File spec : files) {
@@ -853,20 +907,29 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                System.out.println( jsonArrayup.length() );
+                System.out.println(jsonArrayup.length());
                 int uploadnumber = 0;
-                for( int i = 0;i<jsonArrayup.length();i++ ){
+                for (int i = 0; i < jsonArrayup.length(); i++) {
                     try {
-                        if( jsonArrayup.getJSONObject(i).getBoolean("check") ){
-                            uploadnumber ++;
+                        if (jsonArrayup.getJSONObject(i).getBoolean("check")) {
+                            uploadnumber++;
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 }
 
-                if( uploadnumber == 0 ){
-                    Toast.makeText(HomeActivity.this, "请选择需要打包的文件", Toast.LENGTH_LONG).show();
+                if (uploadnumber == 0) {
+                    DialogSettings.style = STYLE_IOS;
+                    DialogSettings.use_blur = true;
+                    DialogSettings.blur_alpha = 200;
+                    MessageDialog.show(HomeActivity.this,
+                            "提示", "请勾选需上传的文件", "知道了", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                }
+                            });
+//                    Toast.makeText(HomeActivity.this, "请选择需要打包的文件", Toast.LENGTH_LONG).show();
                     return;
                 }
 
@@ -993,8 +1056,8 @@ public class HomeActivity extends AppCompatActivity {
         com.suke.widget.SwitchButton switchButton4G = (com.suke.widget.SwitchButton)
                 uploadView.findViewById(R.id.switch_button4G);
         boolean networkstatecome4G = sharedPreferencesSet.getBoolean("network", false);
-        switchButtonwifi.setChecked(networkstatecome4G);//初始化的值是开启还是关闭
-        switchButtonwifi.setOnCheckedChangeListener(new SwitchButton.OnCheckedChangeListener() {
+        switchButton4G.setChecked(networkstatecome4G);//初始化的值是开启还是关闭
+        switchButton4G.setOnCheckedChangeListener(new SwitchButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(SwitchButton view, boolean isChecked) {
                 if (!isChecked) {
@@ -1033,13 +1096,13 @@ public class HomeActivity extends AppCompatActivity {
         ns.setOnSpinnerItemSelectedListener(new OnSpinnerItemSelectedListener() {
             @Override
             public void onItemSelected(NiceSpinner parent, View view, int position, long id) {
-                System.out.println( position );
+                System.out.println(position);
                 SharedPreferences preupload = HomeActivity.this.getSharedPreferences("data", MODE_PRIVATE);
                 SharedPreferences.Editor editorupload = preupload.edit();
 
                 preupload.edit().putInt("uploadinfo", position).commit();
 
-                System.out.println( preupload.getInt("uploadinfo", 4) );
+                System.out.println(preupload.getInt("uploadinfo", 4));
 
             }
         });
@@ -1131,20 +1194,20 @@ public class HomeActivity extends AppCompatActivity {
                 try {
                     Response response = call.execute();
 
-                    for(int i=0;i<arrs.size();i++){
-                        Cursor cursor = sqLiteDatabase.query("upload", null, "name='"+ arrs.get(i) +"'", null, null, null, null);
-                        System.out.println( cursor.getCount() + "------" );
-                        System.out.println( arrs.get(i) );
-                        if( cursor.getCount() == 0 ){
-                            sqLiteDatabase.execSQL("insert into upload(name) values('"+ arrs.get(i)+"')");
+                    for (int i = 0; i < arrs.size(); i++) {
+                        Cursor cursor = sqLiteDatabase.query("upload", null, "name='" + arrs.get(i) + "'", null, null, null, null);
+                        System.out.println(cursor.getCount() + "------");
+                        System.out.println(arrs.get(i));
+                        if (cursor.getCount() == 0) {
+                            sqLiteDatabase.execSQL("insert into upload(name) values('" + arrs.get(i) + "')");
                         }
                     }
 
-                    System.out.println( "当前设置是：" + selectNumber );
+                    System.out.println("当前设置是：" + selectNumber);
 
-                    if( selectNumber == 1 ){
-                        for( int i = 0; i < removeUoloads.size(); i++ ){
-                            DeleteFolder( removeUoloads.get(i) );
+                    if (selectNumber == 1) {
+                        for (int i = 0; i < removeUoloads.size(); i++) {
+                            DeleteFolder(removeUoloads.get(i));
                         }
                     }
 
@@ -1153,12 +1216,15 @@ public class HomeActivity extends AppCompatActivity {
                     handler.sendMessage(message);
                     Looper.prepare();
                     Toast.makeText(getApplicationContext(), "上传文件成功", Toast.LENGTH_LONG).show();
+
                     Looper.loop();
+
                 } catch (IOException e) {
                     Looper.prepare();
                     pdialogUp.dismiss();
                     Toast.makeText(getApplicationContext(), "上传文件失败", Toast.LENGTH_LONG).show();
                     Looper.loop();
+
                     e.printStackTrace();
                 }
             }
@@ -1167,7 +1233,8 @@ public class HomeActivity extends AppCompatActivity {
 
     /**
      * 删除单个文件
-     * @param   filePath    被删除文件的文件名
+     *
+     * @param filePath 被删除文件的文件名
      * @return 文件删除成功返回true，否则返回false
      */
     public boolean deleteFile(String filePath) {
@@ -1180,8 +1247,9 @@ public class HomeActivity extends AppCompatActivity {
 
     /**
      * 删除文件夹以及目录下的文件
-     * @param   filePath 被删除目录的文件路径
-     * @return  目录删除成功返回true，否则返回false
+     *
+     * @param filePath 被删除目录的文件路径
+     * @return 目录删除成功返回true，否则返回false
      */
     public boolean deleteDirectory(String filePath) {
         boolean flag = false;
@@ -1213,9 +1281,10 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     /**
-     *  根据路径删除指定的目录或文件，无论存在与否
-     *@param filePath  要删除的目录或文件
-     *@return 删除成功返回 true，否则返回 false。
+     * 根据路径删除指定的目录或文件，无论存在与否
+     *
+     * @param filePath 要删除的目录或文件
+     * @return 删除成功返回 true，否则返回 false。
      */
     public boolean DeleteFolder(String filePath) {
         File file = new File(filePath);
@@ -1792,7 +1861,7 @@ public class HomeActivity extends AppCompatActivity {
         });
 
 
-        //点击确定时，获取...
+        //点击确定时，获取...ip等，进入ip设置页面
         view.findViewById(R.id.vercodehome).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -1807,7 +1876,7 @@ public class HomeActivity extends AppCompatActivity {
                     DialogSettings.style = STYLE_IOS;
                     DialogSettings.use_blur = true;
                     DialogSettings.blur_alpha = 200;
-                    SelectDialog.show(HomeActivity.this, "WIFI设置", "未检测到连接设备，去设置WIFI", "确定", new DialogInterface.OnClickListener() {
+                    SelectDialog.show(HomeActivity.this, "提示", "未连接工装WIFI，去连接WIFI", "确定", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             Intent i = new Intent();
@@ -1900,14 +1969,15 @@ public class HomeActivity extends AppCompatActivity {
                     if (timeHis.length() > 5) {//存的有时间
                         //用历史的时间
                         histime = true;
-                        dirname1 = chexingValue + "_" + jutiChexingValue + "_" + timeHis + "_" + chexinaghao + "_" + editext_peishu.getText().toString().trim();
+                        dirname1 = jutiChexingValue + "_" +chehaoHis+"_"+
+                                timeHis + "_" + chexinaghao + "_" + editext_peishu.getText().toString().trim();
                     } else {
                         //直接用最新的时间
-                        dirname1 = chexingValue + "_" + jutiChexingValue + "_" + timeva + "_" + chexianghaoValue + "_" + editext_peishu.getText().toString().trim();
+                        dirname1 = jutiChexingValue + "_" +chehaoHis+"_"+ timeva + "_" + chexianghaoValue + "_" + editext_peishu.getText().toString().trim();
                     }
                 } else {
                     //车型 或 车号等 有一个不一样，则新建文件夹，且时间也是最新的
-                    dirname1 = chexingValue + "_" + jutiChexingValue + "_" + timeva + "_" + chexianghaoValue + "_" + editext_peishu.getText().toString().trim();
+                    dirname1 = jutiChexingValue + "_" +chehaoHis+"_"+ timeva + "_" + chexianghaoValue + "_" + editext_peishu.getText().toString().trim();
                 }
 
 
@@ -1920,8 +1990,15 @@ public class HomeActivity extends AppCompatActivity {
                     String chehaoNow = editext_chehao.getText().toString().trim();
                     SharedPreferences pref = HomeActivity.this.getSharedPreferences("filedirname", MODE_PRIVATE);
                     SharedPreferences.Editor editor = pref.edit();
-                    editor.putString("filedirnamevalue", dirname1);//一级
+
+                    editor.putString("chexing", chexingValue);//存机车 动车 城轨  对应根目录文件夹机车产品线...
+                    //正式
+                    editor.putString("filedirnamevalue", dirname1);//一级 由信息配置的各项信息组成
                     editor.putString("shebeinamevalue", shebeiValue);//二级
+
+                    //测试时 手写的一级 二级目录  这部分的代码应该写在MainActivity中
+
+
                     if (!histime) {//bu是用的历史时间
                         System.out.println("布尔测试");
                         editor.putString("historyTime", timeva);//历史时间
@@ -1933,36 +2010,68 @@ public class HomeActivity extends AppCompatActivity {
                     editor.commit();
 
 
-                    //供测试设备用
-                    if (shebeiValue.equals("ERM")) {//本身是edrm才需要验证
-                        haveCheck = true;
+                    String twoDotIpShebei = ChangeIp.getBeforeThteeIp(dataIpPswUser.get(0));//选择的机车设备的IP并去掉最后一位
+                    String twoDotIpGateway = ChangeIp.getBeforeThteeIp(new ChangeIp().getGateWayIp(HomeActivity.this));//选择的机车设备的IP并去掉最后一位
+                    System.out.println("设备IP前3位：" + twoDotIpShebei);
+                    System.out.println("网关IP前3位：" + twoDotIpGateway);
+                    if (twoDotIpShebei.equals(twoDotIpGateway)) {
+
+                        //正式代码 把查询的ip user psw传给 _host _user _pass
+//                        _host = dataIpPswUser.get(0);
+//                        _user = dataIpPswUser.get(1);
+//                        _pass = dataIpPswUser.get(2);
+
+
+                        // 测试用：供测试设备用
+                        if (shebeiValue.equals("ERM")) {//本身是edrm才需要验证
+                            haveCheck = true;
+                        }
+                        if (shebeiValue.equals("WTD")) {
+                            haveCheck = false;
+                            _host = "10.0.1.130";
+                            _user = "admin";
+                            _pass = "8498883-2";
+                        }
+                        if (shebeiValue.equals("TCU1")) {
+                            haveCheck = false;
+                            _host = "10.0.2.100";
+                            _user = "teg";
+                            _pass = "88888888";
+                        }
+                        String can[] = new String[4];
+                        can[0] = _host;
+                        can[1] = _port;
+                        can[2] = _user;
+                        can[3] = _pass;
+                        LogTask task = new LogTask(HomeActivity.this);
+                        task.execute(can);
+                    } else {
+
+                        changeIp(twoDotIpShebei);//不一样的则修改ip
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                promptDialog.showLoading("IP正在配置，稍后请重新连接WIFI", false);
+                            }
+                        });
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                promptDialog.dismiss();
+                                Intent iWifi = new Intent();
+                                iWifi = new Intent(Settings.ACTION_WIFI_SETTINGS);
+                                startActivity(iWifi);
+                            }
+                        }, 8000);
+
                     }
-                    if (shebeiValue.equals("WTD")) {
-                        haveCheck = false;
-                        _host = "";
-                        _user = "admin";
-                        _pass = "8498883-2";
-                    }
-                    if (shebeiValue.equals("TCU1")) {
-                        haveCheck = false;
-                        _host = "";
-                        _user = "admin";
-                        _pass = "8498883-2";
-                    }
-                    String can[] = new String[4];
-                    can[0] = _host;
-                    can[1] = _port;
-                    can[2] = _user;
-                    can[3] = _pass;
-                    LogTask task = new LogTask(HomeActivity.this);
-                    task.execute(can);
 
                 } else {
                     DialogSettings.style = STYLE_IOS;
                     DialogSettings.use_blur = true;
                     DialogSettings.blur_alpha = 200;
                     MessageDialog.show(HomeActivity.this,
-                            "无法登陆", "请检查是否连接无线工装WIFI以及信息填写是否完整无误", "知道了", new DialogInterface.OnClickListener() {
+                            "提示", "请检查信息填写是否完整无误", "知道了", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                 }
@@ -1976,6 +2085,38 @@ public class HomeActivity extends AppCompatActivity {
 
     }
 
+
+    public boolean changeIp(String twoDotIpShebei) {
+
+        //不一样则进行IP修改指令的发送并设置
+        final ChangeIp ipChange = new ChangeIp();
+        final String chuankou = "115200" + "," + "8" + "," + "1" + "," + "NONE" + "," + "NFC";
+        final String ipForchange = twoDotIpShebei + ".221" + ",255.255.0.0";
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                //设置串口
+                ipChange.socketSend2ParaTEst(HomeActivity.this, "UART", chuankou);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                //修改网关IP
+                ipChange.socketSend2ParaTEstSecond(HomeActivity.this, "LANN", ipForchange);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                //发重启指令
+                ipChange.socketSendQueryCommChongqi(HomeActivity.this);
+
+
+            }
+        }).start();
+        return true;
+    }
 
     private void registerPermission() {
         //动态获取定位权限
@@ -2026,11 +2167,6 @@ public class HomeActivity extends AppCompatActivity {
 
         protected void onPostExecute(Boolean flag) {
             if (flag) {
-//                Toast tot = Toast.makeText(
-//                        mContext,
-//                        "登录成功",
-//                        Toast.LENGTH_LONG);
-//                tot.show();
                 Intent intent = new Intent(HomeActivity.this, selectFileActivity.class);
                 //准备进入选择界面并且准备好参数
                 intent.putExtra("host", _host);
@@ -2039,11 +2175,15 @@ public class HomeActivity extends AppCompatActivity {
                 intent.putExtra("port", Integer.parseInt(_port));
                 startActivity(intent);
             } else {
-                new android.app.AlertDialog.Builder(mContext)
-                        .setTitle("无法连接")
-                        .setMessage("请检查是否连接无线工装WIFI以及信息填写是否无误！")
-                        .setPositiveButton("确定", null)
-                        .show();
+                DialogSettings.style = STYLE_IOS;
+                DialogSettings.use_blur = true;
+                DialogSettings.blur_alpha = 200;
+                MessageDialog.show(HomeActivity.this,
+                        "无法连接车辆设备", "请检查工装网线是否接好，信息填写是否无误！", "知道了", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        });
 
             }
         }
@@ -2054,10 +2194,10 @@ public class HomeActivity extends AppCompatActivity {
 
     //校验 只有edrm模块需要校验  其他模块直接登陆即可。
     public boolean nocheckLogin() {
-        String host1 = host.getText().toString();
-        String user1 = name.getText().toString();
-        String pass1 = pass.getText().toString();
-        int port1 = Integer.parseInt(port.getText().toString());
+        String host1 = _host;
+        String user1 = _user;
+        String pass1 = _pass;
+        int port1 = Integer.parseInt(_port);
         boolean flag = false;
         FTPManager manager = new FTPManager();
         try {
@@ -2080,7 +2220,10 @@ public class HomeActivity extends AppCompatActivity {
 
     //校验 只有edrm模块需要校验  其他模块直接登陆即可。
     public boolean checkLogin(int socketPort) {
-
+        System.out.println("测试host：" + _host);
+        System.out.println("测试_user：" + _user);
+        System.out.println("测试_pass：" + _pass);
+        System.out.println("测试_port：" + _port);
         String host1 = _host;
         String user1 = _user;
         String pass1 = _pass;
@@ -2501,7 +2644,7 @@ public class HomeActivity extends AppCompatActivity {
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
-                              token = AuthService.getAuth();
+                                token = AuthService.getAuth();
                                 getToken = true;
                             }
                         }).start();

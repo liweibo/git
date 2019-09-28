@@ -149,13 +149,12 @@ public class AuthActivity extends AppCompatActivity {
                 Activity.MODE_PRIVATE);
         String user = sharedPreferences.getString("user", "");
         String psw = sharedPreferences.getString("psw", "");
-        if (!user.equals("")&&!psw.equals("")){
+        if (!user.equals("") && !psw.equals("")) {
             cb_psw.setChecked(true);
             etUsername.setText(user);
             etPassword.setText(psw);
 
-        }else
-        {
+        } else {
             cb_psw.setChecked(false);
         }
 
@@ -165,17 +164,17 @@ public class AuthActivity extends AppCompatActivity {
         cb_psw.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                SharedPreferences pref =AuthActivity.this.getSharedPreferences("userpsw", MODE_PRIVATE);
+                SharedPreferences pref = AuthActivity.this.getSharedPreferences("userpsw", MODE_PRIVATE);
                 SharedPreferences.Editor editor = pref.edit();
-                if (b){//勾选
+                if (b) {//勾选
                     //判空，存储
                     String usr = etUsername.getText().toString().trim();
                     String psw = etPassword.getText().toString().trim();
 
-                    if (!usr.equals("")&&!psw.equals("")){
-                        editor.putString("user",usr).commit();
-                        editor.putString("psw",psw).commit();
-                    }else{
+                    if (!usr.equals("") && !psw.equals("")) {
+                        editor.putString("user", usr).commit();
+                        editor.putString("psw", psw).commit();
+                    } else {
                         DialogSettings.style = STYLE_IOS;
                         DialogSettings.use_blur = true;
                         DialogSettings.blur_alpha = 200;
@@ -190,10 +189,10 @@ public class AuthActivity extends AppCompatActivity {
                     }
 
 
-                }else{
+                } else {
                     //存储的数据清空
-                    editor.putString("user","").commit();
-                    editor.putString("psw","").commit();
+                    editor.putString("user", "").commit();
+                    editor.putString("psw", "").commit();
                 }
             }
         });
@@ -214,7 +213,12 @@ public class AuthActivity extends AppCompatActivity {
         btGo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        promptDialog.showLoading("登录中...", false);
+                    }
+                });
                 final String users = etUsername.getText().toString().trim();
                 final String psw = etPassword.getText().toString().trim();
                 if (users.trim().length() > 0 && psw.trim().length() > 0) {
@@ -240,6 +244,12 @@ public class AuthActivity extends AppCompatActivity {
 
                         @Override
                         public void onFailure(Call call, IOException e) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    promptDialog.dismiss();
+                                }
+                            });
                             System.out.println("超时-错误：" + e.toString());
                             runOnUiThread(new Runnable() {
                                 @Override
@@ -260,6 +270,8 @@ public class AuthActivity extends AppCompatActivity {
 
                         @Override
                         public void onResponse(Call call, Response response) throws IOException {
+
+
                             String dataResult = response.body().string();
                             JSONObject jsonObject = null;
                             try {
@@ -269,7 +281,22 @@ public class AuthActivity extends AppCompatActivity {
                                 if (actionResult) {
                                     Intent i2 = new Intent(AuthActivity.this, HomeActivity.class);
                                     startActivity(i2);
+
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            promptDialog.dismiss();
+                                        }
+                                    });
                                 } else {
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            promptDialog.dismiss();
+                                        }
+                                    });
+
+
                                     runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
@@ -293,6 +320,12 @@ public class AuthActivity extends AppCompatActivity {
                         }
                     });
                 } else {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            promptDialog.dismiss();
+                        }
+                    });
                     DialogSettings.style = STYLE_IOS;
                     DialogSettings.use_blur = true;
                     DialogSettings.blur_alpha = 200;

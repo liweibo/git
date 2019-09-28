@@ -55,7 +55,7 @@ public class VerticalAdapter extends RecyclerView.Adapter<VerticalAdapter.Vertic
             if( lists.getJSONObject(i).getString("state") == "1" ){
                 holder.uploadstate.setVisibility( View.VISIBLE );
             }else{
-                holder.uploadstate.setVisibility( View.GONE );
+                holder.uploadstate.setVisibility( View.INVISIBLE );
             }
         } catch (JSONException e) {
             e.printStackTrace();

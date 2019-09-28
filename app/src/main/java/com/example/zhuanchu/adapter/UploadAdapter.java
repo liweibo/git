@@ -58,21 +58,6 @@ public class UploadAdapter extends RecyclerView.Adapter<UploadAdapter.VerticalVi
             holder.fileTime.setText(lists.getJSONObject(i).getString("time"));
             holder.checkBox.setChecked(lists.getJSONObject(i).getBoolean("check"));
 
-            for (int j = 0; j < listYi.size(); j++) {
-                //哪个item的已上传进行标记？
-                if (listYi.get(j)==i){
-                    holder.shangchuanstate.setVisibility(View.VISIBLE);
-                }else
-                {
-                    holder.shangchuanstate.setVisibility(View.INVISIBLE);
-
-                }
-            }
-            if (listYi.size()==0){
-                holder.shangchuanstate.setVisibility(View.INVISIBLE);
-
-            }
-
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -111,15 +96,13 @@ public class UploadAdapter extends RecyclerView.Adapter<UploadAdapter.VerticalVi
 
     public class VerticalViewHolder extends RecyclerView.ViewHolder {
 
-        TextView textView, fileTime, shangchuanstate;
+        TextView textView, fileTime;
         CheckBox checkBox;
 
         public VerticalViewHolder(@NonNull View itemView) {
             super(itemView);
             textView = itemView.findViewById(R.id.fileNameupload);
             fileTime = itemView.findViewById(R.id.filetimeupload);
-            shangchuanstate = itemView.findViewById(R.id.shangchuanstate);
-
             checkBox = itemView.findViewById(R.id.filecheckupload);
         }
     }

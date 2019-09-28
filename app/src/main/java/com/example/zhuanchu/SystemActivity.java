@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
+import com.suke.widget.SwitchButton;
 
 import me.leefeng.promptlibrary.PromptDialog;
 
@@ -78,59 +79,33 @@ public class SystemActivity extends AppCompatActivity {
         /*
          * 初始化wifi,4g打开按钮
          * */
-        boolean networkinit = sharedPreferences.getBoolean("network", false);
-        boolean wifiinit = sharedPreferences.getBoolean("wifi", false);
-        ImageView networkImg = findViewById(R.id.switch_button4G);
-        ImageView wifiImg = findViewById(R.id.switch_buttonWifi);
-        if( networkinit ){
-            networkImg.setImageResource(R.drawable.kaiqi);
-        }else{
-            networkImg.setImageResource(R.drawable.kaiqi_c);
-        }
-        if( wifiinit ){
-            wifiImg.setImageResource(R.drawable.kaiqi);
-        }else{
-            wifiImg.setImageResource(R.drawable.kaiqi_c);
-        }
-
-
-        findViewById(R.id.switch_button4G).setOnClickListener(new View.OnClickListener() {
+        boolean networkinit = sharedPreferences.getBoolean("network", false);//4g
+        boolean wifiinit = sharedPreferences.getBoolean("wifi", false);//wifi
+        com.suke.widget.SwitchButton switchButtoncheck = (com.suke.widget.SwitchButton)
+                findViewById(R.id.switch_button4G);
+        switchButtoncheck.setChecked(networkinit);
+        com.suke.widget.SwitchButton switchButtoncheckwifi = (com.suke.widget.SwitchButton)
+                findViewById(R.id.switch_buttonWifi);
+        switchButtoncheckwifi.setChecked(wifiinit);
+        switchButtoncheck.setOnCheckedChangeListener(new SwitchButton.OnCheckedChangeListener() {
             @Override
-            public void onClick(View v) {
-                boolean networkstate = sharedPreferences.getBoolean("network", false);
-
-                ImageView imageView = findViewById(R.id.switch_button4G);
-                if( networkstate ){
-                    imageView.setImageResource(R.drawable.kaiqi_c);
-                    editor.putBoolean("network", false);
-                }else{
-                    imageView.setImageResource(R.drawable.kaiqi);
-                    editor.putBoolean("network", true);
-                }
-                editor.commit();
+            public void onCheckedChanged(SwitchButton view, boolean isChecked) {
+                    editor.putBoolean("network", isChecked);
+            }
+        });
+        switchButtoncheckwifi.setOnCheckedChangeListener(new SwitchButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(SwitchButton view, boolean isChecked) {
+                editor.putBoolean("wifi", isChecked);
             }
         });
 
-        findViewById(R.id.switch_buttonWifi).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                boolean wifistate = sharedPreferences.getBoolean("wifi", false);
 
-                ImageView imageView = findViewById(R.id.switch_buttonWifi);
-                if( wifistate ){
-                    imageView.setImageResource(R.drawable.kaiqi_c);
-                    editor.putBoolean("wifi", false);
-                }else{
-                    imageView.setImageResource(R.drawable.kaiqi);
-                    editor.putBoolean("wifi", true);
-                }
-                editor.commit();
-            }
-        });
 
         findViewById(R.id.toFileView).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                System.out.println("查看文件");
                 ARouter.getInstance().build("/app/fileview").navigation();
             }
         });

@@ -161,22 +161,22 @@ public class selectFileActivity extends AppCompatActivity implements OnClickList
         checkbox_all.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-                if (currentFiles!=null){
+                if (currentFiles != null) {
 
-                if (isChecked) {
-                    // 遍历list的长度，将MyAdapter中的map值全部设为true
-                    for (int i = 0; i < currentFiles.size(); i++) {
-                        MyAdapter.getIsSelected().put(i, true);
-                        System.out.println("11111" + MyAdapter.getIsSelected().get(i));
-                    }
-                    mAdapter.notifyDataSetChanged();
+                    if (isChecked) {
+                        // 遍历list的长度，将MyAdapter中的map值全部设为true
+                        for (int i = 0; i < currentFiles.size(); i++) {
+                            MyAdapter.getIsSelected().put(i, true);
+                            System.out.println("11111" + MyAdapter.getIsSelected().get(i));
+                        }
+                        mAdapter.notifyDataSetChanged();
 
-                } else {
-                    for (int i = 0; i < currentFiles.size(); i++) {
-                        MyAdapter.getIsSelected().put(i, false);
+                    } else {
+                        for (int i = 0; i < currentFiles.size(); i++) {
+                            MyAdapter.getIsSelected().put(i, false);
+                        }
+                        mAdapter.notifyDataSetChanged();
                     }
-                    mAdapter.notifyDataSetChanged();
-                }
 
                 }
             }
@@ -632,7 +632,7 @@ public class selectFileActivity extends AppCompatActivity implements OnClickList
         }
 
         protected void onProgressUpdate(Long... values) {
-            pdialog.setTitle("文件:" + downloadingFileName+"正在下载");
+            pdialog.setTitle("文件:" + downloadingFileName + "正在下载");
             pdialog.show();
             long a = Long.valueOf(values[0].toString());
             int value = (int) a;
@@ -669,6 +669,11 @@ public class selectFileActivity extends AppCompatActivity implements OnClickList
             SharedPreferences sharedPreferences = getSharedPreferences("mypath",
                     Activity.MODE_PRIVATE);
             mypathname = sharedPreferences.getString("pathname", "");
+
+
+            //判断是否是测试
+
+
             String[] strdir = mypathname.split("/");
             crSDFile(strdir);
             localPath = dirpath;
@@ -897,13 +902,13 @@ public class selectFileActivity extends AppCompatActivity implements OnClickList
     }
 
 
-    public  void crSDFile(String... folder) {
+    public void crSDFile(String... folder) {
 
         int length = folder.length;
 
         String genFolder8 = Environment.getExternalStorageDirectory().getPath().toString() +
                 File.separator + "CRRC" + File.separator;
-        File file, file2, file3,file4,file8;
+        File file, file2, file3, file4, file8, filejidongcheng;
         file8 = new File(genFolder8);
         if (!file8.exists()) {
             file8.mkdir();
@@ -917,10 +922,27 @@ public class selectFileActivity extends AppCompatActivity implements OnClickList
         }
         SharedPreferences sharedPreferences = getSharedPreferences("filedirname",
                 Activity.MODE_PRIVATE);
+        String jidongcheng = sharedPreferences.getString("chexing", "");//机车产品线  ..文件夹创建
+        if (jidongcheng.equals("机车")) {
+            jidongcheng = "机车产品线";
+        } else if (jidongcheng.equals("动车")) {
+            jidongcheng = "动车产品线";
+
+        } else if (jidongcheng.equals("城轨")) {
+            jidongcheng = "城轨产品线";
+        }
         String dir1 = sharedPreferences.getString("filedirnamevalue", "");
         String dir2 = sharedPreferences.getString("shebeinamevalue", "");
 
-        String genFolder1 = genFolder +
+//        机车产品线 等文件夹创建
+        String genFolderJidongcheng = genFolder +
+                File.separator + jidongcheng + File.separator;
+        filejidongcheng = new File(genFolderJidongcheng);
+        if (!filejidongcheng.exists()) {
+            filejidongcheng.mkdir();
+        }
+
+        String genFolder1 = genFolderJidongcheng +
                 File.separator + dir1 + File.separator;
         file3 = new File(genFolder1);
         if (!file3.exists()) {

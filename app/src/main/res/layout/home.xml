@@ -129,17 +129,15 @@
 
                 <LinearLayout
                     android:layout_marginTop="20dp"
-
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
-
                     <TextView
+                        android:id="@+id/peishutext"
+                        android:clickable="true"
                         android:layout_width="119dp"
                         android:layout_height="wrap_content"
                         android:text="配属用户"
                         android:textSize="16dp" />
-
-
                     <scut.carson_ho.diy_view.SuperEditText
                         android:id="@+id/et_peishu"
                         android:layout_width="0dp"
@@ -155,7 +153,6 @@
                         app:delete_y="0"
                         app:ic_delete="@drawable/delete"
                         app:ic_left_click="@drawable/ic_left_click"
-
                         app:ic_left_unclick="@drawable/ic_left_unclick"
                         app:left_height="0"
                         app:left_width="0"
@@ -168,7 +165,6 @@
 
                     <ImageButton
                         android:layout_width="20dp"
-
                         android:layout_height="20dp"
                         android:layout_gravity="center_vertical"
                         android:layout_marginRight="10dp"
@@ -180,7 +176,6 @@
 
                 <LinearLayout
                     android:layout_marginTop="20dp"
-
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
