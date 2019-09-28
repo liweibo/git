@@ -1,0 +1,778 @@
+{
+	"update": false,
+	"datalist": {
+		"locomotive": {
+			"name": "机车",
+			"trainType": {
+				"trainTypeInfo": [{
+						"name": "HXD1C",
+						"multiCar": {
+							"car": [{
+									"name": "A",
+									"devices": {
+										"item": [{
+												"name": "ERM",
+												"CMDitem": [{
+														"name": " ",
+														"ip": "10.0.1.5",
+														"user": "CSR",
+														"psw": "12345678"
+													},
+													{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													}
+												]
+											},
+											{
+												"name": " ",
+												"CMDitem": [{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													},
+													{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													},
+													{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													}
+												]
+											},
+											{
+												"name": " ",
+												"CMDitem": [{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													},
+													{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													},
+													{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													}
+												]
+											}
+										]
+									}
+								},
+								{
+									"name": " ",
+									"devices": {
+										"item": [{
+												"name": " ",
+												"CMDitem": [{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													},
+													{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													}
+												]
+											},
+											{
+												"name": " ",
+												"CMDitem": [{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													},
+													{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													},
+													{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													}
+												]
+											},
+											{
+												"name": " ",
+												"CMDitem": [{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													},
+													{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													},
+													{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													}
+												]
+											}
+										]
+									}
+								}
+							]
+						}
+					}
+
+				]
+			}
+		},
+
+
+		"MotorTrain": {
+			"name": "动车",
+			"trainType": {
+				"trainTypeInfo": [{
+						"name": "CRH6F-160",
+						"multiCar": {
+							"car": [{
+									"name": "1",
+									"devices": {
+										"item": [{
+												"name": "WTD",
+												"CMDitem": [{
+														"name": " ",
+														"ip": "10.0.1.130",
+														"user": "admin",
+														"psw": "8498883-2"
+													},
+													{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													}
+												]
+											},
+											{
+												"name": "TCU",
+												"CMDitem": [{
+														"name": " ",
+														"ip": "10.0.2.100",
+														"user": "teg",
+														"psw": "88888888"
+													},
+													{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													},
+													{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													}
+												]
+											},
+											{
+												"name": " ",
+												"CMDitem": [{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													},
+													{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													},
+													{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													}
+												]
+											}
+										]
+									}
+								},
+								{
+									"name": " ",
+									"devices": {
+										"item": [{
+												"name": " ",
+												"CMDitem": [{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													},
+													{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													}
+												]
+											},
+											{
+												"name": " ",
+												"CMDitem": [{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													},
+													{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													},
+													{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													}
+												]
+											},
+											{
+												"name": " ",
+												"CMDitem": [{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													},
+													{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													},
+													{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													}
+												]
+											}
+										]
+									}
+								}
+							]
+						}
+					}
+
+
+				]
+			}
+		},
+
+		"Urbanrail": {
+			"name": "城轨",
+			"trainType": {
+				"trainTypeInfo": [{
+						"name": " ",
+						"multiCar": {
+							"car": [{
+									"name": " ",
+									"devices": {
+										"item": [{
+												"name": " ",
+												"CMDitem": [{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													},
+													{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													}
+												]
+											},
+											{
+												"name": " ",
+												"CMDitem": [{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													},
+													{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													}
+												]
+											}
+										]
+									}
+								},
+								{
+									"name": " ",
+									"devices": {
+										"item": [{
+												"name": " ",
+												"CMDitem": [{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													},
+													{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													}
+												]
+											},
+											{
+												"name": " ",
+												"CMDitem": [{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													},
+													{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													}
+												]
+											}
+										]
+									}
+								},
+								{
+									"name": " ",
+									"devices": {
+										"item": [{
+												"name": " ",
+												"CMDitem": [{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													},
+													{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													}
+												]
+											},
+											{
+												"name": " ",
+												"CMDitem": [{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													},
+													{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													}
+												]
+											}
+										]
+									}
+								},
+								{
+									"name": " ",
+									"devices": {
+										"item": [{
+												"name": " ",
+												"CMDitem": [{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													},
+													{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													}
+												]
+											},
+											{
+												"name": " ",
+												"CMDitem": [{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													},
+													{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													}
+												]
+											}
+										]
+									}
+								},
+								{
+									"name": " ",
+									"devices": {
+										"item": [{
+												"name": " ",
+												"CMDitem": [{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													},
+													{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													}
+												]
+											},
+											{
+												"name": " ",
+												"CMDitem": [{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													},
+													{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													}
+												]
+											}
+										]
+									}
+								},
+								{
+									"name": " ",
+									"devices": {
+										"item": [{
+												"name": " ",
+												"CMDitem": [{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													},
+													{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													}
+												]
+											},
+											{
+												"name": " ",
+												"CMDitem": [{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													},
+													{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													}
+												]
+											}
+										]
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": " ",
+						"multiCar": {
+							"car": [{
+									"name": " ",
+									"devices": {
+										"item": [{
+												"name": " ",
+												"CMDitem": [{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													},
+													{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													}
+												]
+											},
+											{
+												"name": " ",
+												"CMDitem": [{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													},
+													{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													}
+												]
+											}
+										]
+									}
+								},
+								{
+									"name": " ",
+									"devices": {
+										"item": [{
+												"name": " ",
+												"CMDitem": [{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													},
+													{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													}
+												]
+											},
+											{
+												"name": " ",
+												"CMDitem": [{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													},
+													{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													}
+												]
+											}
+										]
+									}
+								},
+								{
+									"name": " ",
+									"devices": {
+										"item": [{
+												"name": " ",
+												"CMDitem": [{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													},
+													{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													}
+												]
+											},
+											{
+												"name": " ",
+												"CMDitem": [{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													},
+													{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													}
+												]
+											}
+										]
+									}
+								},
+								{
+									"name": " ",
+									"devices": {
+										"item": [{
+												"name": " ",
+												"CMDitem": [{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													},
+													{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													}
+												]
+											},
+											{
+												"name": " ",
+												"CMDitem": [{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													},
+													{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													}
+												]
+											}
+										]
+									}
+								},
+								{
+									"name": " ",
+									"devices": {
+										"item": [{
+												"name": " ",
+												"CMDitem": [{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													},
+													{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													}
+												]
+											},
+											{
+												"name": " ",
+												"CMDitem": [{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													},
+													{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													}
+												]
+											}
+										]
+									}
+								},
+								{
+									"name": " ",
+									"devices": {
+										"item": [{
+												"name": " ",
+												"CMDitem": [{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													},
+													{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													}
+												]
+											},
+											{
+												"name": " ",
+												"CMDitem": [{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													},
+													{
+														"name": " ",
+														"ip": " ",
+														"user": " ",
+														"psw": " "
+													}
+												]
+											}
+										]
+									}
+								}
+							]
+						}
+					}
+				]
+			}
+		}
+
+
+
+
+
+	}
+}

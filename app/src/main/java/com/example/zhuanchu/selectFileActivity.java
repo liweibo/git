@@ -934,15 +934,15 @@ public class selectFileActivity extends AppCompatActivity implements OnClickList
         String dir1 = sharedPreferences.getString("filedirnamevalue", "");
         String dir2 = sharedPreferences.getString("shebeinamevalue", "");
 
-//        机车产品线 等文件夹创建
-        String genFolderJidongcheng = genFolder +
-                File.separator + jidongcheng + File.separator;
-        filejidongcheng = new File(genFolderJidongcheng);
-        if (!filejidongcheng.exists()) {
-            filejidongcheng.mkdir();
-        }
+////        机车产品线 等文件夹创建
+//        String genFolderJidongcheng = genFolder +
+//                File.separator + jidongcheng + File.separator;
+//        filejidongcheng = new File(genFolderJidongcheng);
+//        if (!filejidongcheng.exists()) {
+//            filejidongcheng.mkdir();
+//        }
 
-        String genFolder1 = genFolderJidongcheng +
+        String genFolder1 = genFolder +
                 File.separator + dir1 + File.separator;
         file3 = new File(genFolder1);
         if (!file3.exists()) {

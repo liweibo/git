@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         editor.putString("chexing", "机车");//存机车 动车 城轨  对应根目录文件夹机车产品线...
         editor.putString("filedirnamevalue", "HXD1C(测试)_0021_20191001144521_A_重庆机务段");//一级
         editor.putString("shebeinamevalue", "TCU(测试)");//二级
-
+        editor.commit();
         com.suke.widget.SwitchButton switchButtoncheck = (com.suke.widget.SwitchButton)
                 findViewById(R.id.switch_buttoncheck);
         switchButtoncheck.setOnCheckedChangeListener(new SwitchButton.OnCheckedChangeListener() {

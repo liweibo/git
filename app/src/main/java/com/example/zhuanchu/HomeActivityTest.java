@@ -1,3 +1,4 @@
+
 package com.example.zhuanchu;
 
 import android.Manifest;
@@ -133,7 +134,7 @@ import okhttp3.Response;
 
 import static com.kongzue.dialog.v2.DialogSettings.STYLE_IOS;
 
-public class HomeActivity extends AppCompatActivity {
+public class HomeActivityTest extends AppCompatActivity {
     private List<String> datajutiCheXing = new ArrayList<>();
     private List<String> dataCheHao = new ArrayList<>();
     private List<String> dataShebei = new ArrayList<>();
@@ -223,6 +224,12 @@ public class HomeActivity extends AppCompatActivity {
     int uploadIndex = 0;
     private static final int COMPLETED = 0;
     View viewRE = null;
+
+    RecyclerView recyclerView = null;
+    FlexboxLayoutManager flexboxLayoutManager = null;
+
+    View packView = null;
+    int uploadindex = 1;
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -235,41 +242,19 @@ public class HomeActivity extends AppCompatActivity {
             }
         }
     };
-    RecyclerView recyclerView = null;
-    FlexboxLayoutManager flexboxLayoutManager = null;
-
-    View packView = null;
-    int uploadindex = 1;
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.homeoncreate);
-
-
-        SharedPreferences sharedPreferences = getSharedPreferences("tab",
-                Activity.MODE_PRIVATE);
-        int tabnum = sharedPreferences.getInt("tabnum", 0);
+        setContentView(R.layout.activity_home_test);
+        initdownload();
 
 
         actionBar = this.getSupportActionBar();
-        if (tabnum == 3) {
-            actionBar.setTitle("系统设置");
-        } else if (tabnum == 2) {
-            actionBar.setTitle("文件上传");
-
-        } else if (tabnum == 1) {
-            actionBar.setTitle("文件打包");
-
-        } else if (tabnum == 0) {
             actionBar.setTitle("信息配置");
 
-        } else {
-            actionBar.setTitle("信息配置");
-        }
         actionBar.setDisplayHomeAsUpEnabled(true);
         StatusBarCompat.setStatusBarColor(this, getResources().getColor(R.color.colorfocus), true);
-        initUI();
+       // initUI();
     }
 
     public void textMethod(View view) {
@@ -289,7 +274,7 @@ public class HomeActivity extends AppCompatActivity {
                 if (SystemClock.uptimeMillis() - mHints[0] <= 500) {
                     //跳转到测试界面
                     Intent intentTest =
-                            new Intent(HomeActivity.this, HomeActivityTest.class);
+                            new Intent(HomeActivityTest.this, MainActivity.class);
                     Toast.makeText(getApplicationContext(),
                             "连续点击4次", Toast.LENGTH_SHORT).show();
                     startActivity(intentTest);
@@ -309,7 +294,7 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            SharedPreferences pref = HomeActivity.this.getSharedPreferences("tab", MODE_PRIVATE);
+            SharedPreferences pref = HomeActivityTest.this.getSharedPreferences("tab", MODE_PRIVATE);
             SharedPreferences.Editor editor = pref.edit();
             editor.putInt("tabnum", 0);
             editor.commit();
@@ -347,7 +332,7 @@ public class HomeActivity extends AppCompatActivity {
                             getBaseContext()).inflate(R.layout.home, null, false);
                     uploadView = view;
 
-                    initdownload(view);
+
                 } else if (position == 1) {
                     view = LayoutInflater.from(
                             getBaseContext()).inflate(R.layout.pack, null, false);
@@ -466,21 +451,20 @@ public class HomeActivity extends AppCompatActivity {
     //以下4点，根据position的值，选择对应的一个即可，即在instantiateItem中被调用
 
     //1  init下载首页的UI组件，以及逻辑代码，也就是homeactivity页面的内容
-    public void initdownload(View view) {
-        textMethod(view);
+    public void initdownload() {
 
-        imbtnOcr = (ImageButton) view.findViewById(R.id.imagebtnCamera);
+        imbtnOcr = (ImageButton)findViewById(R.id.imagebtnCamera);
 
-        editext_chehao = (EditText) view.findViewById(R.id.editext_chehao);
-        editext_peishu = (EditText) view.findViewById(R.id.et_peishu);
-        edit_spinnerCheXing = view.findViewById(R.id.edit_spinnerCheXing);
-        edit_spinnerjuTiCheXing = view.findViewById(R.id.edit_spinnerjuTiCheXing);
-        edit_spinnerCheXingCheHao = view.findViewById(R.id.edit_spinnerCheXingCheHao);
-        edit_spinnerCheXingCheHaoSheBei = view.findViewById(R.id.edit_spinnerCheXingCheHaoSheBei);
-        edit_spinnerCheXingCheHaoCMD = view.findViewById(R.id.edit_spinnerCheXingCheHaoCMD);
+        editext_chehao = (EditText)findViewById(R.id.editext_chehao);
+        editext_peishu = (EditText) findViewById(R.id.et_peishu);
+        edit_spinnerCheXing =  findViewById(R.id.edit_spinnerCheXing);
+        edit_spinnerjuTiCheXing =  findViewById(R.id.edit_spinnerjuTiCheXing);
+        edit_spinnerCheXingCheHao =  findViewById(R.id.edit_spinnerCheXingCheHao);
+        edit_spinnerCheXingCheHaoSheBei =  findViewById(R.id.edit_spinnerCheXingCheHaoSheBei);
+        edit_spinnerCheXingCheHaoCMD =  findViewById(R.id.edit_spinnerCheXingCheHaoCMD);
 
-        fl_cmd = (LinearLayout) view.findViewById(R.id.fl_cmd);
-        cb_remember = (CheckBox) view.findViewById(R.id.remember_info);
+        fl_cmd = (LinearLayout)  findViewById(R.id.fl_cmd);
+        cb_remember = (CheckBox)  findViewById(R.id.remember_info);
         promptDialog = new PromptDialog(this);
 
 
@@ -577,7 +561,7 @@ public class HomeActivity extends AppCompatActivity {
 
 
         //跳转
-        initSwich(view);
+        initSwich();
     }
 
 
@@ -597,7 +581,7 @@ public class HomeActivity extends AppCompatActivity {
             weiAllPack = weiPack;
         }
 
-        final ProgressDialog pdialog = new ProgressDialog(HomeActivity.this);
+        final ProgressDialog pdialog = new ProgressDialog(HomeActivityTest.this);
 
         Context context;
 
@@ -631,7 +615,7 @@ public class HomeActivity extends AppCompatActivity {
                     DialogSettings.style = STYLE_IOS;
                     DialogSettings.use_blur = true;
                     DialogSettings.blur_alpha = 200;
-                    MessageDialog.show(HomeActivity.this,
+                    MessageDialog.show(HomeActivityTest.this,
                             "提示", "请选择需要打包的目录", "知道了", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
@@ -682,7 +666,7 @@ public class HomeActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             try {
-                                CompressOperate_zip4j.compressZip4j(path + "/DOWNLOAD/" + finalChoose.getString("name"), path2 + "/" + packname, "123456", pdialog, HomeActivity.this, finalChoose.getString("name"));
+                                CompressOperate_zip4j.compressZip4j(path + "/DOWNLOAD/" + finalChoose.getString("name"), path2 + "/" + packname, "123456", pdialog, HomeActivityTest.this, finalChoose.getString("name"));
                                 //pdialog.dismiss();
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -765,7 +749,7 @@ public class HomeActivity extends AppCompatActivity {
 
     //3   init上传首页的UI组件，以及逻辑代码，...
     public void initUpload(final View view) {
-        sqlHelper = new SqlHelper(HomeActivity.this);
+        sqlHelper = new SqlHelper(HomeActivityTest.this);
         sqLiteDatabase = sqlHelper.getWritableDatabase();
         fragmnetWeishangchuan(view);
         view.findViewById(R.id.noupload).setBackgroundResource(R.drawable.btnclick);
@@ -923,7 +907,7 @@ public class HomeActivity extends AppCompatActivity {
                     DialogSettings.style = STYLE_IOS;
                     DialogSettings.use_blur = true;
                     DialogSettings.blur_alpha = 200;
-                    MessageDialog.show(HomeActivity.this,
+                    MessageDialog.show(HomeActivityTest.this,
                             "提示", "请勾选需上传的文件", "知道了", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
@@ -936,10 +920,10 @@ public class HomeActivity extends AppCompatActivity {
                 /*
                  * 判断是否有网络
                  * */
-                boolean network = isNetworkAvailable(HomeActivity.this);
+                boolean network = isNetworkAvailable(HomeActivityTest.this);
                 if (!network) {
 
-                    Toast.makeText(HomeActivity.this, "没有检测到网络", Toast.LENGTH_LONG).show();
+                    Toast.makeText(HomeActivityTest.this, "没有检测到网络", Toast.LENGTH_LONG).show();
                     return;
                 }
 
@@ -949,7 +933,7 @@ public class HomeActivity extends AppCompatActivity {
                     DialogSettings.style = STYLE_IOS;
                     DialogSettings.use_blur = true;
                     DialogSettings.blur_alpha = 200;
-                    SelectDialog.show(HomeActivity.this, "WIFI设置", "请切换能上网的WIFI", "确定", new DialogInterface.OnClickListener() {
+                    SelectDialog.show(HomeActivityTest.this, "WIFI设置", "请切换能上网的WIFI", "确定", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             Intent i = new Intent();
@@ -964,7 +948,7 @@ public class HomeActivity extends AppCompatActivity {
                     return;
                 }
 
-                boolean mobile = isMobile(HomeActivity.this);
+                boolean mobile = isMobile(HomeActivityTest.this);
                 sharedPreferencesUp = getSharedPreferences("data", MODE_PRIVATE);
 
                 boolean networkinit = sharedPreferencesUp.getBoolean("network", false);//4g
@@ -979,7 +963,7 @@ public class HomeActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             sharedPreferencesUp.edit().putBoolean("network", true).commit();
-                            uploadFile(HomeActivity.this);
+                            uploadFile(HomeActivityTest.this);
                         }
                     }, "取消", new DialogInterface.OnClickListener() {
                         @Override
@@ -989,7 +973,7 @@ public class HomeActivity extends AppCompatActivity {
                     });
                     return;
                 }
-                uploadFile(HomeActivity.this);
+                uploadFile(HomeActivityTest.this);
             }
         });
     }
@@ -1073,7 +1057,7 @@ public class HomeActivity extends AppCompatActivity {
         uploadView.findViewById(R.id.toFileView).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(HomeActivity.this, FileView.class));
+                startActivity(new Intent(HomeActivityTest.this, FileView.class));
             }
         });
         NiceSpinner ns = (NiceSpinner) uploadView.findViewById(R.id.edit_spinnerDelete);
@@ -1085,7 +1069,7 @@ public class HomeActivity extends AppCompatActivity {
         ncdataList.add("保留三天删除");
         ncdataList.add("保留一周删除");
 
-        SharedPreferences preupload = HomeActivity.this.getSharedPreferences("data", MODE_PRIVATE);
+        SharedPreferences preupload = HomeActivityTest.this.getSharedPreferences("data", MODE_PRIVATE);
         SharedPreferences.Editor editorupload = preupload.edit();
         int selectNumber = preupload.getInt("uploadinfo", 4);
 
@@ -1097,7 +1081,7 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(NiceSpinner parent, View view, int position, long id) {
                 System.out.println(position);
-                SharedPreferences preupload = HomeActivity.this.getSharedPreferences("data", MODE_PRIVATE);
+                SharedPreferences preupload = HomeActivityTest.this.getSharedPreferences("data", MODE_PRIVATE);
                 SharedPreferences.Editor editorupload = preupload.edit();
 
                 preupload.edit().putInt("uploadinfo", position).commit();
@@ -1178,7 +1162,7 @@ public class HomeActivity extends AppCompatActivity {
                 .writeTimeout(5 * 60 * 1000, TimeUnit.MILLISECONDS);
 
         System.out.println(url);
-        SharedPreferences preupload = HomeActivity.this.getSharedPreferences("data", MODE_PRIVATE);
+        SharedPreferences preupload = HomeActivityTest.this.getSharedPreferences("data", MODE_PRIVATE);
         SharedPreferences.Editor editorupload = preupload.edit();
         final int selectNumber = preupload.getInt("uploadinfo", 4);
 
@@ -1369,28 +1353,17 @@ public class HomeActivity extends AppCompatActivity {
         InputStream is = null;
         String result = "";
         String xkl = "";
-
         try {
-            is = getAssets().open("tegs.txt");
+            is = getAssets().open("tegstest.txt");
             int lenght = is.available();
             byte[] buffer = new byte[lenght];
             is.read(buffer);
             result = new String(buffer, "utf8");
-            String keys = "ijijkjkjkjlkklok";
-            try {
-                xkl = AESCrypt.decrypt(keys, result);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return xkl;
+        return result;
     }
-
-
-
 
 
 //    private String getJson() {
@@ -1760,7 +1733,7 @@ public class HomeActivity extends AppCompatActivity {
 
     private void jutichexingchehaoshebeicmd(List<String> dataCMDs) {
 
-        SharedPreferences pref = HomeActivity.this.getSharedPreferences("myInfo", MODE_PRIVATE);
+        SharedPreferences pref = HomeActivityTest.this.getSharedPreferences("myInfo", MODE_PRIVATE);
         SharedPreferences.Editor editor = pref.edit();
 
         if (dataCMDs.size() > 0) {
@@ -1775,7 +1748,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
 
-    private void initSwich(View view) {
+    private void initSwich() {
         cb_remember.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -1803,7 +1776,7 @@ public class HomeActivity extends AppCompatActivity {
                                 && chehao.length() != 0
                                 && peishu.length() != 0) {
 
-                            SharedPreferences pref = HomeActivity.this.getSharedPreferences("myInfo", MODE_PRIVATE);
+                            SharedPreferences pref = HomeActivityTest.this.getSharedPreferences("myInfo", MODE_PRIVATE);
                             SharedPreferences.Editor editor = pref.edit();
                             editor.putString("chexing", checing);
                             editor.putString("jutichecing", jutichecing);
@@ -1819,7 +1792,7 @@ public class HomeActivity extends AppCompatActivity {
                             DialogSettings.style = STYLE_IOS;
                             DialogSettings.use_blur = true;
                             DialogSettings.blur_alpha = 200;
-                            MessageDialog.show(HomeActivity.this,
+                            MessageDialog.show(HomeActivityTest.this,
                                     "提示", "信息填写不完整", "知道了", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
@@ -1836,7 +1809,7 @@ public class HomeActivity extends AppCompatActivity {
                                 && chehao.length() != 0
                                 && peishu.length() != 0) {
 
-                            SharedPreferences pref = HomeActivity.this.getSharedPreferences("myInfo", MODE_PRIVATE);
+                            SharedPreferences pref = HomeActivityTest.this.getSharedPreferences("myInfo", MODE_PRIVATE);
                             SharedPreferences.Editor editor = pref.edit();
                             editor.putString("chexing", checing);
                             editor.putString("jutichecing", jutichecing);
@@ -1852,7 +1825,7 @@ public class HomeActivity extends AppCompatActivity {
                             DialogSettings.style = STYLE_IOS;
                             DialogSettings.use_blur = true;
                             DialogSettings.blur_alpha = 200;
-                            MessageDialog.show(HomeActivity.this,
+                            MessageDialog.show(HomeActivityTest.this,
                                     "提示", "信息填写不完整", "知道了", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
@@ -1865,7 +1838,7 @@ public class HomeActivity extends AppCompatActivity {
                     System.out.println("保存的信息：" + checing + "，" + chexianghao + "，" + shebei + "，" + cmd + "，"
                             + chehao + "，" + peishu);
                 } else {
-                    SharedPreferences pref = HomeActivity.this.getSharedPreferences("myInfo", MODE_PRIVATE);
+                    SharedPreferences pref = HomeActivityTest.this.getSharedPreferences("myInfo", MODE_PRIVATE);
                     SharedPreferences.Editor editor = pref.edit();
                     editor.putBoolean("remember", false);//是否记住信息标志
 
@@ -1889,12 +1862,12 @@ public class HomeActivity extends AppCompatActivity {
 
 
         //点击确定时，获取...ip等，进入ip设置页面
-        view.findViewById(R.id.vercodehome).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.vercodehome).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 //判断wifi是不是连接了设备
-                boolean wfstate = isWifi(HomeActivity.this);
+                boolean wfstate = isWifi(HomeActivityTest.this);
                 System.out.println(wfstate + "------------------");
 
                 String wifiresult = getSSID();
@@ -1903,7 +1876,7 @@ public class HomeActivity extends AppCompatActivity {
                     DialogSettings.style = STYLE_IOS;
                     DialogSettings.use_blur = true;
                     DialogSettings.blur_alpha = 200;
-                    SelectDialog.show(HomeActivity.this, "提示", "未连接工装WIFI，去连接WIFI", "确定", new DialogInterface.OnClickListener() {
+                    SelectDialog.show(HomeActivityTest.this, "提示", "未连接工装WIFI，去连接WIFI", "确定", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             Intent i = new Intent();
@@ -1949,7 +1922,7 @@ public class HomeActivity extends AppCompatActivity {
                 dataIpPswUser.clear();
                 dataIpPswUser.addAll(jutichexingchehaoshebeicmdpswIp);
 
-                Toast.makeText(HomeActivity.this, dataIpPswUser.toString(), Toast.LENGTH_LONG).show();
+//                Toast.makeText(HomeActivityTest.this, dataIpPswUser.toString(), Toast.LENGTH_LONG).show();
 
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
                 //获取当前时间
@@ -1996,15 +1969,15 @@ public class HomeActivity extends AppCompatActivity {
                     if (timeHis.length() > 5) {//存的有时间
                         //用历史的时间
                         histime = true;
-                        dirname1 = jutiChexingValue + "_" +chehaoHis+"_"+
+                        dirname1 = jutiChexingValue + "_" + chehaoHis + "_" +
                                 timeHis + "_" + chexinaghao + "_" + editext_peishu.getText().toString().trim();
                     } else {
                         //直接用最新的时间
-                        dirname1 = jutiChexingValue + "_" +chehaoHis+"_"+ timeva + "_" + chexianghaoValue + "_" + editext_peishu.getText().toString().trim();
+                        dirname1 = jutiChexingValue + "_" + chehaoHis + "_" + timeva + "_" + chexianghaoValue + "_" + editext_peishu.getText().toString().trim();
                     }
                 } else {
                     //车型 或 车号等 有一个不一样，则新建文件夹，且时间也是最新的
-                    dirname1 = jutiChexingValue + "_" +chehaoHis+"_"+ timeva + "_" + chexianghaoValue + "_" + editext_peishu.getText().toString().trim();
+                    dirname1 = jutiChexingValue + "_" + chehaoHis + "_" + timeva + "_" + chexianghaoValue + "_" + editext_peishu.getText().toString().trim();
                 }
 
 
@@ -2015,7 +1988,7 @@ public class HomeActivity extends AppCompatActivity {
                         && peishu.length() != 0 && dataIpPswUser.toString().length() > 7) {
 
                     String chehaoNow = editext_chehao.getText().toString().trim();
-                    SharedPreferences pref = HomeActivity.this.getSharedPreferences("filedirname", MODE_PRIVATE);
+                    SharedPreferences pref = HomeActivityTest.this.getSharedPreferences("filedirname", MODE_PRIVATE);
                     SharedPreferences.Editor editor = pref.edit();
 
                     editor.putString("chexing", chexingValue);//存机车 动车 城轨  对应根目录文件夹机车产品线...
@@ -2038,26 +2011,31 @@ public class HomeActivity extends AppCompatActivity {
 
 
                     String twoDotIpShebei = ChangeIp.getBeforeThteeIp(dataIpPswUser.get(0));//选择的机车设备的IP并去掉最后一位
-                    String twoDotIpGateway = ChangeIp.getBeforeThteeIp(new ChangeIp().getGateWayIp(HomeActivity.this));//选择的机车设备的IP并去掉最后一位
+                    String twoDotIpGateway = ChangeIp.getBeforeThteeIp(new ChangeIp().getGateWayIp(HomeActivityTest.this));//选择的机车设备的IP并去掉最后一位
                     System.out.println("设备IP前3位：" + twoDotIpShebei);
                     System.out.println("网关IP前3位：" + twoDotIpGateway);
                     if (twoDotIpShebei.equals(twoDotIpGateway)) {
 
                         //正式代码 把查询的ip user psw传给 _host _user _pass
-                        _host = dataIpPswUser.get(0).trim();
-                        _user = dataIpPswUser.get(1).trim();
-                        _pass = dataIpPswUser.get(2).trim();
+                        _host = dataIpPswUser.get(0);
+                        _user = dataIpPswUser.get(1);
+                        _pass = dataIpPswUser.get(2);
 
-                        if (shebeiValue.equals("ERM")||shebeiValue.equals("EDRM")) {//本身是edrm才需要验证
+                        System.out.println("设备值："+shebeiValue);
+                        if (shebeiValue.equals("ERM") || shebeiValue.equals("EDRM")) {//本身是edrm才需要验证
                             haveCheck = true;
+                        }else{
+                            haveCheck = false;
+
                         }
+                        System.out.println("布尔值："+haveCheck);
 
                         String can[] = new String[4];
                         can[0] = _host;
                         can[1] = _port;
                         can[2] = _user;
                         can[3] = _pass;
-                        LogTask task = new LogTask(HomeActivity.this);
+                        LogTask task = new LogTask(HomeActivityTest.this);
                         task.execute(can);
                     } else {
 
@@ -2084,7 +2062,7 @@ public class HomeActivity extends AppCompatActivity {
                     DialogSettings.style = STYLE_IOS;
                     DialogSettings.use_blur = true;
                     DialogSettings.blur_alpha = 200;
-                    MessageDialog.show(HomeActivity.this,
+                    MessageDialog.show(HomeActivityTest.this,
                             "提示", "请检查信息填写是否完整无误", "知道了", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
@@ -2110,21 +2088,21 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void run() {
                 //设置串口
-                ipChange.socketSend2ParaTEst(HomeActivity.this, "UART", chuankou);
+                ipChange.socketSend2ParaTEst(HomeActivityTest.this, "UART", chuankou);
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
                 //修改网关IP
-                ipChange.socketSend2ParaTEstSecond(HomeActivity.this, "LANN", ipForchange);
+                ipChange.socketSend2ParaTEstSecond(HomeActivityTest.this, "LANN", ipForchange);
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
                 //发重启指令
-                ipChange.socketSendQueryCommChongqi(HomeActivity.this);
+                ipChange.socketSendQueryCommChongqi(HomeActivityTest.this);
 
 
             }
@@ -2169,7 +2147,7 @@ public class HomeActivity extends AppCompatActivity {
         }
 
         protected Boolean doInBackground(String... Params) {
-
+            System.out.println("最终的布尔值："+haveCheck);
             if (haveCheck) {
                 return checkLogin(8001);
 
@@ -2181,7 +2159,7 @@ public class HomeActivity extends AppCompatActivity {
 
         protected void onPostExecute(Boolean flag) {
             if (flag) {
-                Intent intent = new Intent(HomeActivity.this, selectFileActivity.class);
+                Intent intent = new Intent(HomeActivityTest.this, selectFileActivity.class);
                 //准备进入选择界面并且准备好参数
                 intent.putExtra("host", _host);
                 intent.putExtra("user", _user);
@@ -2192,7 +2170,7 @@ public class HomeActivity extends AppCompatActivity {
                 DialogSettings.style = STYLE_IOS;
                 DialogSettings.use_blur = true;
                 DialogSettings.blur_alpha = 200;
-                MessageDialog.show(HomeActivity.this,
+                MessageDialog.show(HomeActivityTest.this,
                         "无法连接车辆设备", "请检查工装网线是否接好，信息填写是否无误！", "知道了", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -2333,10 +2311,10 @@ public class HomeActivity extends AppCompatActivity {
                     // 再使用 AES密钥对象 加密数据。
 
                     try {
-                        byte[] byteEny = HomeActivity.encrypt(bytess16, bytes16);
+                        byte[] byteEny = HomeActivityTest.encrypt(bytess16, bytes16);
                         System.out.println("byteEny:" + Arrays.toString(byteEny));
 
-                        String strEny = HomeActivity.byte2hex(byteEny);
+                        String strEny = HomeActivityTest.byte2hex(byteEny);
                         System.out.println("把字节数组转换成16进值字符串:" + strEny);
 
 //                                        把字节数组转换成16进值字符串
@@ -2506,23 +2484,23 @@ public class HomeActivity extends AppCompatActivity {
         // 如果SDK版本大于或等于23才需要检查权限，否则直接拨弹出图库
         if (Build.VERSION.SDK_INT >= 23) {
             // 检查权限是否允许
-            if (ContextCompat.checkSelfPermission(HomeActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            if (ContextCompat.checkSelfPermission(HomeActivityTest.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                     != PackageManager.PERMISSION_GRANTED) {
                 Log.e("TAG", "没有权限");
                 // 没有权限，考虑是否需要解释为什么需要这个权限
                 /*申请权限的解释，该方法在用户上一次已经拒绝过你的这个权限申请时使用。
                  * 也就是说，用户已经拒绝一次了，你又弹个授权框，你需要给用户一个解释，为什么要授权*/
-                if (ActivityCompat.shouldShowRequestPermissionRationale(HomeActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                if (ActivityCompat.shouldShowRequestPermissionRationale(HomeActivityTest.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                     Log.e("TAG", "没有权限,用户上次已经拒绝该权限，解释为什么需要这个权限");
                     // Show an expanation to the user *asynchronously* -- don't block this thread
                     //waiting for the user's response! After the user
                     // sees the explanation, try again to request the permission.
-                    Toast.makeText(HomeActivity.this, "需要权限才能上传图片哦", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(HomeActivityTest.this, "需要权限才能上传图片哦", Toast.LENGTH_SHORT).show();
 
                 } else {
                     Log.e("TAG", "没有权限，申请权限");
                     // 申请权限
-                    ActivityCompat.requestPermissions(HomeActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    ActivityCompat.requestPermissions(HomeActivityTest.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                             REQUEST_CALL_PHONE);
                 }
             } else {
@@ -2584,7 +2562,7 @@ public class HomeActivity extends AppCompatActivity {
             }
         }, 5000);
 
-        if (resultCode == HomeActivity.this.RESULT_OK && requestCode == 100) {
+        if (resultCode == HomeActivityTest.this.RESULT_OK && requestCode == 100) {
             // 作为头像的图片在设备上的本地路径是什么（/sdcard/XXX/XXXX.jpg）
             String filePath = "";
             if (data != null) {
@@ -2592,7 +2570,7 @@ public class HomeActivity extends AppCompatActivity {
                 // uri代表用户选取的图片在MediaStroe中存储的位置
                 Uri uri = data.getData();
                 try {
-                    Bitmap bm = getBitmapFormUri(HomeActivity.this, uri);
+                    Bitmap bm = getBitmapFormUri(HomeActivityTest.this, uri);
                     if (bm != null) {
                         String img = imgToBase64(filePath, bm, "256");
                         Log.i("hxl", "img========================================" + img);
@@ -2601,7 +2579,7 @@ public class HomeActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 // 利用ContentResolver查找uri所对应图片在设备上的真实路径
-                Cursor cursor = HomeActivity.this.getContentResolver().query(uri,
+                Cursor cursor = HomeActivityTest.this.getContentResolver().query(uri,
                         new String[]{MediaStore.Images.Media.DATA}, null, null, null);
                 cursor.moveToNext();
                 filePath = cursor.getString(0);
@@ -2643,7 +2621,7 @@ public class HomeActivity extends AppCompatActivity {
                     try {
 
 
-                        bitmap = getBitmapFormUri(HomeActivity.this, uri);
+                        bitmap = getBitmapFormUri(HomeActivityTest.this, uri);
                         System.out.println("大小2：" + bitmap.getAllocationByteCount());
 //                       ;
                     } catch (IOException e) {
@@ -2687,7 +2665,7 @@ public class HomeActivity extends AppCompatActivity {
                                             DialogSettings.style = STYLE_IOS;
                                             DialogSettings.use_blur = true;
                                             DialogSettings.blur_alpha = 200;
-                                            MessageDialog.show(HomeActivity.this,
+                                            MessageDialog.show(HomeActivityTest.this,
                                                     "提示", "网络状况不佳", "知道了", new DialogInterface.OnClickListener() {
                                                         @Override
                                                         public void onClick(DialogInterface dialog, int which) {
@@ -2859,7 +2837,7 @@ public class HomeActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        SharedPreferences pref = HomeActivity.this.getSharedPreferences("tab", MODE_PRIVATE);
+        SharedPreferences pref = HomeActivityTest.this.getSharedPreferences("tab", MODE_PRIVATE);
         SharedPreferences.Editor editor = pref.edit();
         editor.putInt("tabnum", 0);
         editor.commit();
