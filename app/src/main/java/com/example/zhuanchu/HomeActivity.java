@@ -1899,6 +1899,9 @@ public class HomeActivity extends AppCompatActivity {
 
                 String wifiresult = getSSID();
                 System.out.println(wifiresult + "------------------");
+//                Toast.makeText(HomeActivity.this, "连接的wifi名称为："
+//                        +wifiresult, Toast.LENGTH_LONG).show();
+
                 if (wifiresult.indexOf("SHGZ") < 0) {
                     DialogSettings.style = STYLE_IOS;
                     DialogSettings.use_blur = true;
@@ -1949,7 +1952,7 @@ public class HomeActivity extends AppCompatActivity {
                 dataIpPswUser.clear();
                 dataIpPswUser.addAll(jutichexingchehaoshebeicmdpswIp);
 
-                Toast.makeText(HomeActivity.this, dataIpPswUser.toString(), Toast.LENGTH_LONG).show();
+//                Toast.makeText(HomeActivity.this, dataIpPswUser.toString(), Toast.LENGTH_LONG).show();
 
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
                 //获取当前时间
