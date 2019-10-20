@@ -92,7 +92,7 @@ public class SplashActivity extends AppCompatActivity {
                 .subscribe(new Action1<Long>() {
                     @Override
                     public void call(Long aLong) {
-                        startActivity(new Intent(SplashActivity.this, HomeActivity.class));
+                        startActivity(new Intent(SplashActivity.this, AuthActivity.class));
                         overridePendingTransition(0, android.R.anim.fade_out);
                         finish();
                     }
