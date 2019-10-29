@@ -175,10 +175,13 @@ public class HomeActivity extends AppCompatActivity {
     public static EditText host, port, name, pass;
     public static boolean haveCheck = false;
     public ImageButton imbtnOcr;
+    public boolean ipFlag=false;
 
 
     public EditText editext_chehao;
     public EditText editext_peishu;
+    public EditText editext_ip;
+    public LinearLayout ll_ip;
     public NiceSpinner edit_spinnerCheXing;
     public NiceSpinner edit_spinnerjuTiCheXing;
     public NiceSpinner edit_spinnerCheXingCheHao;
@@ -473,6 +476,8 @@ public class HomeActivity extends AppCompatActivity {
 
         editext_chehao = (EditText) view.findViewById(R.id.editext_chehao);
         editext_peishu = (EditText) view.findViewById(R.id.et_peishu);
+        editext_ip = (EditText) view.findViewById(R.id.et_ip);
+        ll_ip = (LinearLayout) view.findViewById(R.id.ll_ip);
         edit_spinnerCheXing = view.findViewById(R.id.edit_spinnerCheXing);
         edit_spinnerjuTiCheXing = view.findViewById(R.id.edit_spinnerjuTiCheXing);
         edit_spinnerCheXingCheHao = view.findViewById(R.id.edit_spinnerCheXingCheHao);
@@ -1379,6 +1384,7 @@ public class HomeActivity extends AppCompatActivity {
             String keys = "ijijkjkjkjlkklok";
             try {
                 xkl = AESCrypt.decrypt(keys, result);
+//                saveFile(xkl,"filetest.txt");
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -1389,8 +1395,29 @@ public class HomeActivity extends AppCompatActivity {
         return xkl;
     }
 
+    public void encryptTeg() {
+        InputStream is = null;
+        String result = "";
+        String xkl = "";
 
+        try {
+            is = getAssets().open("tegstest.txt");
+            int lenght = is.available();
+            byte[] buffer = new byte[lenght];
+            is.read(buffer);
+            result = new String(buffer, "utf8");
+            String keys = "ijijkjkjkjlkklok";
+            try {
+                xkl = AESCrypt.encrypt(keys, result);
+                saveFile(xkl,"filetestEncry.txt");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 
 //    private String getJson() {
@@ -1952,6 +1979,11 @@ public class HomeActivity extends AppCompatActivity {
                 dataIpPswUser.clear();
                 dataIpPswUser.addAll(jutichexingchehaoshebeicmdpswIp);
 
+                //只把手动输入的ip存入 本地
+                SharedPreferences prefInfo = HomeActivity.this.getSharedPreferences("ipuser", MODE_PRIVATE);
+                SharedPreferences.Editor editorInfo = prefInfo.edit();
+                editorInfo.putString("myhost", dataIpPswUser.get(0));
+
 //                Toast.makeText(HomeActivity.this, dataIpPswUser.toString(), Toast.LENGTH_LONG).show();
 
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
@@ -1999,15 +2031,15 @@ public class HomeActivity extends AppCompatActivity {
                     if (timeHis.length() > 5) {//存的有时间
                         //用历史的时间
                         histime = true;
-                        dirname1 = jutiChexingValue + "_" +chehaoHis+"_"+
+                        dirname1 = jutiChexingValue + "_" + chehaoHis + "_" +
                                 timeHis + "_" + chexinaghao + "_" + editext_peishu.getText().toString().trim();
                     } else {
                         //直接用最新的时间
-                        dirname1 = jutiChexingValue + "_" +chehaoHis+"_"+ timeva + "_" + chexianghaoValue + "_" + editext_peishu.getText().toString().trim();
+                        dirname1 = jutiChexingValue + "_" + chehaoHis + "_" + timeva + "_" + chexianghaoValue + "_" + editext_peishu.getText().toString().trim();
                     }
                 } else {
                     //车型 或 车号等 有一个不一样，则新建文件夹，且时间也是最新的
-                    dirname1 = jutiChexingValue + "_" +chehaoHis+"_"+ timeva + "_" + chexianghaoValue + "_" + editext_peishu.getText().toString().trim();
+                    dirname1 = jutiChexingValue + "_" + chehaoHis + "_" + timeva + "_" + chexianghaoValue + "_" + editext_peishu.getText().toString().trim();
                 }
 
 
@@ -2044,14 +2076,30 @@ public class HomeActivity extends AppCompatActivity {
                     String twoDotIpGateway = ChangeIp.getBeforeThteeIp(new ChangeIp().getGateWayIp(HomeActivity.this));//选择的机车设备的IP并去掉最后一位
                     System.out.println("设备IP前3位：" + twoDotIpShebei);
                     System.out.println("网关IP前3位：" + twoDotIpGateway);
+
+                    //手动输入的IP
+                    String ipEditout = editext_ip.getText().toString().trim();
+                    if (ipEditout!=""&&ipEditout!=null){
+                        twoDotIpShebei = ipEditout;
+                    }
+
                     if (twoDotIpShebei.equals(twoDotIpGateway)) {
 
                         //正式代码 把查询的ip user psw传给 _host _user _pass
-                        _host = dataIpPswUser.get(0).trim();
+                        String ipEdit = editext_ip.getText().toString().trim();
+                        if (ipEdit!=""&&ipEdit!=null){
+                            _host = ipEdit;
+                        }else{
+                            _host = dataIpPswUser.get(0).trim();
+                        }
                         _user = dataIpPswUser.get(1).trim();
                         _pass = dataIpPswUser.get(2).trim();
 
-                        if (shebeiValue.equals("ERM")||shebeiValue.equals("EDRM")) {//本身是edrm才需要验证
+
+
+                        editor.commit();
+
+                        if (shebeiValue.equals("ERM") || shebeiValue.equals("EDRM")) {//本身是edrm才需要验证
                             haveCheck = true;
                         }
 
@@ -2068,7 +2116,7 @@ public class HomeActivity extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                promptDialog.showLoading("IP正在配置，稍后请重新连接WIFI", false);
+                                promptDialog.showLoading("正在配置工装IP，稍后请重新连接WIFI", false);
                             }
                         });
                         new Handler().postDelayed(new Runnable() {
@@ -2084,11 +2132,15 @@ public class HomeActivity extends AppCompatActivity {
                     }
 
                 } else {
+
+                    //连不上设备  尝试手动式输入ip。设置一个开关控制是否显示 ip输入框
+
+                    ll_ip.setVisibility(View.VISIBLE);//表示显示ip输入框ui
                     DialogSettings.style = STYLE_IOS;
                     DialogSettings.use_blur = true;
                     DialogSettings.blur_alpha = 200;
                     MessageDialog.show(HomeActivity.this,
-                            "提示", "请检查信息填写是否完整无误", "知道了", new DialogInterface.OnClickListener() {
+                            "无法连接车辆设备", "请检查信息填写是否完整无误", "知道了", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                 }
@@ -2868,5 +2920,11 @@ public class HomeActivity extends AppCompatActivity {
         editor.commit();
         if (promptDialog.onBackPressed())
             super.onBackPressed();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        ll_ip.setVisibility(View.GONE);
     }
 }

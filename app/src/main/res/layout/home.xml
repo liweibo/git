@@ -252,7 +252,49 @@
 
 
                 </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/ll_ip"
+                    android:visibility="gone"
+                    android:layout_marginTop="20dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                    <TextView
+                        android:id="@+id/ipedit"
+                        android:clickable="true"
+                        android:layout_width="119dp"
+                        android:layout_height="wrap_content"
+                        android:text="设备IP"
+                        android:textSize="16dp" />
+                    <scut.carson_ho.diy_view.SuperEditText
+                        android:id="@+id/et_ip"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="20dp"
+                        android:layout_weight="1"
+                        android:textColor="@color/colorfocus"
+                        android:textSize="16dp"
+                        app:cursor="@drawable/cursortest"
+                        app:delete_height="60"
+                        app:delete_width="60"
+                        app:delete_x="0"
+                        app:delete_y="0"
+                        app:ic_delete="@drawable/delete"
+                        app:ic_left_click="@drawable/ic_left_click"
+                        app:ic_left_unclick="@drawable/ic_left_unclick"
+                        app:left_height="0"
+                        app:left_width="0"
+                        app:left_x="0"
+                        app:left_y="0"
+                        />
 
+                    <ImageButton
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginRight="10dp"
+                        android:background="@color/transparent" />
+
+                </LinearLayout>
 
                 <TextView
                     android:id="@+id/testtext"
@@ -290,7 +332,10 @@
                 </LinearLayout>
 
 
+
             </LinearLayout>
+
+
 
 
         </ScrollView>
