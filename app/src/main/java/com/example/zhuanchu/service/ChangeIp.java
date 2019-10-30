@@ -26,7 +26,7 @@ public class ChangeIp {
         }
     }
 
-    public static String getBeforeThteeIp(String sbIP){//传入设备ip 或者网关ip都行
+    public static String getBeforeThteeIp(String sbIP) {//传入设备ip 或者网关ip都行
         int indexLastDot = sbIP.lastIndexOf(".");
         char[] arrIP = sbIP.toCharArray();
         String twoDotIp = "";//前三位的ip 去掉了最后一位
@@ -88,7 +88,7 @@ public class ChangeIp {
 
     }
 
-//非首次发送修改指令，就不用发连接指令与+ok指令了。
+    //非首次发送修改指令，就不用发连接指令与+ok指令了。
     public void socketSend2ParaTEstSecond(Context context, String command, String para) {
         String gateWayIp = getGateWayIp(context);//网关地址
         DatagramPacket datagramPacket = null;
@@ -105,18 +105,19 @@ public class ChangeIp {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+
         }
 
     }
 
-//发送重启指令
-    public void socketSendQueryCommChongqi( Context context) {
+    //发送重启指令
+    public void socketSendQueryCommChongqi(Context context) {
         DatagramPacket datagramPacket = null;
         try {
-                byte[] data = ("AT+" + "Z" + "\r").getBytes();
-                datagramPacket = new DatagramPacket
-                        (data, data.length, InetAddress.getByName(getGateWayIp(context)), 48899);
-                datagramSocket.send(datagramPacket);
+            byte[] data = ("AT+" + "Z" + "\r").getBytes();
+            datagramPacket = new DatagramPacket
+                    (data, data.length, InetAddress.getByName(getGateWayIp(context)), 48899);
+            datagramSocket.send(datagramPacket);
         } catch (UnknownHostException e) {
             e.printStackTrace();
         } catch (SocketException e) {

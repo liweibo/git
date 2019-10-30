@@ -175,7 +175,7 @@ public class HomeActivity extends AppCompatActivity {
     public static EditText host, port, name, pass;
     public static boolean haveCheck = false;
     public ImageButton imbtnOcr;
-    public boolean ipFlag=false;
+    public boolean ipFlag = false;
 
 
     public EditText editext_chehao;
@@ -1376,12 +1376,20 @@ public class HomeActivity extends AppCompatActivity {
         String xkl = "";
 
         try {
-            is = getAssets().open("tegs.txt");
+            is = getAssets().open("newjsonen.txt");
             int lenght = is.available();
             byte[] buffer = new byte[lenght];
             is.read(buffer);
             result = new String(buffer, "utf8");
             String keys = "ijijkjkjkjlkklok";
+
+//            try {
+//                xkl = AESCrypt.encrypt(keys, result);
+//                saveFile(xkl, "newjsonen.txt");
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+
             try {
                 xkl = AESCrypt.decrypt(keys, result);
 //                saveFile(xkl,"filetest.txt");
@@ -1393,6 +1401,7 @@ public class HomeActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         return xkl;
+//        return result;
     }
 
     public void encryptTeg() {
@@ -1409,7 +1418,7 @@ public class HomeActivity extends AppCompatActivity {
             String keys = "ijijkjkjkjlkklok";
             try {
                 xkl = AESCrypt.encrypt(keys, result);
-                saveFile(xkl,"filetestEncry.txt");
+                saveFile(xkl, "filetestEncry.txt");
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -1985,7 +1994,6 @@ public class HomeActivity extends AppCompatActivity {
                 editorInfo.putString("myhost", dataIpPswUser.get(0));
 
 //                Toast.makeText(HomeActivity.this, dataIpPswUser.toString(), Toast.LENGTH_LONG).show();
-
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
                 //获取当前时间
                 Date date = new Date(System.currentTimeMillis());
@@ -2079,7 +2087,7 @@ public class HomeActivity extends AppCompatActivity {
 
                     //手动输入的IP
                     String ipEditout = editext_ip.getText().toString().trim();
-                    if (ipEditout!=""&&ipEditout!=null){
+                    if (ipEditout != "" && ipEditout != null) {
                         twoDotIpShebei = ipEditout;
                     }
 
@@ -2087,14 +2095,13 @@ public class HomeActivity extends AppCompatActivity {
 
                         //正式代码 把查询的ip user psw传给 _host _user _pass
                         String ipEdit = editext_ip.getText().toString().trim();
-                        if (ipEdit!=""&&ipEdit!=null){
+                        if (ipEdit != "" && ipEdit != null) {
                             _host = ipEdit;
-                        }else{
+                        } else {
                             _host = dataIpPswUser.get(0).trim();
                         }
                         _user = dataIpPswUser.get(1).trim();
                         _pass = dataIpPswUser.get(2).trim();
-
 
 
                         editor.commit();
