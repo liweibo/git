@@ -2142,7 +2142,12 @@ public class HomeActivity extends AppCompatActivity {
 
                     //连不上设备  尝试手动式输入ip。设置一个开关控制是否显示 ip输入框
 
-                    ll_ip.setVisibility(View.VISIBLE);//表示显示ip输入框ui
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            ll_ip.setVisibility(View.VISIBLE);//表示显示ip输入框ui
+                        }
+                    });
                     DialogSettings.style = STYLE_IOS;
                     DialogSettings.use_blur = true;
                     DialogSettings.blur_alpha = 200;
@@ -2932,6 +2937,11 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        ll_ip.setVisibility(View.GONE);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ll_ip.setVisibility(View.GONE);
+            }
+        });
     }
 }
