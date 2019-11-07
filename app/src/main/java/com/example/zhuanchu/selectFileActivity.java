@@ -365,7 +365,10 @@ public class selectFileActivity extends AppCompatActivity implements OnClickList
             port = Integer.parseInt(portStr);
             try {
                 util.connectServer(host, port, user, pass, "");
-                list = util.getFileList(path);
+                list = util.getFileList();
+//                if (list.size()<0){
+//                    list = util.getFileList("");
+//                }
                 if (list.size() > 0) {
                     backDir.add(path);//每次点击文件夹进入下级目录时，都记录父路径
                 }
@@ -499,7 +502,7 @@ public class selectFileActivity extends AppCompatActivity implements OnClickList
             port = Integer.parseInt(portStr);
             try {
                 util.connectServer(host, port, user, pass, "");
-                list = util.getFileList(path);
+                list = util.getFileList();
 
                 //附带父亲文件夹的路径进去
                 list.add(new FtpUtils.wxhFile(path, "", 2));

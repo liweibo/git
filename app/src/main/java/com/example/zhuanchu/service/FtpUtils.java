@@ -58,18 +58,43 @@ public class FtpUtils {
         }
     }
 
-    /**
-     * @param path
-     * @return function:读取指定目录下的文件名
-     * @throws IOException
-     */
-    public List<wxhFile> getFileList(String path) throws ParseException {
+//    public List<wxhFile> getFileList(String path) throws ParseException {
+//        List<wxhFile> fileLists = new ArrayList<wxhFile>();
+//        // 获得指定目录下所有文件名
+//        FTPFile[] ftpFiles = null;
+//        try {
+////            ftpFiles = ftpClient.listFiles(path);
+//            ftpFiles = ftpClient.listFiles();
+//                System.out.println(ftpFiles.length+"长度");
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        for (int i = 0; ftpFiles != null && i < ftpFiles.length; i++) {
+//            FTPFile file = ftpFiles[i];
+//            if (file.isFile()) {
+//                System.out.println("文件夹下面的文件=====" + file.getName());
+//                wxhFile a = new wxhFile(path + file.getName(), file.getName(), 1);
+//                fileLists.add(a);
+//            } else if (file.isDirectory()) {
+//                String name = file.getName();
+//                if (name.equals(".") || name.equals("..")) continue;
+//                System.out.println("文件夹名称为=====" + name);
+//                wxhFile a = new wxhFile(path + file.getName(), file.getName(), 0);
+//                fileLists.add(a);
+//            }
+//        }
+//
+//        return fileLists;
+//    }
+
+    public List<wxhFile> getFileList() throws ParseException {
         List<wxhFile> fileLists = new ArrayList<wxhFile>();
         // 获得指定目录下所有文件名
         FTPFile[] ftpFiles = null;
         try {
-            ftpFiles = ftpClient.listFiles(path);
-                System.out.println(ftpFiles.length+"长度");
+//            ftpFiles = ftpClient.listFiles(path);
+            ftpFiles = ftpClient.listFiles();
+            System.out.println(ftpFiles.length+"长度");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -77,21 +102,19 @@ public class FtpUtils {
             FTPFile file = ftpFiles[i];
             if (file.isFile()) {
                 System.out.println("文件夹下面的文件=====" + file.getName());
-                wxhFile a = new wxhFile(path + file.getName(), file.getName(), 1);
+                wxhFile a = new wxhFile(file.getName(), file.getName(), 1);
                 fileLists.add(a);
             } else if (file.isDirectory()) {
                 String name = file.getName();
                 if (name.equals(".") || name.equals("..")) continue;
                 System.out.println("文件夹名称为=====" + name);
-                wxhFile a = new wxhFile(path + file.getName(), file.getName(), 0);
+                wxhFile a = new wxhFile(file.getName(), file.getName(), 0);
                 fileLists.add(a);
             }
         }
 
         return fileLists;
     }
-
-
 
     public List<wxhFile> firstgetFileList() throws ParseException {
         List<wxhFile> fileLists = new ArrayList<wxhFile>();
