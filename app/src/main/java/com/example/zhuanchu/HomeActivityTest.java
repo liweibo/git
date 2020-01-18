@@ -4,7 +4,6 @@ package com.example.zhuanchu;
 import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -28,7 +27,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.os.SystemClock;
-import android.preference.Preference;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -36,12 +34,9 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -50,7 +45,6 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -58,19 +52,16 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
-
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.alibaba.android.arouter.launcher.ARouter;
 import com.alibaba.fastjson.JSON;
 import com.example.zhuanchu.adapter.UploadAdapter;
 import com.example.zhuanchu.adapter.VerticalAdapter;
-import com.example.zhuanchu.bean.UploadFile;
 import com.example.zhuanchu.bean.javaBean.JsonRootBean;
 import com.example.zhuanchu.bean.pojo15.JsonRootBean15;
+import com.example.zhuanchu.service.AlertUtils;
 import com.example.zhuanchu.service.AuthService;
 import com.example.zhuanchu.service.ChangeIp;
 import com.example.zhuanchu.service.CompressOperate_zip4j;
@@ -79,17 +70,10 @@ import com.example.zhuanchu.service.GetInfoForMultiList;
 import com.example.zhuanchu.service.MultiViewPager;
 import com.example.zhuanchu.service.SqlHelper;
 import com.example.zhuanchu.service.UploadProgressListener;
-import com.example.zhuanchu.service.ViewFindUtils;
+import com.example.zhuanchu.thread.DownloadUtil;
 import com.flyco.tablayout.SegmentTabLayout;
-import com.flyco.tablayout.listener.OnTabSelectListener;
-import com.flyco.tablayout.widget.MsgView;
 import com.githang.statusbar.StatusBarCompat;
-import com.google.android.flexbox.FlexboxLayout;
 import com.google.android.flexbox.FlexboxLayoutManager;
-import com.kongzue.dialog.v2.DialogSettings;
-import com.kongzue.dialog.v2.MessageDialog;
-import com.kongzue.dialog.v2.SelectDialog;
-import com.scottyab.aescrypt.AESCrypt;
 import com.suke.widget.SwitchButton;
 
 import org.angmarch.views.NiceSpinner;
@@ -113,8 +97,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import javax.crypto.Cipher;
@@ -131,8 +117,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-
-import static com.kongzue.dialog.v2.DialogSettings.STYLE_IOS;
 
 public class HomeActivityTest extends AppCompatActivity {
     private List<String> datajutiCheXing = new ArrayList<>();
@@ -242,6 +226,7 @@ public class HomeActivityTest extends AppCompatActivity {
             }
         }
     };
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -250,11 +235,11 @@ public class HomeActivityTest extends AppCompatActivity {
 
 
         actionBar = this.getSupportActionBar();
-            actionBar.setTitle("信息配置");
+        actionBar.setTitle("信息配置");
 
         actionBar.setDisplayHomeAsUpEnabled(true);
         StatusBarCompat.setStatusBarColor(this, getResources().getColor(R.color.colorfocus), true);
-       // initUI();
+        // initUI();
     }
 
     public void textMethod(View view) {
@@ -453,18 +438,18 @@ public class HomeActivityTest extends AppCompatActivity {
     //1  init下载首页的UI组件，以及逻辑代码，也就是homeactivity页面的内容
     public void initdownload() {
 
-        imbtnOcr = (ImageButton)findViewById(R.id.imagebtnCamera);
+        imbtnOcr = (ImageButton) findViewById(R.id.imagebtnCamera);
 
-        editext_chehao = (EditText)findViewById(R.id.editext_chehao);
+        editext_chehao = (EditText) findViewById(R.id.editext_chehao);
         editext_peishu = (EditText) findViewById(R.id.et_peishu);
-        edit_spinnerCheXing =  findViewById(R.id.edit_spinnerCheXing);
-        edit_spinnerjuTiCheXing =  findViewById(R.id.edit_spinnerjuTiCheXing);
-        edit_spinnerCheXingCheHao =  findViewById(R.id.edit_spinnerCheXingCheHao);
-        edit_spinnerCheXingCheHaoSheBei =  findViewById(R.id.edit_spinnerCheXingCheHaoSheBei);
-        edit_spinnerCheXingCheHaoCMD =  findViewById(R.id.edit_spinnerCheXingCheHaoCMD);
+        edit_spinnerCheXing = findViewById(R.id.edit_spinnerCheXing);
+        edit_spinnerjuTiCheXing = findViewById(R.id.edit_spinnerjuTiCheXing);
+        edit_spinnerCheXingCheHao = findViewById(R.id.edit_spinnerCheXingCheHao);
+        edit_spinnerCheXingCheHaoSheBei = findViewById(R.id.edit_spinnerCheXingCheHaoSheBei);
+        edit_spinnerCheXingCheHaoCMD = findViewById(R.id.edit_spinnerCheXingCheHaoCMD);
 
-        fl_cmd = (LinearLayout)  findViewById(R.id.fl_cmd);
-        cb_remember = (CheckBox)  findViewById(R.id.remember_info);
+        fl_cmd = (LinearLayout) findViewById(R.id.fl_cmd);
+        cb_remember = (CheckBox) findViewById(R.id.remember_info);
         promptDialog = new PromptDialog(this);
 
 
@@ -612,15 +597,7 @@ public class HomeActivityTest extends AppCompatActivity {
                 }
 
                 if (packnumber == 0) {
-                    DialogSettings.style = STYLE_IOS;
-                    DialogSettings.use_blur = true;
-                    DialogSettings.blur_alpha = 200;
-                    MessageDialog.show(HomeActivityTest.this,
-                            "提示", "请选择需要打包的目录", "知道了", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                }
-                            });
+                    AlertUtils.alertNoListener(HomeActivityTest.this, "请选择需要打包的目录");
                     return;
                 }
                 try {
@@ -904,16 +881,7 @@ public class HomeActivityTest extends AppCompatActivity {
                 }
 
                 if (uploadnumber == 0) {
-                    DialogSettings.style = STYLE_IOS;
-                    DialogSettings.use_blur = true;
-                    DialogSettings.blur_alpha = 200;
-                    MessageDialog.show(HomeActivityTest.this,
-                            "提示", "请勾选需上传的文件", "知道了", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                }
-                            });
-//                    Toast.makeText(HomeActivity.this, "请选择需要打包的文件", Toast.LENGTH_LONG).show();
+                    AlertUtils.alertNoListener(HomeActivityTest.this, "请勾选需上传的文件");
                     return;
                 }
 
@@ -930,21 +898,35 @@ public class HomeActivityTest extends AppCompatActivity {
                 String wifiresult = getSSID();
                 System.out.println(wifiresult);
                 if (wifiresult.indexOf("SHGZ") >= 0) {
-                    DialogSettings.style = STYLE_IOS;
-                    DialogSettings.use_blur = true;
-                    DialogSettings.blur_alpha = 200;
-                    SelectDialog.show(HomeActivityTest.this, "WIFI设置", "请切换能上网的WIFI", "确定", new DialogInterface.OnClickListener() {
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setTitle("WIFI设置");
+                    builder.setMessage("请切换能上网的WIFI");
+                    builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            Intent i = new Intent();
-                            i = new Intent(Settings.ACTION_WIFI_SETTINGS);
-                            startActivity(i);
-                        }
-                    }, "取消", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            Intent inten = new Intent(Settings.ACTION_WIFI_SETTINGS);
+                            startActivity(inten);
                         }
                     });
+                    builder.setNegativeButton("取消", null);
+                    builder.show();
+
+//                    DialogSettings.style = STYLE_IOS;
+//                    DialogSettings.use_blur = true;
+//                    DialogSettings.blur_alpha = 200;
+//                    SelectDialog.show(HomeActivityTest.this, "WIFI设置", "请切换能上网的WIFI", "确定", new DialogInterface.OnClickListener() {
+//                        @Override
+//                        public void onClick(DialogInterface dialog, int which) {
+//                            Intent i = new Intent();
+//                            i = new Intent(Settings.ACTION_WIFI_SETTINGS);
+//                            startActivity(i);
+//                        }
+//                    }, "取消", new DialogInterface.OnClickListener() {
+//                        @Override
+//                        public void onClick(DialogInterface dialog, int which) {
+//                        }
+//                    });
                     return;
                 }
 
@@ -956,21 +938,20 @@ public class HomeActivityTest extends AppCompatActivity {
                 System.out.println(networkinit);
 
                 if (mobile && !networkinit) {
-                    DialogSettings.style = STYLE_IOS;
-                    DialogSettings.use_blur = true;
-                    DialogSettings.blur_alpha = 200;
-                    SelectDialog.show(context, "网络检测", "当前为4G网络，要继续上传吗?", "确定", new DialogInterface.OnClickListener() {
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setTitle("网络检测");
+                    builder.setMessage("当前为4G网络，要继续上传吗?");
+                    builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialog, int which) {
+                        public void onClick(DialogInterface dialogInterface, int i) {
                             sharedPreferencesUp.edit().putBoolean("network", true).commit();
                             uploadFile(HomeActivityTest.this);
                         }
-                    }, "取消", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-
-                        }
                     });
+                    builder.setNegativeButton("取消", null);
+                    builder.show();
+
                     return;
                 }
                 uploadFile(HomeActivityTest.this);
@@ -1789,15 +1770,8 @@ public class HomeActivityTest extends AppCompatActivity {
                             editor.commit();
                         } else//信息填写不完整 则弹出提示框
                         {
-                            DialogSettings.style = STYLE_IOS;
-                            DialogSettings.use_blur = true;
-                            DialogSettings.blur_alpha = 200;
-                            MessageDialog.show(HomeActivityTest.this,
-                                    "提示", "信息填写不完整", "知道了", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                        }
-                                    });
+                            AlertUtils.alertNoListener(HomeActivityTest.this
+                                    , "请填写完整信息");
                             cb_remember.setChecked(false);
                         }
                     } else {
@@ -1822,15 +1796,9 @@ public class HomeActivityTest extends AppCompatActivity {
                             editor.commit();
                         } else//信息填写不完整 则弹出提示框
                         {
-                            DialogSettings.style = STYLE_IOS;
-                            DialogSettings.use_blur = true;
-                            DialogSettings.blur_alpha = 200;
-                            MessageDialog.show(HomeActivityTest.this,
-                                    "提示", "信息填写不完整", "知道了", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                        }
-                                    });
+                            AlertUtils.alertNoListener(HomeActivityTest.this
+                                    , "请填写完整信息");
+
                             cb_remember.setChecked(false);
                         }
                     }
@@ -1860,36 +1828,54 @@ public class HomeActivityTest extends AppCompatActivity {
             }
         });
 
+        findViewById(R.id.vercodehometest).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String json = "{\r\n"
+                        + "	\"https://y.qq.com/download/import/QQMusic-import-1.2.1.zip\":	\"/storage/emulated/0/CRRC/UPLOAD/QQMusic-import-1.2.1.zip\",\r\n"
+                        + "	\"https://downs.muzhiwan.com/2019/07/04/com.supercell.clashofclans.ewan.mzw_5d1da09397884.apk\":	\"/storage/emulated/0/CRRC/DOWNLOAD/com.supercell.clashofclans.ewan.mzw_5d1da09397884.apk\",\r\n"
+                        + "	\"https://downs.muzhiwan.com/2019/02/28/com.miniclip.plagueinc_5c77596c79179.apk\":	\"/storage/emulated/0/CRRC/com.miniclip.plagueinc_5c77596c79179.apk\"\r\n"
+                        + "}";
+                Map<String, String> map = new HashMap<>();
+                Map<String, String> resMap = JSON.parseObject(json, map.getClass());
+                System.out.println();
+                int times = 1;
+                for (int index = 0; index < times; index++) {
+                    System.out.println("多线程下载------------"+Environment.getExternalStorageDirectory().getPath());
+                    DownloadUtil.batch(resMap);
+                }
 
+            }
+        });
         //点击确定时，获取...ip等，进入ip设置页面
         findViewById(R.id.vercodehome).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 //判断wifi是不是连接了设备
-                boolean wfstate = isWifi(HomeActivityTest.this);
-                System.out.println(wfstate + "------------------");
-
-                String wifiresult = getSSID();
-                System.out.println(wifiresult + "------------------");
-                if (wifiresult.indexOf("SHGZ") < 0) {
-                    DialogSettings.style = STYLE_IOS;
-                    DialogSettings.use_blur = true;
-                    DialogSettings.blur_alpha = 200;
-                    SelectDialog.show(HomeActivityTest.this, "提示", "未连接工装WIFI，去连接WIFI", "确定", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            Intent i = new Intent();
-                            i = new Intent(Settings.ACTION_WIFI_SETTINGS);
-                            startActivity(i);
-                        }
-                    }, "取消", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                        }
-                    });
-                    return;
-                }
+//                boolean wfstate = isWifi(HomeActivityTest.this);
+//                System.out.println(wfstate + "------------------");
+//
+//                String wifiresult = getSSID();
+//                System.out.println(wifiresult + "------------------");
+//                if (wifiresult.indexOf("SHGZ") < 0) {
+//                    DialogSettings.style = STYLE_IOS;
+//                    DialogSettings.use_blur = true;
+//                    DialogSettings.blur_alpha = 200;
+//                    SelectDialog.show(HomeActivityTest.this, "提示", "未连接工装WIFI，去连接WIFI", "确定", new DialogInterface.OnClickListener() {
+//                        @Override
+//                        public void onClick(DialogInterface dialog, int which) {
+//                            Intent i = new Intent();
+//                            i = new Intent(Settings.ACTION_WIFI_SETTINGS);
+//                            startActivity(i);
+//                        }
+//                    }, "取消", new DialogInterface.OnClickListener() {
+//                        @Override
+//                        public void onClick(DialogInterface dialog, int which) {
+//                        }
+//                    });
+//                    return;
+//                }
 
 
                 //从json数据中获取用户名 密码 ip
@@ -1928,7 +1914,6 @@ public class HomeActivityTest extends AppCompatActivity {
                 //获取当前时间
                 Date date = new Date(System.currentTimeMillis());
                 String timeva = simpleDateFormat.format(date);
-                System.out.println("当前时间：" + timeva);
                 //生成一级和二级文件夹的名字 保存在sharepreference
                 boolean flagNum = false;
                 if (chexianghaoValue == " ") {
@@ -1961,6 +1946,9 @@ public class HomeActivityTest extends AppCompatActivity {
                 }
                 boolean histime = false;
 
+
+                //--------homeactivity这段逻辑需要重新梳理---------------------------------------------------------------------------
+                String chehaova = editext_chehao.getText().toString().trim();
                 if (jutichexingHis.equals(edit_spinnerjuTiCheXing.getText().toString().trim())
                         && chehaoHis.equals(editext_chehao.getText().toString().trim())
                         && historychexianghao.equals(chexinaghao)
@@ -1977,8 +1965,9 @@ public class HomeActivityTest extends AppCompatActivity {
                     }
                 } else {
                     //车型 或 车号等 有一个不一样，则新建文件夹，且时间也是最新的
-                    dirname1 = jutiChexingValue + "_" + chehaoHis + "_" + timeva + "_" + chexianghaoValue + "_" + editext_peishu.getText().toString().trim();
+                    dirname1 = jutiChexingValue + "_" + chehaova + "_" + timeva + "_" + chexianghaoValue + "_" + editext_peishu.getText().toString().trim();
                 }
+               //-----------------------------------------------------------------------------------
 
 
                 //先检查信息是否填写完毕完整
@@ -1993,6 +1982,7 @@ public class HomeActivityTest extends AppCompatActivity {
 
                     editor.putString("chexing", chexingValue);//存机车 动车 城轨  对应根目录文件夹机车产品线...
                     //正式
+                    System.out.println("打印以及目录的：" + dirname1);
                     editor.putString("filedirnamevalue", dirname1);//一级 由信息配置的各项信息组成
                     editor.putString("shebeinamevalue", shebeiValue);//二级
 
@@ -2014,60 +2004,53 @@ public class HomeActivityTest extends AppCompatActivity {
                     String twoDotIpGateway = ChangeIp.getBeforeThteeIp(new ChangeIp().getGateWayIp(HomeActivityTest.this));//选择的机车设备的IP并去掉最后一位
                     System.out.println("设备IP前3位：" + twoDotIpShebei);
                     System.out.println("网关IP前3位：" + twoDotIpGateway);
-                    if (twoDotIpShebei.equals(twoDotIpGateway)) {
+//                    if (twoDotIpShebei.equals(twoDotIpGateway)) {
 
-                        //正式代码 把查询的ip user psw传给 _host _user _pass
-                        _host = dataIpPswUser.get(0);
-                        _user = dataIpPswUser.get(1);
-                        _pass = dataIpPswUser.get(2);
+                    //正式代码 把查询的ip user psw传给 _host _user _pass
+                    _host = dataIpPswUser.get(0);
+                    _user = dataIpPswUser.get(1);
+                    _pass = dataIpPswUser.get(2);
 
-                        System.out.println("设备值："+shebeiValue);
-                        if (shebeiValue.equals("ERM") || shebeiValue.equals("EDRM")) {//本身是edrm才需要验证
-                            haveCheck = true;
-                        }else{
-                            haveCheck = false;
-
-                        }
-                        System.out.println("布尔值："+haveCheck);
-
-                        String can[] = new String[4];
-                        can[0] = _host;
-                        can[1] = _port;
-                        can[2] = _user;
-                        can[3] = _pass;
-                        LogTask task = new LogTask(HomeActivityTest.this);
-                        task.execute(can);
+                    System.out.println("设备值：" + shebeiValue);
+                    if (shebeiValue.equals("EDRM")) {//本身是edrm才需要验证
+                        haveCheck = true;
                     } else {
-
-                        changeIp(twoDotIpShebei);//不一样的则修改ip
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                promptDialog.showLoading("IP正在配置，稍后请重新连接WIFI", false);
-                            }
-                        });
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                promptDialog.dismiss();
-                                Intent iWifi = new Intent();
-                                iWifi = new Intent(Settings.ACTION_WIFI_SETTINGS);
-                                startActivity(iWifi);
-                            }
-                        }, 8000);
-
+                        haveCheck = false;
                     }
 
+                    String can[] = new String[4];
+                    can[0] = _host;
+                    can[1] = _port;
+                    can[2] = _user;
+                    can[3] = _pass;
+                    LogTask task = new LogTask(HomeActivityTest.this);
+                    task.execute(can);
+//                    }
+//                    else {
+//
+//                        changeIp(twoDotIpShebei);//不一样的则修改ip
+//                        runOnUiThread(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                promptDialog.showLoading("IP正在配置，稍后请重新连接WIFI", false);
+//                            }
+//                        });
+//                        new Handler().postDelayed(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                promptDialog.dismiss();
+//                                Intent iWifi = new Intent();
+//                                iWifi = new Intent(Settings.ACTION_WIFI_SETTINGS);
+//                                startActivity(iWifi);
+//                            }
+//                        }, 8000);
+//
+//                    }
+
                 } else {
-                    DialogSettings.style = STYLE_IOS;
-                    DialogSettings.use_blur = true;
-                    DialogSettings.blur_alpha = 200;
-                    MessageDialog.show(HomeActivityTest.this,
-                            "提示", "请检查信息填写是否完整无误", "知道了", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                }
-                            });
+                    AlertUtils.alertNoListener(HomeActivityTest.this, "请检查信息填写是否完整无误！");
+
+
                 }
 
 
@@ -2147,7 +2130,7 @@ public class HomeActivityTest extends AppCompatActivity {
         }
 
         protected Boolean doInBackground(String... Params) {
-            System.out.println("最终的布尔值："+haveCheck);
+            System.out.println("最终的布尔值：" + haveCheck);
             if (haveCheck) {
                 return checkLogin(8001);
 
@@ -2167,15 +2150,7 @@ public class HomeActivityTest extends AppCompatActivity {
                 intent.putExtra("port", Integer.parseInt(_port));
                 startActivity(intent);
             } else {
-                DialogSettings.style = STYLE_IOS;
-                DialogSettings.use_blur = true;
-                DialogSettings.blur_alpha = 200;
-                MessageDialog.show(HomeActivityTest.this,
-                        "无法连接车辆设备", "请检查工装网线是否接好，信息填写是否无误！", "知道了", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                            }
-                        });
+                AlertUtils.alertNoListener(HomeActivityTest.this, "无法连接车辆设备，请检查工装网线是否接好，信息填写是否无误！");
 
             }
         }
@@ -2662,17 +2637,10 @@ public class HomeActivityTest extends AppCompatActivity {
                                     runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
-                                            DialogSettings.style = STYLE_IOS;
-                                            DialogSettings.use_blur = true;
-                                            DialogSettings.blur_alpha = 200;
-                                            MessageDialog.show(HomeActivityTest.this,
-                                                    "提示", "网络状况不佳", "知道了", new DialogInterface.OnClickListener() {
-                                                        @Override
-                                                        public void onClick(DialogInterface dialog, int which) {
-                                                        }
-                                                    });
+                                            AlertUtils.alertNoListener(HomeActivityTest.this, "网络状况不佳");
                                         }
                                     });
+
                                 }
 
                                 @Override
@@ -2844,4 +2812,6 @@ public class HomeActivityTest extends AppCompatActivity {
         if (promptDialog.onBackPressed())
             super.onBackPressed();
     }
+
+
 }

@@ -3,7 +3,6 @@ package com.example.zhuanchu;
 import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -27,7 +26,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.os.SystemClock;
-import android.preference.Preference;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -35,12 +33,9 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -49,7 +44,6 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -57,19 +51,16 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
-
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.alibaba.android.arouter.launcher.ARouter;
 import com.alibaba.fastjson.JSON;
 import com.example.zhuanchu.adapter.UploadAdapter;
 import com.example.zhuanchu.adapter.VerticalAdapter;
-import com.example.zhuanchu.bean.UploadFile;
 import com.example.zhuanchu.bean.javaBean.JsonRootBean;
 import com.example.zhuanchu.bean.pojo15.JsonRootBean15;
+import com.example.zhuanchu.service.AlertUtils;
 import com.example.zhuanchu.service.AuthService;
 import com.example.zhuanchu.service.ChangeIp;
 import com.example.zhuanchu.service.CompressOperate_zip4j;
@@ -78,16 +69,9 @@ import com.example.zhuanchu.service.GetInfoForMultiList;
 import com.example.zhuanchu.service.MultiViewPager;
 import com.example.zhuanchu.service.SqlHelper;
 import com.example.zhuanchu.service.UploadProgressListener;
-import com.example.zhuanchu.service.ViewFindUtils;
 import com.flyco.tablayout.SegmentTabLayout;
-import com.flyco.tablayout.listener.OnTabSelectListener;
-import com.flyco.tablayout.widget.MsgView;
 import com.githang.statusbar.StatusBarCompat;
-import com.google.android.flexbox.FlexboxLayout;
 import com.google.android.flexbox.FlexboxLayoutManager;
-import com.kongzue.dialog.v2.DialogSettings;
-import com.kongzue.dialog.v2.MessageDialog;
-import com.kongzue.dialog.v2.SelectDialog;
 import com.scottyab.aescrypt.AESCrypt;
 import com.suke.widget.SwitchButton;
 
@@ -130,8 +114,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-
-import static com.kongzue.dialog.v2.DialogSettings.STYLE_IOS;
 
 public class HomeActivity extends AppCompatActivity {
     private List<String> datajutiCheXing = new ArrayList<>();
@@ -633,15 +615,7 @@ public class HomeActivity extends AppCompatActivity {
                 }
 
                 if (packnumber == 0) {
-                    DialogSettings.style = STYLE_IOS;
-                    DialogSettings.use_blur = true;
-                    DialogSettings.blur_alpha = 200;
-                    MessageDialog.show(HomeActivity.this,
-                            "提示", "请选择需要打包的目录", "知道了", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                }
-                            });
+                    AlertUtils.alertNoListener(HomeActivity.this, "请选择需要打包的目录！");
                     return;
                 }
                 try {
@@ -925,16 +899,7 @@ public class HomeActivity extends AppCompatActivity {
                 }
 
                 if (uploadnumber == 0) {
-                    DialogSettings.style = STYLE_IOS;
-                    DialogSettings.use_blur = true;
-                    DialogSettings.blur_alpha = 200;
-                    MessageDialog.show(HomeActivity.this,
-                            "提示", "请勾选需上传的文件", "知道了", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                }
-                            });
-//                    Toast.makeText(HomeActivity.this, "请选择需要打包的文件", Toast.LENGTH_LONG).show();
+                    AlertUtils.alertNoListener(HomeActivity.this, "请勾选需上传的文件！");
                     return;
                 }
 
@@ -951,21 +916,19 @@ public class HomeActivity extends AppCompatActivity {
                 String wifiresult = getSSID();
                 System.out.println(wifiresult);
                 if (wifiresult.indexOf("SHGZ") >= 0) {
-                    DialogSettings.style = STYLE_IOS;
-                    DialogSettings.use_blur = true;
-                    DialogSettings.blur_alpha = 200;
-                    SelectDialog.show(HomeActivity.this, "WIFI设置", "请切换能上网的WIFI", "确定", new DialogInterface.OnClickListener() {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setTitle("WIFI设置");
+                    builder.setMessage("请切换能上网的WIFI");
+                    builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            Intent i = new Intent();
-                            i = new Intent(Settings.ACTION_WIFI_SETTINGS);
-                            startActivity(i);
-                        }
-                    }, "取消", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            Intent inten = new Intent(Settings.ACTION_WIFI_SETTINGS);
+                            startActivity(inten);
                         }
                     });
+                    builder.setNegativeButton("取消", null);
+                    builder.show();
+
                     return;
                 }
 
@@ -977,21 +940,19 @@ public class HomeActivity extends AppCompatActivity {
                 System.out.println(networkinit);
 
                 if (mobile && !networkinit) {
-                    DialogSettings.style = STYLE_IOS;
-                    DialogSettings.use_blur = true;
-                    DialogSettings.blur_alpha = 200;
-                    SelectDialog.show(context, "网络检测", "当前为4G网络，要继续上传吗?", "确定", new DialogInterface.OnClickListener() {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setTitle("网络检测");
+                    builder.setMessage("当前为4G网络，要继续上传吗?");
+                    builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialog, int which) {
+                        public void onClick(DialogInterface dialogInterface, int i) {
                             sharedPreferencesUp.edit().putBoolean("network", true).commit();
                             uploadFile(HomeActivity.this);
                         }
-                    }, "取消", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-
-                        }
                     });
+                    builder.setNegativeButton("取消", null);
+                    builder.show();
+
                     return;
                 }
                 uploadFile(HomeActivity.this);
@@ -1852,15 +1813,7 @@ public class HomeActivity extends AppCompatActivity {
                             editor.commit();
                         } else//信息填写不完整 则弹出提示框
                         {
-                            DialogSettings.style = STYLE_IOS;
-                            DialogSettings.use_blur = true;
-                            DialogSettings.blur_alpha = 200;
-                            MessageDialog.show(HomeActivity.this,
-                                    "提示", "信息填写不完整", "知道了", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                        }
-                                    });
+                            AlertUtils.alertNoListener(HomeActivity.this, "信息填写不完整！");
                             cb_remember.setChecked(false);
                         }
                     } else {
@@ -1885,15 +1838,7 @@ public class HomeActivity extends AppCompatActivity {
                             editor.commit();
                         } else//信息填写不完整 则弹出提示框
                         {
-                            DialogSettings.style = STYLE_IOS;
-                            DialogSettings.use_blur = true;
-                            DialogSettings.blur_alpha = 200;
-                            MessageDialog.show(HomeActivity.this,
-                                    "提示", "信息填写不完整", "知道了", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                        }
-                                    });
+                            AlertUtils.alertNoListener(HomeActivity.this, "信息填写不完整！");
                             cb_remember.setChecked(false);
                         }
                     }
@@ -1939,21 +1884,19 @@ public class HomeActivity extends AppCompatActivity {
 //                        +wifiresult, Toast.LENGTH_LONG).show();
 
                 if (wifiresult.indexOf("SHGZ") < 0) {
-                    DialogSettings.style = STYLE_IOS;
-                    DialogSettings.use_blur = true;
-                    DialogSettings.blur_alpha = 200;
-                    SelectDialog.show(HomeActivity.this, "提示", "未连接工装WIFI，去连接WIFI", "确定", new DialogInterface.OnClickListener() {
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setTitle("提示");
+                    builder.setMessage("未连接工装WIFI，去连接WIFI");
+                    builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            Intent i = new Intent();
-                            i = new Intent(Settings.ACTION_WIFI_SETTINGS);
-                            startActivity(i);
-                        }
-                    }, "取消", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            Intent inten = new Intent(Settings.ACTION_WIFI_SETTINGS);
+                            startActivity(inten);
                         }
                     });
+                    builder.setNegativeButton("取消", null);
+                    builder.show();
                     return;
                 }
 
@@ -2148,15 +2091,8 @@ public class HomeActivity extends AppCompatActivity {
 //                            ll_ip.setVisibility(View.VISIBLE);//表示显示ip输入框ui
 //                        }
 //                    });
-                    DialogSettings.style = STYLE_IOS;
-                    DialogSettings.use_blur = true;
-                    DialogSettings.blur_alpha = 200;
-                    MessageDialog.show(HomeActivity.this,
-                            "无法连接车辆设备", "请检查信息填写是否完整无误", "知道了", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                }
-                            });
+                    AlertUtils.alertNoListener(HomeActivity.this, "请检查信息填写是否完整无误！");
+
                 }
 
 
@@ -2256,15 +2192,7 @@ public class HomeActivity extends AppCompatActivity {
                 intent.putExtra("port", Integer.parseInt(_port));
                 startActivity(intent);
             } else {
-                DialogSettings.style = STYLE_IOS;
-                DialogSettings.use_blur = true;
-                DialogSettings.blur_alpha = 200;
-                MessageDialog.show(HomeActivity.this,
-                        "无法连接车辆设备", "请检查工装网线是否接好，信息填写是否无误！", "知道了", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                            }
-                        });
+                AlertUtils.alertNoListener(HomeActivity.this, "请检查工装网线是否接好，信息填写是否无误！");
 
             }
         }
@@ -2751,15 +2679,7 @@ public class HomeActivity extends AppCompatActivity {
                                     runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
-                                            DialogSettings.style = STYLE_IOS;
-                                            DialogSettings.use_blur = true;
-                                            DialogSettings.blur_alpha = 200;
-                                            MessageDialog.show(HomeActivity.this,
-                                                    "提示", "网络状况不佳", "知道了", new DialogInterface.OnClickListener() {
-                                                        @Override
-                                                        public void onClick(DialogInterface dialog, int which) {
-                                                        }
-                                                    });
+                                            AlertUtils.alertNoListener(HomeActivity.this, "网络状况不佳！");
                                         }
                                     });
                                 }

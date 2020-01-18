@@ -60,4 +60,5 @@ dependencies {
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
     implementation 'com.alibaba:fastjson:1.2.59'
     implementation project(path: ':diy_view')
+    implementation 'com.android.support.test.espresso:espresso-core:2.2.2@aar'
 }

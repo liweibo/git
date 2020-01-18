@@ -3,6 +3,9 @@
     <domain-config>
         <domain includeSubdomains="true">www.rongswift.com</domain>
         <domain includeSubdomains="true">www.mro.csrzic.com</domain>
+        <domain includeSubdomains="true">http://m.down.sandai.net/MobileThunder/Android_5.29.2.4520/XLWXguanwang.apk</domain>
+        <domain includeSubdomains="true">http://gdown.baidu.com/data/wisegame/d28f2315db2b6f97/UCliulanqi_682.apk</domain>
+
         <!--<trust-anchors>-->
             <!--<certificates src="@raw/my_ca"/>-->
         <!--</trust-anchors>-->

@@ -279,7 +279,7 @@ public class AuthActivity extends AppCompatActivity {
                                 boolean actionResult = jsonObject.getBoolean("actionResult");
                                 System.out.println("测试2");
                                 if (actionResult) {
-                                    Intent i2 = new Intent(AuthActivity.this, HomeActivity.class);
+                                    Intent i2 = new Intent(AuthActivity.this, HomeActivityTest.class);
                                     startActivity(i2);
 
                                     runOnUiThread(new Runnable() {

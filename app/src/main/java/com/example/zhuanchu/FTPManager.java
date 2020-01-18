@@ -3,6 +3,7 @@ package com.example.zhuanchu;
 
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPClientConfig;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 
@@ -18,6 +19,8 @@ public class FTPManager {
 
     public FTPManager() {
         ftpClient = new FTPClient();
+        ftpClient.configure(new FTPClientConfig(FTPClientConfig.SYST_UNIX));
+
     }
 
     // 连接到ftp服务器
@@ -95,7 +98,7 @@ public class FTPManager {
         long process = 0;
         long currentSize = 0;
         // 好了，正式开始上传文件
-        ftpClient.enterLocalPassiveMode();
+//        ftpClient.enterLocalPassiveMode();
         ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
         ftpClient.setRestartOffset(serverSize);
         raf.seek(serverSize);
@@ -154,7 +157,7 @@ public class FTPManager {
         long process = 0;
         long currentSize = 0;
         // 开始准备下载文件
-        ftpClient.enterLocalActiveMode();
+//        ftpClient.enterLocalActiveMode();
         ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
         OutputStream out = new FileOutputStream(localFile, true);
         ftpClient.setRestartOffset(localSize);

@@ -7,64 +7,129 @@
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="fill_parent"
-        android:layout_height="52dp"
+        android:layout_height="80dp"
         android:layout_gravity="center"
         android:orientation="horizontal">
 
-        <ImageView
-            android:id="@+id/file_icon"
-            android:layout_width="26dp"
-            android:layout_height="26dp"
-            android:layout_gravity="center_vertical"
-            android:layout_marginLeft="5dp" />
-
-        <TextView
-            android:id="@+id/item_tv"
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginLeft="10dp"
-            android:layout_weight="1"
-            android:text=""
-            android:textSize="16dp" />
+            android:layout_weight="0.65">
 
-        <com.example.zhuanchu.RingProgressBar
-            android:id="@+id/ringProgressBarAdapter"
-            android:visibility="invisible"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_marginLeft="10dp"
-            android:layout_gravity="center_vertical"
+            <ImageView
+                android:id="@+id/file_icon"
+                android:layout_width="36dp"
+                android:layout_height="46dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                />
 
-            android:gravity="center_vertical"
-            android:layout_marginRight="10dp"
-            android_custom:rProgressColor="#0098fd"
-            android_custom:rTextColor="#0098fd"
-            android_custom:rTextSize="8sp" />
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1">
 
-        <TextView
-            android:id="@+id/item_tv_sucfail"
-            android:layout_width="wrap_content"
+                <TextView
+                    android:id="@+id/item_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:text="123"
+                    android:textSize="14dp"
+                    android:textStyle="bold"
+                    />
+
+                <LinearLayout
+                    android:id="@+id/ll_sizeandtime"
+                    android:visibility="visible"
+                    android:layout_marginTop="5dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/item_size"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.35"
+                        android:layout_gravity="center_vertical"
+                        android:textSize="10dp" />
+
+                    <TextView
+
+                        android:id="@+id/item_time"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.65"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginLeft="5dp"
+                        android:textSize="10dp" />
+                </LinearLayout>
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="5dp"
-            android:text="成功"
-            android:visibility="invisible"
-            android:textColor="#0098fd"
-            android:textSize="12dp" />
-        <CheckBox
-            android:id="@+id/item_cb"
-            android:layout_gravity="center_vertical"
-            android:buttonTint="@color/colorfocus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="5dp"
-            android:clickable="true"
-            android:focusable="false"
-            android:focusableInTouchMode="false"
-            android:gravity="center_vertical" />
+            android:layout_weight="0.35"
+            android:orientation="horizontal">
 
+
+            <com.example.zhuanchu.RingProgressBar
+                android:id="@+id/ringProgressBarAdapter"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="3dp"
+                android:gravity="center_vertical"
+                android:visibility="invisible"
+                android_custom:rProgressColor="#DCDCDC"
+                android_custom:rTextColor="#0098fd"
+                android_custom:rTextSize="9sp"
+                android_custom:style="FILL" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="3dp"
+                android:layout_marginRight="2dp"
+                android:layout_weight="1"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/item_tv_sucfail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:background="@drawable/bt_shape_havedownload"
+                    android:gravity="center"
+                    android:padding="2dp"
+                    android:textColor="#0098fd"
+                    android:textStyle="bold"
+                    android:textSize="6sp"
+                    android:visibility="invisible" />
+            </LinearLayout>
+
+
+            <CheckBox
+                android:id="@+id/item_cb"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="5dp"
+                android:buttonTint="@color/colorfocus"
+                android:clickable="true"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:gravity="center_vertical" />
+        </LinearLayout>
     </LinearLayout>
 
     <ImageView
@@ -72,7 +137,7 @@
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_gravity="right|center"
-        android:layout_marginRight="12dp"
+        android:layout_marginRight="5dp"
         android:background="@mipmap/arro"
         android:visibility="invisible" />
 </FrameLayout>

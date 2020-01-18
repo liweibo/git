@@ -66,11 +66,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     String _port = "21";
 
     boolean checkSwitch = false;
-
+    ItemChooseData itemChooseData = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        itemChooseData = new ItemChooseData();
         int hasReadPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         if (hasReadPermission != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
@@ -113,8 +114,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onStart() {
         super.onStart();
-        if (ItemChooseData.getFilePath().size() > 0) {
-            System.out.println("验证：" + ItemChooseData.getFilePath().get(0));
+        if (itemChooseData.getFilePath().size() > 0) {
+            System.out.println("验证：" + itemChooseData.getFilePath().get(0));
         }
     }
 
